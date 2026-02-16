@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Build Release
+      run: |
+        dotnet publish csharp-version/src/MarkdownToDocx.CLI/MarkdownToDocx.CLI.csproj \
+          --configuration Release \
+          --runtime linux-x64 \
+          --self-contained \
+          --output ./publish/linux-x64
+
+        dotnet publish csharp-version/src/MarkdownToDocx.CLI/MarkdownToDocx.CLI.csproj \
+          --configuration Release \
+          --runtime win-x64 \
+          --self-contained \
+          --output ./publish/win-x64
+
+        dotnet publish csharp-version/src/MarkdownToDocx.CLI/MarkdownToDocx.CLI.csproj \
+          --configuration Release \
+          --runtime osx-x64 \
+          --self-contained \
+          --output ./publish/osx-x64
+
+        dotnet publish csharp-version/src/MarkdownToDocx.CLI/MarkdownToDocx.CLI.csproj \
+          --configuration Release \
+          --runtime osx-arm64 \
+          --self-contained \
+          --output ./publish/osx-arm64
+
+    - name: Create archives
+      run: |
+        cd publish
+        tar czf ../md2docx-linux-x64.tar.gz -C linux-x64 .
+        tar czf ../md2docx-osx-x64.tar.gz -C osx-x64 .
+        tar czf ../md2docx-osx-arm64.tar.gz -C osx-arm64 .
+        cd ../publish/win-x64
+        zip -r ../../md2docx-win-x64.zip .
+        cd ../..
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          md2docx-linux-x64.tar.gz
+          md2docx-win-x64.zip
+          md2docx-osx-x64.tar.gz
+          md2docx-osx-arm64.tar.gz
+        body_path: docs/RELEASE_NOTES_${{ github.ref_name }}.md
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
