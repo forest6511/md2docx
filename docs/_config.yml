@@ -1,0 +1,75 @@
+# Site settings
+title: md2docx
+description: Flexible Markdown to Word (DOCX) converter with YAML-based styling
+baseurl: "/md2docx"
+url: "https://forest6511.github.io"
+
+# Build settings
+theme: jekyll-theme-cayman
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Exclude from processing
+exclude:
+  - DIRECTORY_STRUCTURE.md
+  - decisions/
+  - reports/
+  - RELEASE_NOTES_*.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:path
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+  - scope:
+      path: "en"
+    values:
+      lang: en
+  - scope:
+      path: "ja"
+    values:
+      lang: ja
+
+# Navigation
+navigation:
+  en:
+    - title: Home
+      url: /en/
+    - title: Getting Started
+      url: /en/getting-started
+    - title: Configuration
+      url: /en/configuration
+    - title: Presets
+      url: /en/presets
+    - title: API Reference
+      url: /en/api-reference
+  ja:
+    - title: ホーム
+      url: /ja/
+    - title: はじめに
+      url: /ja/getting-started
+    - title: 設定
+      url: /ja/configuration
+    - title: プリセット
+      url: /ja/presets
+    - title: APIリファレンス
+      url: /ja/api-reference
