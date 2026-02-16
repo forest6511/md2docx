@@ -56,10 +56,6 @@ markdown-to-docx/
 │   ├── scripts/                      # ✅ Build scripts
 │   │   ├── build-docker.sh           # ✅
 │   │   └── test-docker.sh            # ✅
-│   ├── Dockerfile                    # ✅ Standard image
-│   ├── Dockerfile.slim               # ✅ Slim image
-│   ├── Dockerfile.full               # ✅ Full image
-│   ├── Dockerfile.dev                # ✅ Development image
 │   └── docker-compose.yml            # ✅ Multi-service orchestration
 │
 ├── config/                           # YAML configuration files

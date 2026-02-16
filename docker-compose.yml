@@ -90,7 +90,7 @@ services:
       dockerfile: Dockerfile.dev
     image: md2word:dev
     volumes:
-      - ./src:/app/src
+      - ./csharp-version/src:/app/src
       - ./config:/app/config
       - ./input:/workspace/input
       - ./output:/workspace/output
