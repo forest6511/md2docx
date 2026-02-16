@@ -36,9 +36,9 @@ page:
 
 # Font settings - Vertical text optimized
 font:
-  family: "游明朝"  # Optimal for vertical text
+  family: "Noto Serif CJK JP"  # Optimal for vertical text
   # Other recommended fonts:
-  # - "Hiragino Mincho ProN"
+  # - "Noto Serif CJK JP"
   # - "MS P Mincho"
   # - "Kozuka Mincho Pro"
   # - "Noto Serif JP"
@@ -368,7 +368,7 @@ page_numbering:
   # arabic: 1, 2, 3...
 
   # Same font as body text
-  font: "游明朝"
+  font: "Noto Serif CJK JP"
   size: 8pt
 
   # Different position for odd/even pages
@@ -392,7 +392,7 @@ running_header:
     odd_pages: "{chapter_title}"   # Odd pages: chapter title
     even_pages: "{book_title}"     # Even pages: book title
 
-  font: "游明朝"
+  font: "Noto Serif CJK JP"
   size: 8pt
   color: "666666"
 

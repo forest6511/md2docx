@@ -13,7 +13,7 @@ page:
     right: 0.625in
 
 font:
-  family: "游明朝"
+  family: "Noto Serif CJK JP"
   size: 11pt
   embed: true
 
@@ -277,7 +277,7 @@ styles:
     enabled: true
     lines: 3
     distance: 2mm
-    font: "游明朝"
+    font: "Noto Serif CJK JP"
     bold: true
 
 # Styles for special sections

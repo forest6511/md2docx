@@ -18,10 +18,10 @@ page:
     size: 0.125in  # 3.175mm (KDP standard bleed)
 
 font:
-  family: "游明朝"  # Yu Mincho - embedded Japanese font
+  family: "Noto Serif CJK JP"  # Noto Serif CJK JP - embedded Japanese font
   size: 11pt  # Comfortable reading size for 6x9
   embed: true  # REQUIRED for KDP
-  fallback: "Noto Serif JP"  # Fallback if Yu Mincho unavailable
+  fallback: "Noto Serif JP"  # Fallback if Noto Serif CJK JP unavailable
 
 text_direction: horizontal
 

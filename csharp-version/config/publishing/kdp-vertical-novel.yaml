@@ -15,7 +15,7 @@ page:
     size: 3mm  # 3mm bleed for Japanese publishing
 
 font:
-  family: "游明朝"  # Yu Mincho - best for vertical Japanese
+  family: "Noto Serif CJK JP"  # Noto Serif CJK JP - best for vertical Japanese
   size: 10pt
   embed: true  # REQUIRED for KDP
   fallback: "Noto Serif JP"

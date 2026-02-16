@@ -228,7 +228,7 @@ style_inheritance:
     Normal:
       inherits: none
       properties:
-        font_family: "游明朝"
+        font_family: "Noto Serif CJK JP"
         font_size: 11pt
         line_spacing: 1.5
 
@@ -271,7 +271,7 @@ word_xml_structure:
           <w:outlineLvl w:val="0"/>
         </w:pPr>
         <w:rPr>
-          <w:rFonts w:ascii="游明朝" w:eastAsia="游明朝" w:hAnsi="游明朝"/>
+          <w:rFonts w:ascii="Noto Serif CJK JP" w:eastAsia="Noto Serif CJK JP" w:hAnsi="Noto Serif CJK JP"/>
           <w:b/>
           <w:sz w:val="40"/>
         </w:rPr>
