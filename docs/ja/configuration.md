@@ -12,6 +12,17 @@ YAML設定ファイルを通じてドキュメントのスタイリングをカ�
 
 md2docxは、ドキュメントのスタイリングを定義するためにYAMLファイルを使用します。すべての設定はスキーマバージョン2.0に従います。
 
+### 設定キー
+
+トップレベルの設定キー（必須）：
+
+SchemaVersion: スキーマバージョン識別子
+Metadata: プリセットのメタデータと情報
+TextDirection: テキストの流れ方向（HorizontalまたはVertical）
+PageLayout: ページサイズとマージン設定
+Fonts: フォントファミリーとサイズ設定
+Styles: 要素ごとのスタイリングルール
+
 ### 基本構造
 
 ```yaml
@@ -383,3 +394,7 @@ ruby -e "require 'yaml'; YAML.load_file('config/custom/my-style.yaml')"
 
 - **2.0**（現在）：C#マッピング用のPascalCaseキー、改善された構造
 - **1.0**：初期スキーマ（非推奨）
+
+---
+
+**最終更新**: 2026-02-17

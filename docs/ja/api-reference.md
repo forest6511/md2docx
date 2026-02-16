@@ -715,3 +715,7 @@ public class ConverterTests
 - [GitHub Issues](https://github.com/forest6511/md2docx/issues) - バグを報告
 - [GitHub Discussions](https://github.com/forest6511/md2docx/discussions) - 質問する
 - [コントリビューションガイド](https://github.com/forest6511/md2docx/blob/main/CONTRIBUTING.md) - プロジェクトに貢献
+
+---
+
+**最終更新**: 2026-02-17

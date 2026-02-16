@@ -8,6 +8,13 @@ lang: en
 
 md2docx includes several built-in presets optimized for different use cases. This guide provides detailed information about each preset.
 
+## Available Presets
+
+Built-in presets in `config/presets/`:
+- `minimal` - Simple documents
+- `default` - General-purpose documents
+- `technical` - Technical documentation
+
 ## Overview
 
 | Preset | Directory | Best For | Text Direction |
@@ -15,7 +22,6 @@ md2docx includes several built-in presets optimized for different use cases. Thi
 | [minimal](#minimal) | `config/presets/` | Simple documents, quick conversions | Horizontal |
 | [default](#default) | `config/presets/` | General-purpose documents | Horizontal |
 | [technical](#technical) | `config/presets/` | Technical documentation, API docs | Horizontal |
-| [vertical-novel](#vertical-novel) | `config/vertical/` | Japanese novels, traditional documents | Vertical |
 
 ## Standard Presets
 
@@ -140,76 +146,27 @@ docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
 
 ---
 
-## Vertical Text Presets
-
-### vertical-novel
-
-**Location**: `config/vertical/vertical-novel.yaml`
-
-**Description**: Japanese vertical writing (tategaki) optimized for novel formatting. Traditional right-to-left, top-to-bottom text flow.
-
-**Characteristics**:
-- **Page Size**: A5 (14.8 × 21.0 cm) - common for Japanese novels
-- **Text Direction**: Vertical (tategaki)
-- **Fonts**: Noto Serif / Noto Serif CJK JP
-- **Base Font Size**: 11pt
-- **Color Scheme**: Black only
-- **Borders**: None (clean, minimal design)
-- **Line Spacing**: Wide (440 twips) for readability
-
-**Style Details**:
-
-```yaml
-H1: 18pt, Bold, Black
-H2: 16pt, Bold, Black
-H3: 14pt, Bold, Black
-Paragraph: 11pt, Wide line spacing (440 twips), Black
-Code Block: 10pt, Monospace, Light gray background
-Quote: 11pt, Dark gray (#333333)
-```
-
-**Use Cases**:
-- Japanese novels
-- Traditional Japanese documents
-- Vertical text publications
-- Literary works in Japanese
-
-**Important Notes**:
-- Optimized for Japanese text (Hiragana, Katakana, Kanji)
-- Page size follows Japanese book standards
-- Right-to-left reading direction
-- Ideal for long-form text (novels, essays)
-
-**Example Usage**:
-
-```bash
-docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
-  novel.md -o novel.docx -p vertical-novel --preset-dir /app/config/vertical
-```
-
----
-
 ## Comparison Table
 
 ### Visual Characteristics
 
-| Feature | minimal | default | technical | vertical-novel |
-|---------|---------|---------|-----------|----------------|
-| **Font Family** | Serif | Serif | Sans-serif | Serif |
-| **Base Size** | 11pt | 11pt | 10pt | 11pt |
-| **Colors** | B&W | Navy/Blue/Gray | Dark/Blue | Black |
-| **H1 Borders** | No | Bottom | Bottom | No |
-| **Code Blocks** | Gray BG | Gray BG | Gray BG + Border | Gray BG |
-| **Quote Blocks** | Left Border | Left Border + BG | Left Border + BG | No Border |
+| Feature | minimal | default | technical |
+|---------|---------|---------|-----------|
+| **Font Family** | Serif | Serif | Sans-serif |
+| **Base Size** | 11pt | 11pt | 10pt |
+| **Colors** | B&W | Navy/Blue/Gray | Dark/Blue |
+| **H1 Borders** | No | Bottom | Bottom |
+| **Code Blocks** | Gray BG | Gray BG | Gray BG + Border |
+| **Quote Blocks** | Left Border | Left Border + BG | Left Border + BG |
 
 ### Layout Characteristics
 
-| Feature | minimal | default | technical | vertical-novel |
-|---------|---------|---------|-----------|----------------|
-| **Page Size** | A4 | A4 | A4 | A5 |
-| **Text Direction** | Horizontal | Horizontal | Horizontal | Vertical |
-| **Margins** | Standard | Standard | Compact | Standard |
-| **Line Spacing** | 1.5x | 1.5x | 1.4x | Wide (2.2x) |
+| Feature | minimal | default | technical |
+|---------|---------|---------|-----------|
+| **Page Size** | A4 | A4 | A4 |
+| **Text Direction** | Horizontal | Horizontal | Horizontal |
+| **Margins** | Standard | Standard | Compact |
+| **Line Spacing** | 1.5x | 1.5x | 1.4x |
 
 ### File Size (Approximate)
 
@@ -218,7 +175,6 @@ docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
 | minimal | ~12 KB |
 | default | ~14 KB |
 | technical | ~13 KB |
-| vertical-novel | ~11 KB |
 
 *For a 10-page document with standard Markdown content
 
@@ -228,9 +184,6 @@ docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
 
 ```
 Start Here
-│
-├─ Need vertical Japanese text?
-│  └─ Yes → vertical-novel
 │
 ├─ Technical documentation?
 │  └─ Yes → technical
@@ -253,8 +206,6 @@ Start Here
 | Project Report | default |
 | Academic Paper | minimal |
 | Quick Note | minimal |
-| Japanese Novel | vertical-novel |
-| Traditional Japanese Document | vertical-novel |
 
 ## Customizing Presets
 
@@ -359,6 +310,9 @@ All preset files are available in the repository:
 - `config/presets/minimal.yaml`
 - `config/presets/default.yaml`
 - `config/presets/technical.yaml`
-- `config/vertical/vertical-novel.yaml`
 
 View the complete source files for detailed styling specifications.
+
+---
+
+**Last Updated**: 2026-02-17

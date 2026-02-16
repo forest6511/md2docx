@@ -715,3 +715,7 @@ public class ConverterTests
 - [GitHub Issues](https://github.com/forest6511/md2docx/issues) - Report bugs
 - [GitHub Discussions](https://github.com/forest6511/md2docx/discussions) - Ask questions
 - [Contributing Guide](https://github.com/forest6511/md2docx/blob/main/CONTRIBUTING.md) - Contribute to the project
+
+---
+
+**Last Updated**: 2026-02-17

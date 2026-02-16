@@ -23,10 +23,10 @@ if [ -d "config/presets" ] && [ -f "docs/en/configuration.md" ]; then
   ACTUAL_YAML_KEYS=$(find config/presets -name "*.yaml" -exec grep -h "^[A-Za-z]" {} \; | cut -d: -f1 | sort -u)
 
   # Extract documented YAML keys from configuration.md
-  DOC_YAML_KEYS=$(grep -E "^\s*[A-Z][a-zA-Z]+:" docs/en/configuration.md docs/ja/configuration.md 2>/dev/null | sed 's/^[[:space:]]*//' | cut -d: -f1 | sort -u || echo "")
+  DOC_YAML_KEYS=$(grep -h -E "^\s*[A-Z][a-zA-Z]+:" docs/en/configuration.md docs/ja/configuration.md 2>/dev/null | sed 's/^[[:space:]]*//' | cut -d: -f1 | sort -u || echo "")
 
   # Find keys in YAML but not documented
-  UNDOCUMENTED_KEYS=$(comm -23 <(echo "$ACTUAL_YAML_KEYS") <(echo "$DOC_YAML_KEYS") | grep -v "^$")
+  UNDOCUMENTED_KEYS=$(comm -23 <(echo "$ACTUAL_YAML_KEYS") <(echo "$DOC_YAML_KEYS") | grep -v "^$" || true)
 
   if [ -n "$UNDOCUMENTED_KEYS" ]; then
     echo "⚠️  Warning: YAML keys not documented in configuration.md:"
@@ -36,7 +36,7 @@ if [ -d "config/presets" ] && [ -f "docs/en/configuration.md" ]; then
   fi
 
   # Find keys documented but not in actual YAML
-  DOCUMENTED_ONLY=$(comm -13 <(echo "$ACTUAL_YAML_KEYS") <(echo "$DOC_YAML_KEYS") | grep -v "^$")
+  DOCUMENTED_ONLY=$(comm -13 <(echo "$ACTUAL_YAML_KEYS") <(echo "$DOC_YAML_KEYS") | grep -v "^$" || true)
 
   if [ -n "$DOCUMENTED_ONLY" ]; then
     echo "⚠️  Warning: Documented keys not found in YAML files:"
@@ -69,7 +69,7 @@ if [ -d "config/presets" ] && [ -f "docs/en/presets.md" ]; then
   DOC_PRESETS=$(grep -oE '`[a-z-]+\.yaml`|`[a-z-]+`|\*\*`[a-z-]+`\*\*' docs/en/presets.md | sed 's/[`*]//g' | sed 's/\.yaml$//' | sort -u || echo "")
 
   # Find presets not documented
-  UNDOCUMENTED_PRESETS=$(comm -23 <(echo "$ACTUAL_PRESETS") <(echo "$DOC_PRESETS") | grep -v "^$")
+  UNDOCUMENTED_PRESETS=$(comm -23 <(echo "$ACTUAL_PRESETS") <(echo "$DOC_PRESETS") | grep -v "^$" || true)
 
   if [ -n "$UNDOCUMENTED_PRESETS" ]; then
     echo "⚠️  Warning: Preset files not documented in presets.md:"
@@ -79,7 +79,7 @@ if [ -d "config/presets" ] && [ -f "docs/en/presets.md" ]; then
   fi
 
   # Find documented presets that don't exist
-  DOCUMENTED_ONLY_PRESETS=$(comm -13 <(echo "$ACTUAL_PRESETS") <(echo "$DOC_PRESETS") | grep -v "^$")
+  DOCUMENTED_ONLY_PRESETS=$(comm -13 <(echo "$ACTUAL_PRESETS") <(echo "$DOC_PRESETS") | grep -v "^$" || true)
 
   if [ -n "$DOCUMENTED_ONLY_PRESETS" ]; then
     echo "⚠️  Warning: Documented presets not found in config/presets/:"
@@ -112,7 +112,7 @@ if [ -f "csharp-version/src/MarkdownToDocx.CLI/Program.cs" ] && [ -f "docs/en/ge
   DOC_CLI_OPTIONS=$(grep -oE '\-\-[a-z-]+|\-[a-z]' docs/en/getting-started.md docs/ja/getting-started.md 2>/dev/null | sort -u || echo "")
 
   # Find options not documented
-  UNDOCUMENTED_OPTIONS=$(comm -23 <(echo "$ACTUAL_CLI_OPTIONS") <(echo "$DOC_CLI_OPTIONS") | grep -v "^$")
+  UNDOCUMENTED_OPTIONS=$(comm -23 <(echo "$ACTUAL_CLI_OPTIONS") <(echo "$DOC_CLI_OPTIONS") | grep -v "^$" || true)
 
   if [ -n "$UNDOCUMENTED_OPTIONS" ]; then
     echo "⚠️  Warning: CLI options not documented:"
@@ -122,7 +122,7 @@ if [ -f "csharp-version/src/MarkdownToDocx.CLI/Program.cs" ] && [ -f "docs/en/ge
   fi
 
   # Find documented options that don't exist
-  DOCUMENTED_ONLY_OPTIONS=$(comm -13 <(echo "$ACTUAL_CLI_OPTIONS") <(echo "$DOC_CLI_OPTIONS") | grep -v "^$")
+  DOCUMENTED_ONLY_OPTIONS=$(comm -13 <(echo "$ACTUAL_CLI_OPTIONS") <(echo "$DOC_CLI_OPTIONS") | grep -v "^$" || true)
 
   if [ -n "$DOCUMENTED_ONLY_OPTIONS" ]; then
     echo "⚠️  Warning: Documented CLI options not found in code:"

@@ -78,3 +78,7 @@ dotnet run --project src/MarkdownToDocx.CLI -- input.md -o output.docx
 ## ライセンス
 
 md2docxは[MITライセンス](https://opensource.org/licenses/MIT)の下でライセンスされたオープンソースソフトウェアです。
+
+---
+
+**最終更新**: 2026-02-17

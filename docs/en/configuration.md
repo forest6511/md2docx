@@ -12,6 +12,17 @@ Learn how to customize document styling through YAML configuration files.
 
 md2docx uses YAML files to define document styling. All configurations follow Schema Version 2.0.
 
+### Configuration Keys
+
+Top-level configuration keys (required):
+
+SchemaVersion: Schema version identifier
+Metadata: Preset metadata and information
+TextDirection: Text flow direction (Horizontal or Vertical)
+PageLayout: Page dimensions and margins
+Fonts: Font family and size settings
+Styles: Element-specific styling rules
+
 ### Basic Structure
 
 ```yaml
@@ -383,3 +394,7 @@ See `config/presets/default.yaml` for a complete, well-commented example configu
 
 - **2.0** (Current): PascalCase keys for C# mapping, improved structure
 - **1.0**: Initial schema (deprecated)
+
+---
+
+**Last Updated**: 2026-02-17

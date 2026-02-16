@@ -193,3 +193,7 @@ Dockerイメージには Noto フォントが含まれています。.NET CLIを
 詳細なヘルプ：
 - [GitHub Issues](https://github.com/forest6511/md2docx/issues)
 - [GitHub Discussions](https://github.com/forest6511/md2docx/discussions)
+
+---
+
+**最終更新**: 2026-02-17

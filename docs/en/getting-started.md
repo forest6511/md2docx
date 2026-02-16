@@ -193,3 +193,7 @@ Check that:
 For more help:
 - [GitHub Issues](https://github.com/forest6511/md2docx/issues)
 - [GitHub Discussions](https://github.com/forest6511/md2docx/discussions)
+
+---
+
+**Last Updated**: 2026-02-17
