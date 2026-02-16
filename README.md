@@ -1,5 +1,6 @@
 # Markdown to Word Converter
 
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/forest6511/md2docx/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
 [![Tests](https://img.shields.io/badge/tests-82%2F82%20passing-brightgreen.svg)]()
