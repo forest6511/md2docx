@@ -1,0 +1,309 @@
+# KDP Word Styles Mapping - Correspondence with Word Style Tags
+# Mapping between KDP recommended Word structure and YAML configuration
+
+# KDP recommended Word style structure
+kdp_word_styles:
+  # Heading Styles - Used for KDP TOC generation
+  heading_1:
+    word_style_name: "Heading 1"
+    xml_tag: "<w:pStyle w:val=\"Heading1\"/>"
+    purpose: "Chapter Title"
+    toc_level: 1  # TOC level 1
+    page_break: recommended  # Recommended to start on new page
+    yaml_mapping: "h1"
+
+  heading_2:
+    word_style_name: "Heading 2"
+    xml_tag: "<w:pStyle w:val=\"Heading2\"/>"
+    purpose: "Section Title"
+    toc_level: 2
+    yaml_mapping: "h2"
+
+  heading_3:
+    word_style_name: "Heading 3"
+    xml_tag: "<w:pStyle w:val=\"Heading3\"/>"
+    purpose: "Subsection"
+    toc_level: 3
+    yaml_mapping: "h3"
+
+  # Body text style
+  normal:
+    word_style_name: "Normal"
+    xml_tag: "<w:pStyle w:val=\"Normal\"/>"
+    purpose: "Normal body text"
+    yaml_mapping: "paragraph"
+
+  # Quote style
+  quote:
+    word_style_name: "Quote"
+    xml_tag: "<w:pStyle w:val=\"Quote\"/>"
+    purpose: "Quotation"
+    yaml_mapping: "blockquote"
+
+  # Code style
+  code:
+    word_style_name: "HTML Code"
+    xml_tag: "<w:pStyle w:val=\"HTMLCode\"/>"
+    purpose: "Code block"
+    yaml_mapping: "code_block"
+
+  # List styles
+  list_bullet:
+    word_style_name: "List Bullet"
+    xml_tag: "<w:pStyle w:val=\"ListBullet\"/>"
+    purpose: "Bullet list"
+    yaml_mapping: "list_bullet"
+
+  list_number:
+    word_style_name: "List Number"
+    xml_tag: "<w:pStyle w:val=\"ListNumber\"/>"
+    purpose: "Numbered list"
+    yaml_mapping: "list_numbered"
+
+# Implementation with DocumentFormat.OpenXml
+openxml_implementation:
+  # Creating style definitions
+  create_styles:
+    code: |
+      // Heading 1 style definition
+      var heading1Style = new Style()
+      {
+          Type = StyleValues.Paragraph,
+          StyleId = "Heading1",
+          StyleName = new StyleName() { Val = "Heading 1" }
+      };
+
+      // Style properties
+      var heading1Props = new StyleParagraphProperties()
+      {
+          OutlineLevel = new OutlineLevel() { Val = 0 },  // TOC level
+          PageBreakBefore = new PageBreakBefore(),  // Page break
+          KeepNext = new KeepNext()  // Keep with next paragraph on same page
+      };
+
+      // Font properties
+      var heading1RunProps = new StyleRunProperties()
+      {
+          Bold = new Bold(),
+          FontSize = new FontSize() { Val = "32" },  // 16pt = 32 half-points
+          Color = new Color() { Val = "000000" }
+      };
+
+      heading1Style.Append(heading1Props);
+      heading1Style.Append(heading1RunProps);
+
+  # Applying style to paragraph
+  apply_style:
+    code: |
+      // Apply Heading 1 style to paragraph
+      var paragraph = new Paragraph();
+      var paragraphProperties = new ParagraphProperties();
+      var paragraphStyleId = new ParagraphStyleId() { Val = "Heading1" };
+
+      paragraphProperties.Append(paragraphStyleId);
+      paragraph.Append(paragraphProperties);
+      paragraph.Append(new Run(new Text("Chapter 1: Introduction")));
+
+# Configuration required for KDP TOC (Table of Contents) generation
+toc_configuration:
+  # Word TOC field
+  field_code: "TOC \\o \"1-3\" \\h \\z \\u"
+  # \\o \"1-3\" = Include heading levels 1-3
+  # \\h = Hyperlink
+  # \\z = Hide tab leader
+  # \\u = Use heading styles only
+
+  # OpenXML Implementation
+  openxml_code: |
+    var tocParagraph = new Paragraph();
+    var tocFieldChar1 = new Run(new FieldChar() { FieldCharType = FieldCharValues.Begin });
+    var tocFieldCode = new Run(new FieldCode("TOC \\o \"1-3\" \\h \\z \\u"));
+    var tocFieldChar2 = new Run(new FieldChar() { FieldCharType = FieldCharValues.End });
+
+    tocParagraph.Append(tocFieldChar1);
+    tocParagraph.Append(tocFieldCode);
+    tocParagraph.Append(tocFieldChar2);
+
+# Complete mapping from YAML to Word styles
+yaml_to_word_style_mapping:
+  # Markdown headings → Word styles
+  h1: "Heading1"
+  h2: "Heading2"
+  h3: "Heading3"
+  h4: "Heading4"
+  h5: "Heading5"
+  h6: "Heading6"
+
+  # Body elements → Word styles
+  paragraph: "Normal"
+  blockquote: "Quote"
+  code_block: "HTMLCode"
+  code_inline: "HTMLCode"  # Character style for inline code
+
+  # Lists → Word styles
+  list_bullet: "ListBullet"
+  list_numbered: "ListNumber"
+
+  # Tables → Word styles
+  table: "TableGrid"  # Standard table
+  table_header: "TableGrid"  # Header row
+
+# KDP-specific requirements
+kdp_requirements:
+  # Required styles
+  required_styles:
+    - Heading1  # For chapter titles
+    - Normal    # For body text
+
+  # Recommended styles
+  recommended_styles:
+    - Heading2  # For sections
+    - Heading3  # For subsections
+    - Quote     # For quotations
+    - ListBullet  # For bullet lists
+    - ListNumber  # For numbered lists
+
+  # TOC generation
+  toc_generation:
+    method: automatic  # Use Word's TOC feature
+    based_on: heading_styles  # Based on heading styles
+    levels: [1, 2, 3]  # Include headings 1-3
+
+  # Page numbers
+  page_numbers:
+    location: footer  # Place in footer
+    alignment: center  # Center aligned
+    format: "- {page} -"
+    start_page: 1  # or after front_matter
+
+  # Headers/Footers
+  headers_footers:
+    first_page_different: true  # First page is different
+    odd_even_different: false  # Usually the same
+
+# Custom style definition examples
+custom_styles:
+  # Custom style for warning boxes
+  warning_box:
+    word_style_id: "WarningBox"
+    word_style_name: "Warning Box"
+    base_style: "Normal"
+    modifications:
+      background: "fff3cd"
+      border:
+        all: true
+        color: "ffc107"
+        width: 4pt
+      padding: 4mm
+
+  # Custom style for tip boxes
+  tip_box:
+    word_style_id: "TipBox"
+    word_style_name: "Tip Box"
+    base_style: "Normal"
+    modifications:
+      background: "d1ecf1"
+      border:
+        left:
+          style: thick
+          color: "0c5460"
+          width: 16pt
+      padding_left: 8mm
+
+  # Custom style for code headings
+  code_heading:
+    word_style_id: "CodeHeading"
+    word_style_name: "Code Heading"
+    base_style: "Normal"
+    modifications:
+      font: "Consolas"
+      bold: true
+      size: 10pt
+      background: "e9ecef"
+
+# Style inheritance system
+style_inheritance:
+  # Base Style
+  base:
+    Normal:
+      inherits: none
+      properties:
+        font_family: "游明朝"
+        font_size: 11pt
+        line_spacing: 1.5
+
+  # Heading inheritance chain
+  heading_inheritance:
+    Heading1:
+      inherits: Normal
+      overrides:
+        font_size: 20pt
+        bold: true
+        page_break_before: true
+
+    Heading2:
+      inherits: Heading1
+      overrides:
+        font_size: 16pt
+        page_break_before: false
+
+    Heading3:
+      inherits: Heading2
+      overrides:
+        font_size: 14pt
+
+# Word XML structure example
+word_xml_structure:
+  styles_part: |
+    <!-- styles.xml example -->
+    <w:styles>
+      <w:style w:type="paragraph" w:styleId="Heading1">
+        <w:name w:val="Heading 1"/>
+        <w:basedOn w:val="Normal"/>
+        <w:next w:val="Normal"/>
+        <w:link w:val="Heading1Char"/>
+        <w:uiPriority w:val="9"/>
+        <w:qFormat/>
+        <w:pPr>
+          <w:keepNext/>
+          <w:keepLines/>
+          <w:pageBreakBefore/>
+          <w:outlineLvl w:val="0"/>
+        </w:pPr>
+        <w:rPr>
+          <w:rFonts w:ascii="游明朝" w:eastAsia="游明朝" w:hAnsi="游明朝"/>
+          <w:b/>
+          <w:sz w:val="40"/>
+        </w:rPr>
+      </w:style>
+    </w:styles>
+
+  document_part: |
+    <!-- document.xml usage example -->
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Heading1"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Chapter 1: Introduction</w:t>
+      </w:r>
+    </w:p>
+
+# Implementation priority
+implementation_priority:
+  phase_1_essential:
+    - Normal (body text style)
+    - Heading1-3 (heading styles)
+    - Basic font and size settings
+
+  phase_2_recommended:
+    - Quote (quotation style)
+    - ListBullet, ListNumber (list styles)
+    - TableGrid (table style)
+    - Code block styles
+
+  phase_3_advanced:
+    - Custom styles (warning boxes, tips, etc.)
+    - Complex border and background settings
+    - Vertical text specific styles
+    - Page header/footer styles

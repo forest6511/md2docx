@@ -1,0 +1,174 @@
+# KDP Mode - 6x9 inch horizontal layout for publishing
+mode: kdp
+
+page:
+  size: custom
+  width: 6in  # 152.4mm
+  height: 9in  # 228.6mm
+  orientation: portrait
+  margins:
+    # Auto-calculated based on page count, or manual override
+    top: 0.5in  # 12.7mm
+    bottom: 0.75in  # 19.05mm
+    left: 0.875in  # 22.225mm (inner margin for binding)
+    right: 0.625in  # 15.875mm (outer margin)
+    gutter: 0in  # Additional binding margin if needed
+  bleed:
+    enabled: true
+    size: 0.125in  # 3.175mm (KDP standard bleed)
+
+font:
+  family: "游明朝"  # Yu Mincho - embedded Japanese font
+  size: 11pt  # Comfortable reading size for 6x9
+  embed: true  # REQUIRED for KDP
+  fallback: "Noto Serif JP"  # Fallback if Yu Mincho unavailable
+
+text_direction: horizontal
+
+# KDP-specific metadata
+kdp:
+  page_count_estimate: 300  # Used for automatic margin calculation
+  isbn: ""  # Optional
+  trim_size: "6x9"
+
+  # Automatic margin calculation based on page count
+  # 24-150 pages: 0.375in inner
+  # 151-300 pages: 0.5in inner
+  # 301-500 pages: 0.625in inner
+  # 501-700 pages: 0.75in inner
+  # 701+ pages: 0.875in inner
+  auto_margins: true
+
+styles:
+  h1:
+    size: 20pt
+    bold: true
+    color: "000000"
+    spacing_before: 24pt
+    spacing_after: 12pt
+    page_break_before: true  # Chapter starts on new page
+    alignment: left
+
+  h2:
+    size: 16pt
+    bold: true
+    color: "000000"
+    spacing_before: 18pt
+    spacing_after: 9pt
+    page_break_before: false
+
+  h3:
+    size: 14pt
+    bold: true
+    color: "333333"
+    spacing_before: 14pt
+    spacing_after: 7pt
+
+  h4:
+    size: 12pt
+    bold: true
+    color: "333333"
+    spacing_before: 12pt
+    spacing_after: 6pt
+
+  h5:
+    size: 11pt
+    bold: true
+    color: "666666"
+    spacing_before: 10pt
+    spacing_after: 5pt
+
+  h6:
+    size: 11pt
+    bold: false
+    italic: true
+    color: "666666"
+    spacing_before: 8pt
+    spacing_after: 4pt
+
+  paragraph:
+    size: 11pt
+    line_spacing: 1.5
+    spacing_before: 0pt
+    spacing_after: 6pt
+    first_line_indent: 0.25in  # Standard paragraph indent
+    alignment: left
+
+  table_header:
+    background: "D9D9D9"  # Professional gray for publishing
+    bold: true
+    size: 10pt
+    alignment: center
+    border:
+      all: true
+      color: "000000"
+      width: 0.5pt
+
+  table_cell:
+    background: "FFFFFF"
+    size: 10pt
+    alignment: left
+    border:
+      all: true
+      color: "666666"
+      width: 0.5pt
+    padding:
+      top: 1.5mm
+      bottom: 1.5mm
+      left: 2mm
+      right: 2mm
+
+  code_block:
+    background: "F5F5F5"  # Subtle gray for professional look
+    font: "Courier New"
+    size: 9pt
+    border:
+      color: "AAAAAA"
+      width: 0.5pt
+      style: single
+    padding:
+      top: 3mm
+      bottom: 3mm
+      left: 4mm
+      right: 4mm
+    spacing_before: 8pt
+    spacing_after: 8pt
+
+  code_inline:
+    background: "EEEEEE"
+    font: "Courier New"
+    size: 9pt
+
+  blockquote:
+    background: "F9F9F9"
+    italic: true
+    border_left:
+      color: "999999"
+      width: 2pt
+    padding_left: 8mm
+    spacing_before: 8pt
+    spacing_after: 8pt
+    size: 10.5pt
+
+  list_bullet:
+    size: 11pt
+    spacing_before: 2pt
+    spacing_after: 2pt
+    indent: 0.25in
+
+  list_numbered:
+    size: 11pt
+    spacing_before: 2pt
+    spacing_after: 2pt
+    indent: 0.25in
+
+# Cover and front matter settings
+cover:
+  include: false  # Cover handled separately in KDP
+
+front_matter:
+  title_page: true
+  copyright_page: true
+  dedication_page: false
+  toc: true  # Table of contents
+  toc_depth: 2  # H1 and H2 only

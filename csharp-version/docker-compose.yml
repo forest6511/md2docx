@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  # Standard version: For general conversion
+  converter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: md2word:latest
+    volumes:
+      - ./input:/workspace/input:ro
+      - ./output:/workspace/output
+      - ./config:/app/config:ro
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+    # Default command (run with docker-compose up converter)
+    command: ["input/sample.md", "-o", "output/sample.docx", "--preset", "default"]
+
+  # Slim version: Lightweight
+  slim:
+    build:
+      context: .
+      dockerfile: Dockerfile.slim
+    image: md2word:slim
+    volumes:
+      - ./input:/workspace/input:ro
+      - ./output:/workspace/output
+    command: ["input/sample.md", "-o", "output/sample-slim.docx"]
+
+  # Full version: Rich fonts
+  full:
+    build:
+      context: .
+      dockerfile: Dockerfile.full
+    image: md2word:full
+    volumes:
+      - ./input:/workspace/input:ro
+      - ./output:/workspace/output
+    command: ["input/sample.md", "-o", "output/sample-full.docx"]
+
+  # KDP conversion
+  kdp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: md2word:latest
+    volumes:
+      - ./chapters:/workspace/chapters:ro
+      - ./output:/workspace/output
+      - ./config:/app/config:ro
+    command: ["chapters/*.md", "-o", "output/manuscript.docx", "--preset", "publishing/kdp-6x9-horizontal"]
+
+  # Vertical text conversion
+  vertical:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: md2word:latest
+    volumes:
+      - ./novel:/workspace/novel:ro
+      - ./output:/workspace/output
+    command: ["novel/chapter1.md", "-o", "output/chapter1.docx", "--preset", "publishing/kdp-vertical-novel"]
+
+  # Technical documentation conversion
+  technical:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: md2word:latest
+    volumes:
+      - ./docs:/workspace/docs:ro
+      - ./output:/workspace/output
+    command: ["docs/README.md", "-o", "output/README.docx", "--preset", "technical"]
+
+  # Batch conversion (multiple files)
+  batch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: md2word:latest
+    volumes:
+      - ./input:/workspace/input:ro
+      - ./output:/workspace/output
+    command: ["input/*.md", "-o", "output/", "--preset", "default"]
+
+  # Development (hot-reload)
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: md2word:dev
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - ./input:/workspace/input
+      - ./output:/workspace/output
+      # Keep bin/obj inside container (do not mount)
+      - /app/src/bin
+      - /app/src/obj
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true
+    command: ["dotnet", "watch", "--project", "/app/src/MarkdownToDocx.CLI", "run", "--", "input/sample.md", "-o", "output/sample.docx"]
+
+  # Test execution
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: md2word:test
+    volumes:
+      - ./tests:/workspace/tests:ro
+      - ./output:/workspace/output
+    command: ["dotnet", "test", "/app/MarkdownToDocx.Tests.dll"]
+
+# Named volumes (for persistence if needed)
+volumes:
+  output_data:
+    driver: local
+
+# Networks (if needed)
+networks:
+  md2word_network:
+    driver: bridge

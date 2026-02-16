@@ -1,0 +1,554 @@
+# KDP Vertical Text (Tategaki) Complete Configuration
+# Compliant with https://kdp.amazon.co.jp/ja_JP/help vertical text requirements
+
+mode: kdp
+
+# Page settings - For vertical text
+page:
+  size: A5  # Japanese standard book size (148mm × 210mm)
+  # or custom: Bunkobon size, etc.
+  # width: 105mm  # Bunkobon
+  # height: 148mm
+
+  orientation: portrait  # Portrait even for vertical text
+
+  # Margins for vertical text (Important: directions change in vertical layout)
+  margins:
+    # In vertical text, margin meanings change:
+    # top → right side (page turning side, gutter)
+    # bottom → left side (fore edge)
+    # left → top side (head)
+    # right → bottom side (foot)
+
+    top: 20mm      # Right side (gutter, binding side) - wider
+    bottom: 15mm   # Left side (fore edge) - narrower is OK
+    left: 18mm     # Top side (head) - moderate
+    right: 15mm    # Bottom side (foot) - narrower is OK
+
+    gutter: 0mm    # Gutter margin (if needed)
+
+  bleed:
+    enabled: true
+    size: 3mm  # Japanese standard bleed
+
+  # Vertical text specific: page progression direction
+  page_progression: right_to_left  # Pages progress right to left (Japanese standard)
+
+# Font settings - Vertical text optimized
+font:
+  family: "游明朝"  # Optimal for vertical text
+  # Other recommended fonts:
+  # - "Hiragino Mincho ProN"
+  # - "MS P Mincho"
+  # - "Kozuka Mincho Pro"
+  # - "Noto Serif JP"
+
+  size: 10pt  # Slightly smaller is more readable for vertical text than horizontal
+  embed: true  # Required by KDP
+  fallback: "Noto Serif JP"
+
+  # Vertical text font settings
+  vertical_optimized: true  # Vertical text optimization ON
+  proportional_metrics: false  # Maintain monospace
+
+  # Full-width character settings
+  full_width_punctuation: true  # Full-width punctuation
+  full_width_alpha_numeric: false  # Half-width alphanumeric
+
+# Text direction setting (most important)
+text_direction: vertical  # tbRl = Top to Bottom, Right to Left (vertical right to left)
+
+# Vertical text-specific typesetting settings
+vertical_typography:
+  # Character direction
+  writing_mode: vertical-rl  # vertical right-to-left
+
+  # Kinsoku processing (line-start and line-end character control)
+  kinsoku:
+    enabled: true
+    # Line-start forbidden characters (characters that cannot appear at line start)
+    line_start_forbidden: "、。，．）」』】〉》！？；：ぁぃぅぇぉゃゅょゎァィゥェォヵヶャュョヮっッ"
+    # Line-end forbidden characters (characters that cannot appear at line end)
+    line_end_forbidden: "（「『【〈《"
+
+  # Hanging punctuation (punctuation overhang at line end)
+  hanging_punctuation:
+    enabled: true
+    characters: "、。"
+    max_overhang: 0.5em  # Can overhang up to half-width
+
+  # Punctuation trimming (punctuation and symbol spacing adjustment)
+  punctuation_trimming:
+    enabled: true
+    half_width_at_line_start: true  # Half-width punctuation at line start
+    half_width_at_line_end: true    # Half-width punctuation at line end
+
+  # Character spacing
+  character_spacing:
+    standard: 0pt  # Normal character spacing
+    at_line_start: -0.25em  # Tighten at line start
+    at_line_end: -0.25em    # Tighten at line end
+
+  # Line spacing
+  line_spacing:
+    base: 2.0  # Wider spacing is more readable for vertical text
+    min: 1.8
+    max: 2.5
+
+  # Letter spacing
+  letter_spacing: 0em  # Basically tighten
+
+  # Paragraph spacing
+  paragraph_spacing: 1em  # One character space
+
+# Tate-Chu-Yoko (horizontal-in-vertical text)
+tcy:  # Tate-Chu-Yoko (horizontal text within vertical text)
+  enabled: true
+  # Auto-apply targets
+  auto_apply:
+    - two_digit_numbers: true      # 2-digit numbers (e.g., 10, 25)
+    - three_digit_numbers: false   # 3-digit numbers usually remain vertical
+    - western_dates: true          # Dates (e.g., 1/1)
+    - times: true                  # Times (e.g., 10:30)
+    - small_caps_latin: true       # Lowercase Latin letters
+    - punctuation_pairs: true      # Punctuation pairs (!!, !?)
+
+  # Manual specification
+  manual_markers:
+    start: "｜"  # Tate-chu-yoko start marker
+    end: "｜"    # Tate-chu-yoko end marker
+    # Example: "平成｜30｜年" → 30 becomes horizontal
+
+# Ruby (furigana) - Vertical text specific settings
+ruby:
+  enabled: true
+
+  # Size
+  font_size: 5pt  # About half of main text size
+
+  # Position (right side in vertical text)
+  position: right  # Right side of characters in vertical text
+
+  # Ruby and main text spacing
+  offset: 0.5pt
+
+  # Ruby alignment method
+  alignment:
+    type: distribute_space  # Evenly distributed
+    # center: Center aligned
+    # left: Left aligned (for mono-ruby)
+    # right: Right aligned
+
+  # Complex ruby (group ruby)
+  group_ruby:
+    enabled: true
+    distribute: true  # Evenly distributed across entire group
+
+  # Markdown syntax
+  markdown_syntax:
+    pattern: "{kanji|かんじ}"  # {base text|ruby}
+    # or: ｜kanji《かんじ》
+    alternative: "｜kanji《かんじ》"
+
+# Emphasis marks (bougen, sesame dots) - For emphasis
+emphasis_marks:
+  enabled: true
+
+  # Position (right side in vertical text)
+  position: right
+
+  # Type
+  style: sesame_dot  # Sesame dot (﹅)
+  # dot: Black dot (・)
+  # circle: White circle (◦)
+  # filled_circle: Filled circle (●)
+  # double_circle: Double circle
+  # triangle: Triangle
+  # sesame_dot: Sesame dot (most common)
+
+  # Color
+  color: "000000"
+
+  # Markdown syntax
+  markdown_syntax:
+    pattern: "《《強調したい文字》》"  # Enclosed in 《《》》
+
+# Rotated text (rotation of Western text and numbers)
+rotated_text:
+  # Whether to rotate Western text in vertical layout
+  rotate_latin: false  # false = upright, true = rotated
+
+  # Whether to rotate numbers
+  rotate_digits: false  # Usually upright
+
+  # Symbols
+  rotate_symbols: auto  # auto, true, false
+
+# Style definitions - Vertical text optimized
+styles:
+  # Chapter title (H1) - For vertical text
+  h1:
+    size: 14pt  # Conservative for vertical text
+    bold: true
+    color: "000000"
+
+    # Right-aligned in vertical text (right edge of page)
+    alignment: right
+
+    # Page break
+    page_break_before: true
+
+    # Spacing
+    spacing_before: 0mm
+    spacing_after: 20mm  # In vertical text "after" = "left"
+
+    # Vertical text specific
+    text_orientation: upright  # Upright characters
+
+  # Section title (H2)
+  h2:
+    size: 12pt
+    bold: true
+    color: "000000"
+    alignment: right
+    spacing_before: 15mm
+    spacing_after: 10mm
+    text_orientation: upright
+
+  # Subsection (H3)
+  h3:
+    size: 11pt
+    bold: true
+    color: "333333"
+    alignment: right
+    spacing_before: 10mm
+    spacing_after: 8mm
+    text_orientation: upright
+
+  # Body paragraph
+  paragraph:
+    size: 10pt
+    line_spacing: 2.0  # Wider spacing is more readable for vertical text
+
+    # First line indent (indent first character of paragraph by one character)
+    first_line_indent: 1em  # One character
+
+    # Paragraph spacing
+    spacing_before: 0pt
+    spacing_after: 0pt  # No space between paragraphs in vertical text
+
+    # Alignment
+    alignment: left  # In vertical text "left" = "top"
+
+    # Character orientation
+    text_orientation: upright
+
+  # Dialogue (common in Japanese novels)
+  dialogue:
+    size: 10pt
+    # Indicates start of dialogue (starts with 「)
+    first_line_indent: 0em  # No indent
+    hanging_indent: 1em     # Indent from second line onward
+
+    # Dialogue markers
+    quote_start: "「"
+    quote_end: "」"
+    nested_quote_start: "『"
+    nested_quote_end: "』"
+
+  # Quote (for vertical text)
+  blockquote:
+    size: 9.5pt  # Slightly smaller
+    line_spacing: 1.8
+
+    # Quotes in vertical text have vertical spacing
+    spacing_before: 1em
+    spacing_after: 1em
+
+    # Left/right indent (top/bottom in vertical text)
+    indent_top: 1em     # One character from top
+    indent_bottom: 1em  # One character from bottom
+
+    # Background
+    background: "F9F9F9"
+
+  # Code block (horizontal text within vertical layout)
+  code_block:
+    # Code is displayed horizontally
+    text_direction: horizontal
+
+    font: "Consolas"
+    size: 9pt
+    background: "F5F5F5"
+
+    border:
+      all: true
+      style: single
+      color: "CCCCCC"
+      width: 1pt
+
+    padding:
+      all: 3mm
+
+    # Placement within vertical body text
+    rotation: 0deg  # No rotation (stays horizontal)
+
+    # Page break control
+    keep_together: true  # No page break within block
+
+  # List (for vertical text)
+  list_bullet:
+    size: 10pt
+    bullet_char: "・"  # Nakaguro (middle dot)
+
+    # Indent (top direction in vertical text)
+    indent_top: 1em
+
+    # Line spacing
+    spacing_before: 0.25em
+    spacing_after: 0.25em
+
+  # Numbered list
+  list_numbered:
+    size: 10pt
+
+    # Number notation in vertical text
+    numbering_format: kanji  # 一、二、三...
+    # decimal: 1, 2, 3...
+    # kanji: 一、二、三...
+    # iroha: イ、ロ、ハ...
+
+    indent_top: 1em
+    spacing_before: 0.25em
+    spacing_after: 0.25em
+
+  # Table (use sparingly in vertical text)
+  table:
+    # Tables within vertical text are displayed horizontally
+    text_direction: horizontal
+
+    # Or keep vertical
+    # text_direction: vertical
+
+    size: 9pt
+
+    # Rotation
+    rotation: 0deg  # Rotate 90deg if needed
+
+    # Cell alignment
+    cell_alignment: center
+
+# Chapter and heading numbering
+chapter_numbering:
+  enabled: true
+  format: kanji  # Chapter One, Chapter Two, Chapter Three...
+  # decimal: Chapter 1, Chapter 2...
+  # kanji: Chapter One, Chapter Two...
+  # old_kanji: Chapter I, Chapter II...
+
+  prefix: "第"
+  suffix: "章"
+
+  # Section numbering
+  section_format: arabic  # 1, 2, 3...
+
+# Nombre (page numbers) - For vertical text
+page_numbering:
+  enabled: true
+
+  # Position (bottom center is common for vertical text)
+  position: bottom_center
+  # bottom_center: Bottom center
+  # bottom_outer: Bottom outer
+  # bottom_inner: Bottom inner
+
+  # Number format
+  format: arabic  # 1, 2, 3...
+  # kanji: 一、二、三...
+  # arabic: 1, 2, 3...
+
+  # Same font as body text
+  font: "游明朝"
+  size: 8pt
+
+  # Different position for odd/even pages
+  different_odd_even: false
+
+  # Starting page
+  start_page: 1
+
+  # Front matter (TOC, etc.) uses different numbering system
+  front_matter_format: roman  # i, ii, iii...
+
+# Running header (hashira) - For vertical text
+running_header:
+  enabled: true
+
+  # Position (top is common for vertical text)
+  position: top_center
+
+  # Content
+  content:
+    odd_pages: "{chapter_title}"   # Odd pages: chapter title
+    even_pages: "{book_title}"     # Even pages: book title
+
+  font: "游明朝"
+  size: 8pt
+  color: "666666"
+
+  # Separator line from body text
+  separator:
+    enabled: true
+    style: single
+    color: "CCCCCC"
+    width: 0.5pt
+
+# Title page and front matter settings
+front_matter:
+  # Title page (tobira)
+  title_page:
+    enabled: true
+    layout: center_vertical  # Vertical center alignment for vertical text
+
+    # Title
+    title:
+      size: 18pt
+      bold: true
+      spacing_after: 30mm
+
+    # Author name
+    author:
+      size: 12pt
+      position: below_title
+      spacing_after: 50mm
+
+  # Table of contents
+  toc:
+    enabled: true
+
+    # Vertical text TOC
+    text_direction: vertical
+
+    # Depth (heading level)
+    depth: 2  # Up to H1, H2
+
+    # Leader (dotted line)
+    leader: "・"  # Use nakaguro
+    leader_style: dotted
+
+  # Copyright page
+  copyright:
+    enabled: true
+    text_direction: vertical
+    size: 8pt
+
+    # Position
+    position: bottom  # Bottom left in vertical text
+
+  # Dedication / Preface
+  dedication:
+    enabled: false
+
+# Section breaks
+section_breaks:
+  # Chapter break
+  chapter_break:
+    type: page_break
+    blank_page: optional  # Blank page if needed
+
+  # Section break marker
+  section_marker: "※"  # Kome-jirushi (rice symbol)
+  section_marker_size: 12pt
+  section_marker_spacing: 2em
+
+# KDP-specific settings
+kdp:
+  # Page count estimate (for automatic margin calculation)
+  page_count_estimate: 200
+
+  # Binding method
+  binding: perfect_bound
+
+  # Paper type
+  paper_type: cream  # Cream color (suitable for novels)
+  # white: White
+  # cream: Cream
+
+  # Interior type
+  interior_type: black_and_white
+
+  # Trim size
+  trim_size: A5
+
+  # Automatic margin adjustment
+  auto_margins: true
+
+# Proofreading and validation settings
+validation:
+  # Vertical text specific checks
+  checks:
+    - text_direction_consistency  # Text direction consistency
+    - proper_punctuation          # Correct punctuation
+    - kinsoku_compliance          # Kinsoku processing compliance
+    - ruby_formatting             # Correct ruby placement
+    - tcy_application             # Appropriate tate-chu-yoko usage
+    - page_progression            # Page progression direction
+    - font_embedding              # Font embedding
+    - no_latin_rotation_issues    # No Western text rotation issues
+
+# Markdown extended syntax (for vertical text)
+markdown_extensions:
+  # Ruby
+  ruby: "{漢字|かんじ}"
+
+  # Emphasis dots
+  emphasis_dots: "《《強調》》"
+
+  # Tate-chu-yoko
+  tcy: "｜30｜"
+
+  # Dialogue (auto-detect)
+  dialogue_detection:
+    auto: true
+    start_chars: ["「", "『"]
+    end_chars: ["」", "』"]
+
+  # Page break
+  page_break: "---pagebreak---"
+
+  # Section break
+  section_break: "***"
+
+# Conversion notes
+conversion_notes: |
+  Important notes for vertical text conversion:
+
+  1. Handling Western text and numbers
+     - Numbers up to 2 digits: Use tate-chu-yoko (horizontal-in-vertical)
+     - Numbers 3+ digits: Keep vertical (or split)
+     - English words: Basically keep upright in vertical orientation
+
+  2. Punctuation
+     - Use full-width punctuation: 。、
+     - Do not use half-width: .,
+
+  3. Brackets
+     - Use vertical text brackets: （）「」『』【】
+     - Avoid horizontal text brackets: ()[]{}
+
+  4. Symbols
+     - Dash: ―― (double dash)
+     - Ellipsis: …… (use two consecutively)
+     - Exclamation/question marks: Use full-width ！？
+
+  5. Spaces
+     - Use full-width spaces
+     - Half-width spaces appear cramped
+
+  6. Line breaks
+     - Make paragraph breaks clear
+     - Start dialogue on new line
+
+  7. Kinsoku processing
+     - Do not place punctuation at line start
+     - Do not place opening brackets at line end

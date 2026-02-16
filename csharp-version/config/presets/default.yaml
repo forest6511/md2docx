@@ -1,0 +1,140 @@
+# Default Preset - Standard conversion style
+# Balanced settings for general-purpose Markdown to Word conversion
+
+mode: standard
+
+page:
+  size: A4
+  orientation: portrait
+  margins:
+    top: 25mm
+    bottom: 25mm
+    left: 25mm
+    right: 25mm
+
+font:
+  family: "游明朝"  # Yu Mincho (or "Arial", "Times New Roman")
+  size: 11pt
+  embed: false
+
+text_direction: horizontal
+
+styles:
+  h1:
+    size: 20pt
+    bold: true
+    color: "2c3e50"
+    spacing_before: 18pt
+    spacing_after: 12pt
+    border:
+      bottom:
+        style: single
+        color: "3498db"
+        width: 4pt
+        space: 2pt
+
+  h2:
+    size: 16pt
+    bold: true
+    color: "34495e"
+    spacing_before: 14pt
+    spacing_after: 8pt
+
+  h3:
+    size: 14pt
+    bold: true
+    color: "5d6d7e"
+    spacing_before: 12pt
+    spacing_after: 6pt
+
+  h4:
+    size: 12pt
+    bold: true
+    color: "7f8c8d"
+    spacing_before: 10pt
+    spacing_after: 5pt
+
+  h5:
+    size: 11pt
+    bold: true
+    spacing_before: 8pt
+    spacing_after: 4pt
+
+  h6:
+    size: 11pt
+    bold: false
+    italic: true
+    spacing_before: 6pt
+    spacing_after: 3pt
+
+  paragraph:
+    size: 11pt
+    line_spacing: 1.5
+    spacing_after: 6pt
+    alignment: left
+
+  table_header:
+    background: "ecf0f1"
+    bold: true
+    size: 11pt
+    alignment: center
+    border:
+      all: true
+      color: "95a5a6"
+      width: 1pt
+
+  table_cell:
+    background: "ffffff"
+    size: 11pt
+    border:
+      all: true
+      color: "bdc3c7"
+      width: 0.5pt
+    padding:
+      all: 2mm
+
+  code_block:
+    background: "2c3e50"
+    font: "Consolas"
+    size: 9pt
+    color: "ecf0f1"
+    border:
+      all: true
+      color: "34495e"
+      width: 1pt
+    padding:
+      all: 4mm
+    spacing_before: 8pt
+    spacing_after: 8pt
+
+  code_inline:
+    background: "ecf0f1"
+    font: "Consolas"
+    size: 10pt
+    color: "e74c3c"
+
+  blockquote:
+    background: "f9f9f9"
+    italic: true
+    color: "7f8c8d"
+    border:
+      left:
+        style: thick
+        color: "3498db"
+        width: 12pt
+        space: 4pt
+    padding_left: 10mm
+    spacing_before: 8pt
+    spacing_after: 8pt
+
+  list_bullet:
+    size: 11pt
+    bullet_char: "•"
+    spacing_before: 2pt
+    spacing_after: 2pt
+
+  list_numbered:
+    size: 11pt
+    numbering_format: decimal
+    spacing_before: 2pt
+    spacing_after: 2pt

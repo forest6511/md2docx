@@ -1,0 +1,113 @@
+# AS-IS Mode - Minimal styling for general-purpose conversion
+mode: asis
+
+page:
+  size: A4  # A4, Letter, Custom
+  orientation: portrait  # portrait, landscape
+  margins:
+    top: 25.4mm
+    bottom: 25.4mm
+    left: 25.4mm
+    right: 25.4mm
+
+font:
+  family: "游明朝"  # Yu Mincho
+  size: 10.5pt
+  embed: false  # No embedding needed for AS-IS mode
+
+text_direction: horizontal  # horizontal, vertical
+
+styles:
+  h1:
+    size: 18pt
+    bold: true
+    color: "000000"
+    spacing_before: 12pt
+    spacing_after: 6pt
+    page_break_before: false
+
+  h2:
+    size: 16pt
+    bold: true
+    color: "000000"
+    spacing_before: 10pt
+    spacing_after: 5pt
+
+  h3:
+    size: 14pt
+    bold: true
+    color: "000000"
+    spacing_before: 8pt
+    spacing_after: 4pt
+
+  h4:
+    size: 12pt
+    bold: true
+    color: "000000"
+    spacing_before: 6pt
+    spacing_after: 3pt
+
+  h5:
+    size: 11pt
+    bold: true
+    color: "000000"
+    spacing_before: 4pt
+    spacing_after: 2pt
+
+  h6:
+    size: 10.5pt
+    bold: true
+    color: "000000"
+    spacing_before: 2pt
+    spacing_after: 1pt
+
+  paragraph:
+    size: 10.5pt
+    line_spacing: 1.5
+    spacing_before: 0pt
+    spacing_after: 0pt
+    first_line_indent: 0pt
+
+  table_header:
+    background: "CCCCCC"  # Gray background
+    bold: true
+    size: 10.5pt
+    alignment: center
+
+  table_cell:
+    background: "FFFFFF"  # White background
+    size: 10.5pt
+    padding:
+      top: 2mm
+      bottom: 2mm
+      left: 2mm
+      right: 2mm
+
+  code_block:
+    background: "F0F0F0"  # Light gray background
+    font: "Courier New"
+    size: 9pt
+    border:
+      color: "CCCCCC"
+      width: 1pt
+      style: single
+    padding:
+      top: 3mm
+      bottom: 3mm
+      left: 3mm
+      right: 3mm
+
+  code_inline:
+    background: "E8E8E8"
+    font: "Courier New"
+    size: 9pt
+
+  blockquote:
+    background: "F5F5F5"
+    italic: true
+    border_left:
+      color: "CCCCCC"
+      width: 3pt
+    padding_left: 10mm
+    spacing_before: 6pt
+    spacing_after: 6pt

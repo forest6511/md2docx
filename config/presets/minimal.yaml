@@ -1,0 +1,104 @@
+# Minimal Preset - PascalCase keys for direct C# mapping
+SchemaVersion: "2.0"
+
+Metadata:
+  Name: "Minimal"
+  Description: "Basic styling with minimal configuration"
+  Author: "md2docx"
+  Version: "1.0.0"
+
+TextDirection: "Horizontal"
+
+PageLayout:
+  Width: 21.0
+  Height: 29.7
+  MarginTop: 2.5
+  MarginBottom: 2.5
+  MarginLeft: 2.5
+  MarginRight: 2.5
+  MarginHeader: 1.25
+  MarginFooter: 1.25
+  MarginGutter: 0
+
+Fonts:
+  Ascii: "Noto Serif"
+  EastAsia: "Noto Serif CJK JP"
+  DefaultSize: 11
+
+Styles:
+  H1:
+    Size: 24
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "480"
+    SpaceAfter: "240"
+  H2:
+    Size: 20
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "360"
+    SpaceAfter: "180"
+  H3:
+    Size: 16
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "240"
+    SpaceAfter: "120"
+  H4:
+    Size: 14
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "240"
+    SpaceAfter: "120"
+  H5:
+    Size: 12
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "120"
+    SpaceAfter: "60"
+  H6:
+    Size: 11
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "120"
+    SpaceAfter: "60"
+  Paragraph:
+    Size: 11
+    Color: "000000"
+    LineSpacing: "360"
+    FirstLineIndent: "0"
+    LeftIndent: "0"
+  List:
+    Size: 11
+    Color: "000000"
+    LeftIndent: "720"
+    HangingIndent: "360"
+    SpaceBefore: "60"
+    SpaceAfter: "60"
+  CodeBlock:
+    Size: 10
+    Color: "333333"
+    BackgroundColor: "f5f5f5"
+    BorderColor: "cccccc"
+    MonospaceFontAscii: "Noto Sans Mono"
+    MonospaceFontEastAsia: "Noto Sans Mono CJK JP"
+    LineSpacing: "240"
+    SpaceBefore: "240"
+    SpaceAfter: "240"
+  Quote:
+    Size: 11
+    Color: "555555"
+    Italic: true
+    ShowBorder: true
+    BorderColor: "999999"
+    BorderSize: 12
+    BorderPosition: "left"
+    LeftIndent: "720"
+    SpaceBefore: "240"
+    SpaceAfter: "240"

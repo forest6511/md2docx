@@ -1,0 +1,55 @@
+# .dockerignore - Files to exclude during build
+
+# Git-related
+.git
+.gitignore
+.gitattributes
+
+# Build artifacts
+**/bin/
+**/obj/
+**/publish/
+
+# IDE settings
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Test-related
+**/TestResults/
+**/*.trx
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+
+# Documentation (not included in image)
+*.md
+!README.md
+docs/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.cache
+
+# OS-specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Sample files
+samples/
+examples/
+tests/fixtures/
+
+# Docker-related
+Dockerfile*
+docker-compose*.yml
+.dockerignore

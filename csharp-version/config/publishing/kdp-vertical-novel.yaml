@@ -1,0 +1,126 @@
+# KDP Mode - Vertical Japanese novel layout (tategaki)
+mode: kdp
+
+page:
+  size: A5  # Common Japanese novel size
+  orientation: portrait
+  margins:
+    # For vertical text, margins are rotated
+    top: 20mm  # Becomes right side in vertical
+    bottom: 15mm  # Becomes left side in vertical
+    left: 15mm  # Becomes top in vertical
+    right: 20mm  # Becomes bottom in vertical
+  bleed:
+    enabled: true
+    size: 3mm  # 3mm bleed for Japanese publishing
+
+font:
+  family: "游明朝"  # Yu Mincho - best for vertical Japanese
+  size: 10pt
+  embed: true  # REQUIRED for KDP
+  fallback: "Noto Serif JP"
+
+text_direction: vertical  # TATEGAKI (vertical writing)
+
+kdp:
+  page_count_estimate: 200
+  trim_size: "A5"
+  auto_margins: false  # Manual control for vertical layout
+
+styles:
+  h1:
+    size: 14pt
+    bold: true
+    color: "000000"
+    spacing_before: 0mm
+    spacing_after: 0mm
+    page_break_before: true
+    alignment: right  # Right-aligned in vertical text
+
+  h2:
+    size: 12pt
+    bold: true
+    color: "000000"
+    spacing_before: 10mm
+    spacing_after: 5mm
+
+  h3:
+    size: 11pt
+    bold: true
+    color: "333333"
+    spacing_before: 8mm
+    spacing_after: 4mm
+
+  paragraph:
+    size: 10pt
+    line_spacing: 2.0  # Wider spacing for vertical text readability
+    spacing_before: 0pt
+    spacing_after: 0pt
+    first_line_indent: 1em  # 1 character indent for novel style
+
+  # Vertical text specific - ruby (furigana) support
+  ruby:
+    size: 5pt  # Half of main text size
+    position: right  # Right side of characters in vertical text
+
+  # Emphasis marks for vertical text
+  emphasis:
+    type: sesame_dot  # Small dots for emphasis
+    position: right
+
+  # Tables in vertical layout (rare but supported)
+  table_header:
+    background: "E8E8E8"
+    bold: true
+    size: 9pt
+    text_direction: vertical  # Maintain vertical in tables
+
+  table_cell:
+    size: 9pt
+    text_direction: vertical
+    padding:
+      top: 2mm
+      bottom: 2mm
+      left: 2mm
+      right: 2mm
+
+  # Code blocks in vertical (technical novels)
+  code_block:
+    background: "F5F5F5"
+    font: "MS Gothic"  # Gothic better for code in vertical
+    size: 8pt
+    text_direction: horizontal  # Code usually stays horizontal
+    border:
+      color: "CCCCCC"
+      width: 0.5pt
+    padding:
+      top: 3mm
+      bottom: 3mm
+      left: 3mm
+      right: 3mm
+
+  # Special Japanese typography
+  typography:
+    # Hanging punctuation
+    hanging_punctuation: true
+
+    # Character spacing adjustments (kinsoku - line breaking rules)
+    kinsoku: true
+
+    # Full-width punctuation
+    full_width_punctuation: true
+
+    # Proportional kana
+    proportional_kana: false  # Usually false for novels
+
+front_matter:
+  title_page: true
+  copyright_page: true
+  dedication_page: true  # Common in Japanese novels
+  toc: false  # Usually no TOC in novels
+
+# Japanese novel specific
+novel:
+  chapter_numbering: japanese  # 第一章, 第二章
+  section_marks: "※"  # Section break symbol
+  dialogue_marks: "「」『』"  # Japanese quotation marks

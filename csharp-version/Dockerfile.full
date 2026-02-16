@@ -1,0 +1,61 @@
+# Full Version - Rich font package
+# Size: ~500MB (Supports diverse font options)
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /source
+
+COPY src/*.sln .
+COPY src/MarkdownToDocx.Core/*.csproj ./MarkdownToDocx.Core/
+COPY src/MarkdownToDocx.Styling/*.csproj ./MarkdownToDocx.Styling/
+COPY src/MarkdownToDocx.CLI/*.csproj ./MarkdownToDocx.CLI/
+RUN dotnet restore
+
+COPY src/ .
+RUN dotnet publish MarkdownToDocx.CLI/MarkdownToDocx.CLI.csproj \
+    -c Release \
+    -o /app/publish \
+    --no-restore
+
+FROM mcr.microsoft.com/dotnet/runtime:8.0
+WORKDIR /app
+
+# Comprehensive Japanese font packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    # Noto CJK (All variants)
+    fonts-noto-cjk \
+    # IPA fonts
+    fonts-ipafont-mincho \
+    fonts-ipafont-gothic \
+    fonts-ipaexfont-mincho \
+    fonts-ipaexfont-gothic \
+    # Takao fonts
+    fonts-takao-mincho \
+    fonts-takao-gothic \
+    # Liberation fonts (Latin)
+    fonts-liberation \
+    # DejaVu fonts (Latin, monospace)
+    fonts-dejavu \
+    fonts-dejavu-extra \
+    # fontconfig
+    fontconfig && \
+    fc-cache -fv && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Display font list
+RUN echo "=== All Installed Fonts ===" && \
+    fc-list | wc -l && \
+    echo "Japanese Fonts:" && \
+    fc-list :lang=ja | head -20
+
+COPY --from=build /app/publish .
+COPY config/ /app/config/
+
+WORKDIR /workspace
+ENTRYPOINT ["dotnet", "/app/MarkdownToDocx.CLI.dll"]
+CMD ["--help"]
+
+LABEL maintainer="your-email@example.com"
+LABEL version="1.0.0-full"
+LABEL description="Markdown to Word Converter (Full) with comprehensive font support"

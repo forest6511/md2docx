@@ -1,0 +1,116 @@
+# Technical Preset - Optimized for technical documentation and code-heavy content
+SchemaVersion: "2.0"
+
+Metadata:
+  Name: "Technical"
+  Description: "Optimized styling for technical documentation, API references, and code-heavy content"
+  Author: "md2docx"
+  Version: "1.0.0"
+
+TextDirection: "Horizontal"
+
+PageLayout:
+  Width: 21.0
+  Height: 29.7
+  MarginTop: 2.0
+  MarginBottom: 2.0
+  MarginLeft: 2.5
+  MarginRight: 2.5
+  MarginHeader: 1.25
+  MarginFooter: 1.25
+  MarginGutter: 0
+
+Fonts:
+  Ascii: "Noto Sans"
+  EastAsia: "Noto Sans CJK JP"
+  DefaultSize: 10
+
+Styles:
+  H1:
+    Size: 24
+    Bold: true
+    Color: "1a1a1a"
+    ShowBorder: true
+    BorderColor: "0066cc"
+    BorderSize: 8
+    BorderPosition: "bottom"
+    SpaceBefore: "480"
+    SpaceAfter: "240"
+  H2:
+    Size: 20
+    Bold: true
+    Color: "333333"
+    ShowBorder: true
+    BorderColor: "4d4d4d"
+    BorderSize: 4
+    BorderPosition: "bottom"
+    SpaceBefore: "400"
+    SpaceAfter: "200"
+  H3:
+    Size: 16
+    Bold: true
+    Color: "333333"
+    ShowBorder: false
+    SpaceBefore: "320"
+    SpaceAfter: "160"
+  H4:
+    Size: 14
+    Bold: true
+    Color: "666666"
+    ShowBorder: false
+    SpaceBefore: "280"
+    SpaceAfter: "140"
+  H5:
+    Size: 12
+    Bold: true
+    Color: "666666"
+    ShowBorder: false
+    SpaceBefore: "240"
+    SpaceAfter: "120"
+  H6:
+    Size: 10
+    Bold: true
+    Italic: true
+    Color: "808080"
+    ShowBorder: false
+    SpaceBefore: "200"
+    SpaceAfter: "100"
+  Paragraph:
+    Size: 10
+    Color: "1a1a1a"
+    LineSpacing: "320"
+    FirstLineIndent: "0"
+    LeftIndent: "0"
+    SpaceBefore: "0"
+    SpaceAfter: "160"
+  List:
+    Size: 10
+    Color: "1a1a1a"
+    LeftIndent: "600"
+    HangingIndent: "300"
+    SpaceBefore: "40"
+    SpaceAfter: "40"
+  CodeBlock:
+    Size: 9
+    Color: "000000"
+    BackgroundColor: "f5f5f5"
+    BorderColor: "d0d0d0"
+    MonospaceFontAscii: "Noto Sans Mono"
+    MonospaceFontEastAsia: "Noto Sans Mono CJK JP"
+    LineSpacing: "240"
+    SpaceBefore: "240"
+    SpaceAfter: "240"
+    ShowBorder: true
+    BorderSize: 4
+  Quote:
+    Size: 10
+    Color: "4d4d4d"
+    Italic: false
+    ShowBorder: true
+    BorderColor: "0066cc"
+    BorderSize: 12
+    BorderPosition: "left"
+    LeftIndent: "600"
+    BackgroundColor: "f0f4f8"
+    SpaceBefore: "240"
+    SpaceAfter: "240"

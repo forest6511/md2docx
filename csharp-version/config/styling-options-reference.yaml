@@ -1,0 +1,195 @@
+# YAML Styling Options Reference
+# Complete list of styling options available in DocumentFormat.OpenXml
+
+# Text decoration
+text_decoration:
+  bold: true / false
+  italic: true / false
+  underline:
+    type: single / double / thick / dotted / dashed / wavy / dashDotted
+    color: "000000"  # Hex color
+  strike: true / false  # Strikethrough
+  double_strike: true / false  # Double strikethrough
+  small_caps: true / false  # Small capitals
+  all_caps: true / false  # All uppercase
+  outline: true / false  # Outline
+  shadow: true / false  # Shadow
+  emboss: true / false  # Emboss
+  imprint: true / false  # Imprint
+  color: "000000"  # Text color
+  highlight: yellow / green / cyan / magenta / blue / red / darkBlue / darkCyan / darkGreen / darkMagenta / darkRed / darkYellow / darkGray / lightGray / black / white / none
+  shading:
+    fill: "CCCCCC"  # Background color
+    pattern: clear / solid / horzStripe / vertStripe / reverseDiagStripe / diagStripe / horzCross / diagCross / thinHorzStripe / thinVertStripe / thinReverseDiagStripe / thinDiagStripe / thinHorzCross / thinDiagCross / pct5 / pct10 / pct12 / pct15 / pct20 / pct25 / pct30 / pct35 / pct37 / pct40 / pct45 / pct50 / pct55 / pct60 / pct62 / pct65 / pct70 / pct75 / pct80 / pct85 / pct87 / pct90 / pct95
+
+# Font settings
+font:
+  family: "Times New Roman"
+  size: 10.5pt
+  size_complex: 10.5pt  # For complex scripts
+  spacing: 0pt  # Character spacing (positive wider, negative narrower)
+  position: 0pt  # Superscript/subscript (-6pt subscript, 6pt superscript)
+  kerning: 0pt  # Kerning
+  scale: 100  # Character width scale (%)
+
+# Paragraph borders
+paragraph_border:
+  top:
+    style: single / double / thick / thin / triple / dashSmallGap / dotted / dashed / dashDot / dashDotDot / wave / doubleWave
+    color: "000000"
+    width: 4pt  # 1/8 pt units (4 = 0.5pt)
+    space: 1pt  # Distance from text
+  bottom:
+    style: single
+    color: "000000"
+    width: 4pt
+    space: 1pt
+  left:
+    style: single
+    color: "000000"
+    width: 4pt
+    space: 4pt
+  right:
+    style: single
+    color: "000000"
+    width: 4pt
+    space: 4pt
+
+# Table borders
+table_border:
+  top:
+    style: single / double / thick / thin / dashed / dotted / dashDotStroked / threeDEmboss / threeDEngrave / outset / inset
+    color: "000000"
+    width: 4pt
+  bottom:
+    style: single
+    color: "000000"
+    width: 4pt
+  left:
+    style: single
+    color: "000000"
+    width: 4pt
+  right:
+    style: single
+    color: "000000"
+    width: 4pt
+  insideH:  # Inside horizontal lines
+    style: single
+    color: "CCCCCC"
+    width: 2pt
+  insideV:  # Inside vertical lines
+    style: single
+    color: "CCCCCC"
+    width: 2pt
+
+# Paragraph alignment
+paragraph_alignment:
+  horizontal: left / center / right / both / distribute / mediumKashida / highKashida / lowKashida / thaiDistribute
+  vertical: auto / baseline / bottom / center / top
+
+# Paragraph indentation
+paragraph_indent:
+  left: 0mm
+  right: 0mm
+  first_line: 0mm  # Positive for first line indent
+  hanging: 0mm  # Positive for hanging indent
+
+# Paragraph spacing
+paragraph_spacing:
+  before: 0pt
+  after: 0pt
+  line:
+    type: auto / atLeast / exact / multiple
+    value: 1.0  # Multiplier for 'multiple', pt for 'exact'
+
+# Tab stops
+tabs:
+  - position: 30mm
+    alignment: left / center / right / decimal / bar / num
+    leader: none / dot / hyphen / underscore / heavy / middleDot
+
+# Page breaks
+page_break:
+  before: true / false
+  after: true / false
+  keep_with_next: true / false  # Keep with next paragraph on same page
+  keep_lines_together: true / false  # Don't break paragraph across pages
+  widow_control: true / false  # Prevent widow/orphan lines
+
+# Section settings
+section:
+  type: nextPage / nextColumn / continuous / evenPage / oddPage
+  columns:
+    count: 1
+    space: 10mm  # Column spacing
+    separator: true / false  # Column separator line
+
+# Header/Footer
+header_footer:
+  different_first_page: true / false
+  different_odd_even: true / false
+
+# List settings
+list:
+  numbering_format: decimal / upperRoman / lowerRoman / upperLetter / lowerLetter / ordinal / cardinalText / ordinalText / japaneseCounting / chineseCounting / bullet
+  start: 1
+  level_indent: 7mm
+  hanging_indent: 7mm
+  bullet_char: "•"  # Custom bullet character
+
+# Vertical text specific
+vertical_text:
+  text_direction: tbRl / btLr / lrTb / tbRlV  # tbRl = vertical right-to-left
+  text_flow: lrTb / tbRl
+  rotate: 0 / 90 / 180 / 270  # Text rotation
+  combine_characters: true / false  # Tate-chu-yoko (horizontal in vertical)
+
+# Ruby (furigana/phonetic guide)
+ruby:
+  base_text: "Base"
+  ruby_text: "phonetic"
+  alignment: center / distributeLetter / distributeSpace / left / right
+  size: 5pt
+
+# Emphasis marks
+emphasis_mark:
+  type: none / dot / comma / circle / underDot
+  position: above / below
+
+# Character borders
+character_border:
+  style: single / double / thick / thin / triple
+  color: "000000"
+  width: 4pt
+  padding: 1pt
+
+# Line numbering
+line_numbering:
+  enabled: true / false
+  start: 1
+  distance: 5mm
+  restart: continuous / newPage / newSection
+
+# Multi-column layout
+multi_column:
+  count: 2
+  equal_width: true / false
+  separator: true / false
+  spacing: 10mm
+
+# Drop cap
+drop_cap:
+  enabled: true / false
+  lines: 3
+  distance: 2mm
+
+# Text box
+text_box:
+  width: 50mm
+  height: 30mm
+  border:
+    style: single
+    color: "000000"
+    width: 1pt
+  fill: "FFFFFF"
+  text_direction: horizontal / vertical

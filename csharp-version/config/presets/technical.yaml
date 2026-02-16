@@ -1,0 +1,258 @@
+# Technical Documentation Preset - For Technical Documents
+# API specifications, technical manuals, README files, etc.
+
+mode: technical
+
+page:
+  size: A4
+  orientation: portrait
+  margins:
+    top: 25mm
+    bottom: 25mm
+    left: 25mm
+    right: 25mm
+
+font:
+  family: "Segoe UI"  # or "Roboto", "Noto Sans JP"
+  size: 10.5pt
+  embed: false
+
+text_direction: horizontal
+
+styles:
+  # Project title
+  h1:
+    size: 22pt
+    bold: true
+    color: "0366d6"  # GitHub blue
+    spacing_before: 0pt
+    spacing_after: 16pt
+    border:
+      bottom:
+        style: double
+        color: "0366d6"
+        width: 4pt
+        space: 3pt
+
+  # Major section
+  h2:
+    size: 18pt
+    bold: true
+    color: "24292e"
+    spacing_before: 20pt
+    spacing_after: 10pt
+    page_break_before: false
+
+  # Subsection
+  h3:
+    size: 15pt
+    bold: true
+    color: "586069"
+    spacing_before: 16pt
+    spacing_after: 8pt
+
+  # API endpoints, function names, etc.
+  h4:
+    size: 13pt
+    bold: true
+    font: "Consolas"
+    color: "6f42c1"  # Purple
+    background: "f6f8fa"
+    spacing_before: 12pt
+    spacing_after: 6pt
+    padding:
+      left: 2mm
+      top: 1mm
+      bottom: 1mm
+
+  h5:
+    size: 11pt
+    bold: true
+    color: "24292e"
+    spacing_before: 10pt
+    spacing_after: 5pt
+
+  h6:
+    size: 10.5pt
+    bold: true
+    color: "6a737d"
+    spacing_before: 8pt
+    spacing_after: 4pt
+
+  # Body text
+  paragraph:
+    size: 10.5pt
+    line_spacing: 1.6
+    spacing_after: 8pt
+    alignment: left
+
+  # Code block (most important)
+  code_block:
+    background: "f6f8fa"  # GitHub gray
+    font: "Consolas"
+    size: 9pt
+    color: "24292e"
+    border:
+      all: true
+      color: "d1d5da"
+      width: 1pt
+    padding:
+      all: 5mm
+    spacing_before: 10pt
+    spacing_after: 10pt
+    line_spacing: 1.4
+
+  # Syntax highlighting style (future extension)
+  code_keyword:
+    color: "d73a49"  # Red
+    bold: true
+
+  code_string:
+    color: "032f62"  # Dark blue
+
+  code_comment:
+    color: "6a737d"  # Gray
+    italic: true
+
+  # Inline code
+  code_inline:
+    background: "f6f8fa"
+    font: "Consolas"
+    size: 9.5pt
+    color: "24292e"
+    border:
+      all: true
+      color: "e1e4e8"
+      width: 0.5pt
+    padding: 1pt
+
+  # API responses, output examples
+  output_block:
+    background: "282c34"  # Dark theme
+    font: "Consolas"
+    size: 9pt
+    color: "abb2bf"  # Light gray text
+    border:
+      all: true
+      color: "21252b"
+      width: 1pt
+    padding:
+      all: 5mm
+    spacing_before: 10pt
+    spacing_after: 10pt
+
+  # Notes, warnings
+  warning_box:
+    background: "fff5b1"
+    border:
+      left:
+        style: thick
+        color: "ffd33d"
+        width: 12pt
+        space: 4pt
+    padding:
+      all: 5mm
+    spacing_before: 12pt
+    spacing_after: 12pt
+
+  error_box:
+    background: "ffeef0"
+    border:
+      left:
+        style: thick
+        color: "d73a49"
+        width: 12pt
+        space: 4pt
+    padding:
+      all: 5mm
+    spacing_before: 12pt
+    spacing_after: 12pt
+
+  info_box:
+    background: "f1f8ff"
+    border:
+      left:
+        style: thick
+        color: "0366d6"
+        width: 12pt
+        space: 4pt
+    padding:
+      all: 5mm
+    spacing_before: 12pt
+    spacing_after: 12pt
+
+  # Table (specifications, parameter lists)
+  table_header:
+    background: "f6f8fa"
+    bold: true
+    size: 10pt
+    color: "24292e"
+    alignment: left
+    border:
+      all: true
+      color: "d1d5da"
+      width: 1pt
+    padding:
+      top: 3mm
+      bottom: 3mm
+      left: 4mm
+      right: 4mm
+
+  table_cell:
+    background: "ffffff"
+    size: 10pt
+    color: "24292e"
+    border:
+      all: true
+      color: "e1e4e8"
+      width: 0.5pt
+    padding:
+      all: 3mm
+
+  # Quote (reference links, document references)
+  blockquote:
+    background: "ffffff"
+    color: "6a737d"
+    border:
+      left:
+        style: thick
+        color: "dfe2e5"
+        width: 10pt
+        space: 4pt
+    padding_left: 8mm
+    spacing_before: 8pt
+    spacing_after: 8pt
+    italic: false
+
+  # List
+  list_bullet:
+    size: 10.5pt
+    bullet_char: "•"
+    spacing_before: 2pt
+    spacing_after: 2pt
+
+  list_numbered:
+    size: 10.5pt
+    numbering_format: decimal
+    spacing_before: 2pt
+    spacing_after: 2pt
+
+# Table of contents settings
+toc:
+  enabled: true
+  depth: 3
+  title: "Table of Contents"
+  title_size: 18pt
+
+# Page numbering
+page_numbering:
+  enabled: true
+  format: "{page}"
+  position: bottom_right
+  font_size: 9pt
+
+# Metadata
+metadata:
+  category: "Technical Documentation"
+  template: "technical"
+  language: "ja"

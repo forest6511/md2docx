@@ -1,0 +1,208 @@
+# Business Document Preset - For Business Documents
+# Professional style suitable for proposals, reports, meeting minutes, etc.
+
+mode: business
+
+page:
+  size: A4
+  orientation: portrait
+  margins:
+    top: 30mm
+    bottom: 30mm
+    left: 30mm
+    right: 25mm
+
+font:
+  family: "游ゴシック"  # Yu Gothic (or "Calibri", "Arial")
+  size: 11pt
+  embed: false
+
+text_direction: horizontal
+
+styles:
+  # Cover page title H1
+  h1:
+    size: 24pt
+    bold: true
+    color: "1a5490"
+    spacing_before: 48pt
+    spacing_after: 24pt
+    alignment: center
+
+  # Section title H2
+  h2:
+    size: 16pt
+    bold: true
+    color: "2e5c8a"
+    spacing_before: 18pt
+    spacing_after: 10pt
+    border:
+      bottom:
+        style: single
+        color: "4a90e2"
+        width: 3pt
+        space: 2pt
+
+  # Subsection H3
+  h3:
+    size: 13pt
+    bold: true
+    color: "34495e"
+    spacing_before: 14pt
+    spacing_after: 7pt
+    border:
+      left:
+        style: thick
+        color: "7fb3d5"
+        width: 8pt
+        space: 4pt
+    indent:
+      left: 6mm
+
+  h4:
+    size: 12pt
+    bold: true
+    color: "5d6d7e"
+    spacing_before: 10pt
+    spacing_after: 5pt
+
+  # Body text
+  paragraph:
+    size: 11pt
+    line_spacing: 1.75
+    spacing_after: 8pt
+    alignment: both  # Justified
+    first_line_indent: 0pt
+
+  # Important paragraph (notes, etc.)
+  important_note:
+    background: "fff9e6"
+    border:
+      all: true
+      color: "f39c12"
+      width: 2pt
+    padding:
+      all: 5mm
+    spacing_before: 12pt
+    spacing_after: 12pt
+
+  # Data table
+  table_header:
+    background: "2c3e50"
+    bold: true
+    size: 10pt
+    color: "ffffff"
+    alignment: center
+    border:
+      all: true
+      color: "34495e"
+      width: 1.5pt
+    padding:
+      top: 3mm
+      bottom: 3mm
+      left: 3mm
+      right: 3mm
+
+  table_cell:
+    background: "ffffff"
+    size: 10pt
+    border:
+      all: true
+      color: "95a5a6"
+      width: 0.5pt
+    padding:
+      all: 2.5mm
+    alignment: left
+
+  # Alternating row color
+  table_cell_alt:
+    background: "f8f9fa"
+    size: 10pt
+    border:
+      all: true
+      color: "95a5a6"
+      width: 0.5pt
+    padding:
+      all: 2.5mm
+
+  # Code block (for technical specifications)
+  code_block:
+    background: "f5f5f5"
+    font: "Consolas"
+    size: 9pt
+    color: "333333"
+    border:
+      all: true
+      color: "dddddd"
+      width: 1pt
+    padding:
+      all: 4mm
+    spacing_before: 10pt
+    spacing_after: 10pt
+
+  # Quote (reference information)
+  blockquote:
+    background: "eef2f7"
+    color: "5d6d7e"
+    border:
+      left:
+        style: thick
+        color: "3498db"
+        width: 10pt
+        space: 4pt
+    padding_left: 8mm
+    padding_top: 3mm
+    padding_bottom: 3mm
+    spacing_before: 10pt
+    spacing_after: 10pt
+    italic: false
+
+  # Bullet list
+  list_bullet:
+    size: 11pt
+    bullet_char: "■"  # Square
+    spacing_before: 3pt
+    spacing_after: 3pt
+    indent: 8mm
+
+  # Numbered list
+  list_numbered:
+    size: 11pt
+    numbering_format: decimal
+    spacing_before: 3pt
+    spacing_after: 3pt
+    indent: 8mm
+
+# Header settings
+header:
+  enabled: true
+  content:
+    left: "{company_name}"
+    right: "{document_date}"
+  font_size: 9pt
+  color: "7f8c8d"
+  border:
+    bottom:
+      style: single
+      color: "bdc3c7"
+      width: 0.5pt
+
+# Footer settings
+footer:
+  enabled: true
+  page_number:
+    enabled: true
+    format: "Page {page} / {total}"
+    alignment: center
+  font_size: 9pt
+  color: "7f8c8d"
+  border:
+    top:
+      style: single
+      color: "bdc3c7"
+      width: 0.5pt
+
+# Metadata
+metadata:
+  category: "Business Document"
+  template: "business"

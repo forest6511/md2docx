@@ -1,0 +1,39 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+
+# Test files
+**/tests/
+**/*.Tests/
+test-*.md
+test-*.docx
+test-*/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE
+.vscode/
+.vs/
+*.suo
+*.user
+*.swp
+*.swo
+
+# Documentation (internal)
+internal-docs/
+docs/knowledge/
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+debug-*.cs
+*.original
+
+# OS files
+.DS_Store
+Thumbs.db

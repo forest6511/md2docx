@@ -1,0 +1,103 @@
+# Vertical Novel Preset - Japanese vertical writing for novels
+SchemaVersion: "2.0"
+
+Metadata:
+  Name: "Vertical Novel"
+  Description: "Japanese vertical writing optimized for novel formatting"
+  Author: "md2docx"
+  Version: "1.0.0"
+
+TextDirection: "Vertical"
+
+PageLayout:
+  Width: 14.8
+  Height: 21.0
+  MarginTop: 2.0
+  MarginBottom: 2.0
+  MarginLeft: 2.0
+  MarginRight: 2.0
+  MarginHeader: 1.5
+  MarginFooter: 1.5
+  MarginGutter: 0
+
+Fonts:
+  Ascii: "Noto Serif"
+  EastAsia: "Noto Serif CJK JP"
+  DefaultSize: 11
+
+Styles:
+  H1:
+    Size: 18
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "720"
+    SpaceAfter: "480"
+  H2:
+    Size: 16
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "600"
+    SpaceAfter: "360"
+  H3:
+    Size: 14
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "480"
+    SpaceAfter: "240"
+  H4:
+    Size: 12
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "360"
+    SpaceAfter: "180"
+  H5:
+    Size: 11
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "240"
+    SpaceAfter: "120"
+  H6:
+    Size: 11
+    Bold: true
+    Color: "000000"
+    ShowBorder: false
+    SpaceBefore: "180"
+    SpaceAfter: "90"
+  Paragraph:
+    Size: 11
+    Color: "000000"
+    LineSpacing: "440"
+    FirstLineIndent: "0"
+    LeftIndent: "0"
+    SpaceBefore: "0"
+    SpaceAfter: "0"
+  List:
+    Size: 11
+    Color: "000000"
+    LeftIndent: "440"
+    HangingIndent: "220"
+    SpaceBefore: "120"
+    SpaceAfter: "120"
+  CodeBlock:
+    Size: 10
+    Color: "333333"
+    BackgroundColor: "f5f5f5"
+    BorderColor: "cccccc"
+    MonospaceFontAscii: "Noto Sans Mono"
+    MonospaceFontEastAsia: "Noto Sans Mono CJK JP"
+    LineSpacing: "320"
+    SpaceBefore: "360"
+    SpaceAfter: "360"
+  Quote:
+    Size: 11
+    Color: "333333"
+    Italic: false
+    ShowBorder: false
+    LeftIndent: "440"
+    SpaceBefore: "360"
+    SpaceAfter: "360"

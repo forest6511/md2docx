@@ -1,0 +1,116 @@
+# Default Preset - Balanced styling for general documents
+SchemaVersion: "2.0"
+
+Metadata:
+  Name: "Default"
+  Description: "Balanced styling suitable for most documents"
+  Author: "md2docx"
+  Version: "1.0.0"
+
+TextDirection: "Horizontal"
+
+PageLayout:
+  Width: 21.0
+  Height: 29.7
+  MarginTop: 2.54
+  MarginBottom: 2.54
+  MarginLeft: 3.17
+  MarginRight: 3.17
+  MarginHeader: 1.27
+  MarginFooter: 1.27
+  MarginGutter: 0
+
+Fonts:
+  Ascii: "Noto Serif"
+  EastAsia: "Noto Serif CJK JP"
+  DefaultSize: 11
+
+Styles:
+  H1:
+    Size: 26
+    Bold: true
+    Color: "2c3e50"
+    ShowBorder: true
+    BorderColor: "3498db"
+    BorderSize: 6
+    BorderPosition: "bottom"
+    SpaceBefore: "600"
+    SpaceAfter: "300"
+  H2:
+    Size: 22
+    Bold: true
+    Color: "34495e"
+    ShowBorder: true
+    BorderColor: "95a5a6"
+    BorderSize: 4
+    BorderPosition: "bottom"
+    SpaceBefore: "480"
+    SpaceAfter: "240"
+  H3:
+    Size: 18
+    Bold: true
+    Color: "34495e"
+    ShowBorder: false
+    SpaceBefore: "360"
+    SpaceAfter: "180"
+  H4:
+    Size: 15
+    Bold: true
+    Color: "7f8c8d"
+    ShowBorder: false
+    SpaceBefore: "300"
+    SpaceAfter: "150"
+  H5:
+    Size: 13
+    Bold: true
+    Color: "7f8c8d"
+    ShowBorder: false
+    SpaceBefore: "240"
+    SpaceAfter: "120"
+  H6:
+    Size: 11
+    Bold: true
+    Italic: true
+    Color: "95a5a6"
+    ShowBorder: false
+    SpaceBefore: "180"
+    SpaceAfter: "90"
+  Paragraph:
+    Size: 11
+    Color: "2c3e50"
+    LineSpacing: "360"
+    FirstLineIndent: "0"
+    LeftIndent: "0"
+    SpaceBefore: "0"
+    SpaceAfter: "180"
+  List:
+    Size: 11
+    Color: "2c3e50"
+    LeftIndent: "720"
+    HangingIndent: "360"
+    SpaceBefore: "60"
+    SpaceAfter: "60"
+  CodeBlock:
+    Size: 10
+    Color: "2c3e50"
+    BackgroundColor: "ecf0f1"
+    BorderColor: "bdc3c7"
+    MonospaceFontAscii: "Noto Sans Mono"
+    MonospaceFontEastAsia: "Noto Sans Mono CJK JP"
+    LineSpacing: "280"
+    SpaceBefore: "300"
+    SpaceAfter: "300"
+    ShowBorder: true
+    BorderSize: 4
+  Quote:
+    Size: 11
+    Color: "7f8c8d"
+    Italic: true
+    ShowBorder: true
+    BorderColor: "3498db"
+    BorderSize: 16
+    BorderPosition: "left"
+    LeftIndent: "720"
+    BackgroundColor: "f8f9fa"
+    SpaceBefore: "300"
+    SpaceAfter: "300"

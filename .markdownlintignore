@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+vendor/
+packages/
+
+# Build artifacts
+dist/
+build/
+out/
+bin/
+obj/
+csharp-version/bin/
+csharp-version/obj/
+
+# Internal documentation (gitignored)
+internal-docs/
+
+# Auto-generated files
+CHANGELOG.md
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Test output
+TestResults/

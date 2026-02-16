@@ -1,0 +1,385 @@
+# KDP Rich Styling Example - Full use of borders, underlines, backgrounds, etc.
+mode: kdp
+
+page:
+  size: custom
+  width: 6in
+  height: 9in
+  orientation: portrait
+  margins:
+    top: 0.5in
+    bottom: 0.75in
+    left: 0.875in
+    right: 0.625in
+
+font:
+  family: "游明朝"
+  size: 11pt
+  embed: true
+
+text_direction: horizontal
+
+styles:
+  # Chapter title (H1) - With underline, page break before
+  h1:
+    size: 22pt
+    bold: true
+    color: "000000"
+    underline:
+      type: double  # Double underline
+      color: "333333"
+    spacing_before: 0pt
+    spacing_after: 18pt
+    page_break_before: true
+    alignment: center
+    border:
+      bottom:  # Thick line at bottom
+        style: double
+        color: "666666"
+        width: 6pt
+        space: 3pt
+
+  # Section title (H2) - Vertical line on left
+  h2:
+    size: 16pt
+    bold: true
+    color: "1a1a1a"
+    spacing_before: 16pt
+    spacing_after: 8pt
+    border:
+      left:  # Accent line on left side
+        style: thick
+        color: "4a90e2"
+        width: 12pt
+        space: 6pt
+    indent:
+      left: 8mm  # Indent by the width of the line
+
+  # Subsection (H3) - Background color and border
+  h3:
+    size: 13pt
+    bold: true
+    color: "2c3e50"
+    spacing_before: 12pt
+    spacing_after: 6pt
+    shading:
+      fill: "ecf0f1"  # Light gray background
+      pattern: clear
+    border:
+      top:
+        style: single
+        color: "95a5a6"
+        width: 2pt
+        space: 2pt
+      bottom:
+        style: single
+        color: "95a5a6"
+        width: 2pt
+        space: 2pt
+    padding:
+      top: 2mm
+      bottom: 2mm
+      left: 3mm
+      right: 3mm
+
+  # H4 - Simple underline
+  h4:
+    size: 12pt
+    bold: true
+    color: "34495e"
+    underline:
+      type: thick
+      color: "7f8c8d"
+    spacing_before: 10pt
+    spacing_after: 5pt
+
+  # Body paragraph
+  paragraph:
+    size: 11pt
+    line_spacing: 1.75
+    spacing_before: 0pt
+    spacing_after: 8pt
+    first_line_indent: 0.25in
+
+  # Important paragraph (e.g., notes, warnings) - with borders
+  important_paragraph:
+    size: 10.5pt
+    bold: false
+    color: "2c3e50"
+    shading:
+      fill: "fff3cd"  # Light yellow background
+      pattern: clear
+    border:
+      top:
+        style: single
+        color: "ffc107"
+        width: 4pt
+        space: 2pt
+      bottom:
+        style: single
+        color: "ffc107"
+        width: 4pt
+        space: 2pt
+      left:
+        style: double
+        color: "ffc107"
+        width: 6pt
+        space: 4pt
+      right:
+        style: single
+        color: "ffc107"
+        width: 2pt
+        space: 2pt
+    padding:
+      top: 3mm
+      bottom: 3mm
+      left: 5mm
+      right: 3mm
+    spacing_before: 10pt
+    spacing_after: 10pt
+
+  # Table header - background color, bold, all borders
+  table_header:
+    background: "34495e"  # Dark gray
+    bold: true
+    color: "ffffff"  # White text
+    size: 10.5pt
+    alignment: center
+    border:
+      all: true
+      style: single
+      color: "2c3e50"
+      width: 4pt
+    padding:
+      top: 2mm
+      bottom: 2mm
+      left: 3mm
+      right: 3mm
+
+  # Table cell - 2 patterns for striping
+  table_cell:
+    background: "ffffff"
+    size: 10pt
+    border:
+      all: true
+      style: single
+      color: "bdc3c7"
+      width: 2pt
+    padding:
+      top: 1.5mm
+      bottom: 1.5mm
+      left: 2mm
+      right: 2mm
+
+  table_cell_alt:  # For alternating rows
+    background: "f8f9fa"  # Light gray
+    size: 10pt
+    border:
+      all: true
+      style: single
+      color: "bdc3c7"
+      width: 2pt
+    padding:
+      top: 1.5mm
+      bottom: 1.5mm
+      left: 2mm
+      right: 2mm
+
+  # Code block - border and background
+  code_block:
+    background: "282c34"  # Dark background
+    font: "Consolas"
+    size: 9pt
+    color: "abb2bf"  # Light text color
+    border:
+      all: true
+      style: single
+      color: "4b5263"
+      width: 2pt
+    padding:
+      top: 4mm
+      bottom: 4mm
+      left: 5mm
+      right: 5mm
+    spacing_before: 10pt
+    spacing_after: 10pt
+
+  # Inline code - background and border
+  code_inline:
+    background: "f1f3f5"
+    font: "Consolas"
+    size: 9.5pt
+    color: "e83e8c"
+    border:
+      all: true
+      style: single
+      color: "dee2e6"
+      width: 1pt
+    padding: 1pt
+
+  # Blockquote - thick vertical line on left
+  blockquote:
+    background: "f9fafb"
+    size: 10.5pt
+    italic: true
+    color: "495057"
+    border:
+      left:
+        style: thick
+        color: "6c757d"
+        width: 12pt
+        space: 4pt
+    padding_left: 10mm
+    spacing_before: 10pt
+    spacing_after: 10pt
+    line_spacing: 1.6
+
+  # List item
+  list_bullet:
+    size: 11pt
+    spacing_before: 2pt
+    spacing_after: 2pt
+    indent: 0.25in
+    bullet_char: "▪"  # Black square
+
+  # Numbered list
+  list_numbered:
+    size: 11pt
+    spacing_before: 2pt
+    spacing_after: 2pt
+    indent: 0.25in
+    numbering_format: decimal
+
+  # Highlighted text (marker)
+  highlight_text:
+    highlight: yellow  # Highlighter style
+    bold: false
+
+  # Emphasized text (underline)
+  emphasis_underline:
+    underline:
+      type: wavy  # Wavy line
+      color: "dc3545"
+
+  # Important text (background color)
+  important_text:
+    background: "fff3cd"
+    bold: true
+    color: "856404"
+
+  # Strikethrough text
+  strikethrough:
+    strike: true
+    color: "6c757d"
+
+  # Drop cap (large first letter of chapter)
+  drop_cap:
+    enabled: true
+    lines: 3
+    distance: 2mm
+    font: "游明朝"
+    bold: true
+
+# Styles for special sections
+special_sections:
+  # Column/Sidebar
+  sidebar:
+    background: "e9ecef"
+    border:
+      all: true
+      style: double
+      color: "6c757d"
+      width: 4pt
+    padding:
+      all: 5mm
+    title:
+      size: 12pt
+      bold: true
+      color: "495057"
+      alignment: center
+    content:
+      size: 10pt
+      color: "212529"
+
+  # Tips/Hints
+  tip:
+    background: "d1ecf1"
+    border:
+      left:
+        style: thick
+        color: "0c5460"
+        width: 16pt
+    padding:
+      top: 3mm
+      bottom: 3mm
+      left: 8mm
+      right: 4mm
+    icon: "💡"  # Light bulb icon
+
+  # Warning
+  warning:
+    background: "fff3cd"
+    border:
+      all: true
+      style: dashed
+      color: "856404"
+      width: 4pt
+    padding:
+      all: 4mm
+    icon: "⚠️"
+
+  # Error/Caution
+  danger:
+    background: "f8d7da"
+    border:
+      all: true
+      style: double
+      color: "721c24"
+      width: 6pt
+    padding:
+      all: 4mm
+    icon: "🚫"
+
+# Page header/footer
+header_footer:
+  header:
+    enabled: true
+    different_first_page: true  # First page is different
+    different_odd_even: false
+    border:
+      bottom:
+        style: single
+        color: "dee2e6"
+        width: 2pt
+    content:
+      size: 9pt
+      color: "6c757d"
+      alignment: center
+
+  footer:
+    enabled: true
+    different_first_page: true
+    different_odd_even: true  # Different for odd/even pages
+    border:
+      top:
+        style: single
+        color: "dee2e6"
+        width: 2pt
+    page_number:
+      enabled: true
+      format: "- {page} -"
+      alignment: center
+      size: 9pt
+
+# Page numbering style
+page_numbering:
+  format: decimal  # 1, 2, 3...
+  start: 1
+  chapter_prefix: false
+  position: center  # center / left / right
+  border:
+    top:
+      style: single
+      color: "adb5bd"
+      width: 1pt
+      space: 2pt

@@ -1,0 +1,240 @@
+# KDP Publishing Workflow Configuration
+# Complete automation setup for Markdown → Word → PDF → KDP
+
+workflow:
+  # Step 1: Markdown to Word conversion
+  markdown_to_word:
+    enabled: true
+    config: "kdp-6x9-horizontal.yaml"  # or kdp-vertical-novel.yaml
+    output: "manuscript.docx"
+
+  # Step 2: Word to PDF conversion (No Pandoc needed!)
+  word_to_pdf:
+    enabled: true
+    method: word_interop  # word_interop / aspose / docx_library
+
+    # PDF export settings (KDP compliant)
+    pdf_settings:
+      # Font embedding (REQUIRED by KDP)
+      embed_fonts: true
+      subset_fonts: true  # Font subsetting
+
+      # Image quality
+      image_quality: high  # high / medium / low
+      image_dpi: 300  # 300 DPI recommended for KDP
+
+      # Color mode
+      color_mode: rgb  # rgb / cmyk (KDP accepts RGB)
+
+      # PDF/A compliance (optional but recommended)
+      pdf_a: false  # true for archival quality
+
+      # Compression
+      compress_images: false  # Keep high quality for print
+
+      # Security (usually disabled for KDP)
+      encrypt: false
+      allow_printing: true
+      allow_copying: true
+
+  # Step 3: KDP validation
+  kdp_validation:
+    enabled: true
+    checks:
+      # Page size validation
+      - check: page_size
+        expected: "6x9in"  # or A5, custom
+        tolerance: 0.1mm
+
+      # Margin validation (based on page count)
+      - check: margins
+        min_inner: 0.375in  # Minimum for 24-150 pages
+        min_outer: 0.25in
+        min_top: 0.25in
+        min_bottom: 0.25in
+
+      # Bleed validation
+      - check: bleed
+        expected: 0.125in
+        required: true  # true if cover has bleed
+
+      # Font validation
+      - check: fonts
+        embedded: required
+        subset: recommended
+        min_size: 7pt
+
+      # Content validation
+      - check: content
+        no_blank_pages: true
+        correct_page_order: true
+        headers_footers_ok: true
+
+      # File size
+      - check: file_size
+        max_size: 650MB  # KDP limit
+        warn_at: 600MB
+
+# KDP Recommended Settings
+kdp_recommendations:
+  # Trim sizes (KDP standard options)
+  trim_sizes:
+    paperback:
+      - "5 x 8 in"
+      - "5.06 x 7.81 in"  # UK
+      - "5.25 x 8 in"
+      - "5.5 x 8.5 in"
+      - "6 x 9 in"  # Most popular
+      - "6.14 x 9.21 in"  # A5
+      - "6.69 x 9.61 in"  # UK
+      - "7 x 10 in"
+      - "7.44 x 9.69 in"  # UK
+      - "7.5 x 9.25 in"
+      - "8 x 10 in"
+      - "8.25 x 6 in"
+      - "8.25 x 8.25 in"
+      - "8.5 x 11 in"
+
+    hardcover:
+      - "5.5 x 8.5 in"
+      - "6 x 9 in"
+      - "6.14 x 9.21 in"
+      - "6.69 x 9.61 in"
+      - "7 x 10 in"
+      - "7.44 x 9.69 in"
+      - "8.5 x 11 in"
+
+  # Interior type
+  interior_type:
+    black_and_white: true
+    premium_color: false
+    standard_color: false
+
+  # Paper type
+  paper:
+    white: true  # White paper
+    cream: false  # Cream paper (for novels)
+
+  # Binding
+  binding: perfect_bound  # Paperback is usually perfect bound
+
+  # File format
+  format: pdf  # PDF recommended over Word .docx
+
+  # DPI for images
+  image_dpi:
+    black_and_white: 300
+    color: 300
+    minimum: 150
+
+  # Font embedding
+  fonts:
+    embed_all: true
+    subset_when_possible: true
+    avoid_type3: true  # Type 3 fonts not recommended
+
+# Word to PDF conversion without Pandoc
+word_pdf_conversion_methods:
+  # Method 1: Microsoft Word (Windows/Mac)
+  microsoft_word:
+    platform: windows / mac
+    automation: com_interop  # Windows
+    command_line: false
+    quality: excellent
+    font_embedding: automatic
+    cost: free_with_word
+
+  # Method 2: LibreOffice (Cross-platform, Free)
+  libreoffice:
+    platform: windows / mac / linux
+    command_line: true
+    command: "libreoffice --headless --convert-to pdf manuscript.docx"
+    quality: good
+    font_embedding: supported
+    cost: free
+
+  # Method 3: Aspose.Words (C# Library)
+  aspose_words:
+    platform: cross_platform
+    requires: nuget_package
+    quality: excellent
+    font_embedding: full_control
+    cost: commercial_license
+
+  # Method 4: Syncfusion DocIO (C# Library)
+  syncfusion:
+    platform: cross_platform
+    requires: nuget_package
+    quality: excellent
+    font_embedding: full_control
+    cost: commercial_license
+
+  # Method 5: GemBox.Document (C# Library - Recommended Free Option)
+  gembox:
+    platform: cross_platform
+    requires: nuget_package
+    free_tier: 20_paragraphs_limit  # Free version has paragraph limit
+    quality: excellent
+    font_embedding: full_control
+    cost: free_tier_or_license
+
+# Recommended workflow for KDP
+recommended_kdp_workflow:
+  steps:
+    1:
+      action: "Markdown → Word conversion"
+      tool: "MarkdownToDocx (this tool)"
+      config: "kdp-6x9-horizontal.yaml"
+      output: "manuscript.docx"
+
+    2:
+      action: "Review and adjust Word file"
+      tool: "Microsoft Word"
+      tasks:
+        - "Verify layout"
+        - "Configure font embedding"
+        - "Check page numbers"
+        - "Update table of contents"
+
+    3:
+      action: "Word → PDF conversion"
+      tool: "Microsoft Word (recommended) or LibreOffice"
+      method: "File → Export → PDF/XPS"
+      settings:
+        - "Font embedding: ON"
+        - "PDF/A compliance: OFF (usually)"
+        - "Image quality: High quality"
+
+    4:
+      action: "PDF validation"
+      tool: "Adobe Acrobat or KDP Previewer"
+      checks:
+        - "Page size accuracy"
+        - "Font embedding verification"
+        - "Image quality verification"
+        - "Trim marks and bleed verification"
+
+    5:
+      action: "KDP upload"
+      platform: "https://kdp.amazon.co.jp"
+      upload: "manuscript.pdf"
+
+# Automation script example
+automation_example: |
+  # PowerShell (Windows)
+  # 1. Markdown → Word
+  dotnet run --project MarkdownToDocx.CLI -- convert chapters/*.md -o manuscript.docx -c kdp-6x9-horizontal.yaml
+
+  # 2. Word → PDF (using Word COM automation)
+  $Word = New-Object -ComObject Word.Application
+  $Doc = $Word.Documents.Open("$PWD\manuscript.docx")
+  $Doc.ExportAsFixedFormat("$PWD\manuscript.pdf", 17, $false, 1, 0, 0, 0, $true)
+  $Doc.Close()
+  $Word.Quit()
+
+  # Bash (Mac/Linux with LibreOffice)
+  # 1. Markdown → Word
+  dotnet run --project MarkdownToDocx.CLI -- convert chapters/*.md -o manuscript.docx -c kdp-6x9-horizontal.yaml
+
+  # 2. Word → PDF
+  libreoffice --headless --convert-to pdf manuscript.docx --outdir ./

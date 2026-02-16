@@ -1,0 +1,42 @@
+# Slim Version - Minimal font package only
+# Size: ~250MB (About half of standard version)
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /source
+
+COPY src/*.sln .
+COPY src/MarkdownToDocx.Core/*.csproj ./MarkdownToDocx.Core/
+COPY src/MarkdownToDocx.Styling/*.csproj ./MarkdownToDocx.Styling/
+COPY src/MarkdownToDocx.CLI/*.csproj ./MarkdownToDocx.CLI/
+RUN dotnet restore
+
+COPY src/ .
+RUN dotnet publish MarkdownToDocx.CLI/MarkdownToDocx.CLI.csproj \
+    -c Release \
+    -o /app/publish \
+    --no-restore \
+    -p:PublishTrimmed=true \
+    -p:PublishSingleFile=true
+
+FROM mcr.microsoft.com/dotnet/runtime:8.0-slim
+WORKDIR /app
+
+# Minimal fonts only (Noto Serif JP only)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    fonts-noto-cjk-jp \
+    fontconfig && \
+    fc-cache -fv && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /app/publish .
+COPY config/ /app/config/
+
+WORKDIR /workspace
+ENTRYPOINT ["dotnet", "/app/MarkdownToDocx.CLI.dll"]
+CMD ["--help"]
+
+LABEL maintainer="your-email@example.com"
+LABEL version="1.0.0-slim"
+LABEL description="Markdown to Word Converter (Slim) with Noto Serif JP only"

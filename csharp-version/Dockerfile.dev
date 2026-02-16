@@ -1,0 +1,28 @@
+# Development Dockerfile - For development (Hot-reload enabled)
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+WORKDIR /app
+
+# Install fonts for development
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    fonts-noto-cjk-jp \
+    fonts-ipafont \
+    fontconfig \
+    # Development tools
+    vim \
+    nano && \
+    fc-cache -fv && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Source code will be provided via volume mount
+VOLUME /app/src
+VOLUME /app/config
+VOLUME /workspace
+
+# Use dotnet watch by default
+ENTRYPOINT ["dotnet"]
+CMD ["watch", "run", "--project", "/app/src/MarkdownToDocx.CLI"]
+
+LABEL description="Development environment with hot-reload support"
