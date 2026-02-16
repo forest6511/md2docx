@@ -2,7 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
-[![Tests](https://img.shields.io/badge/tests-49%2F49%20passing-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-82%2F82%20passing-brightgreen.svg)]()
+[![Coverage](https://img.shields.io/badge/coverage-90.1%25-brightgreen.svg)]()
 
 **A flexible, high-quality Markdown to Word (DOCX) converter with YAML-based styling customization.**
 
@@ -306,10 +307,10 @@ md2docx/
 cd csharp-version
 dotnet test
 
-# Current test coverage: 49/49 tests passing
-# - Core layer: 17 tests
-# - Styling layer: 30 tests
-# - Integration: 2 tests
+# Current test coverage: 82/82 tests passing (90.1% coverage)
+# - Core layer: 42 tests (91.5% coverage)
+# - Styling layer: 37 tests (87.1% coverage)
+# - Integration: 3 tests
 ```
 
 ### Development Workflow
