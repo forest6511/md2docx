@@ -1,0 +1,84 @@
+name: Documentation Consistency Check
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'config/presets/**'
+      - 'README.md'
+      - 'scripts/check-*.sh'
+      - '.github/workflows/docs-check.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'config/presets/**'
+      - 'README.md'
+
+jobs:
+  documentation-check:
+    name: Check Documentation Consistency
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for git log
+
+      - name: Make scripts executable
+        run: |
+          chmod +x scripts/*.sh
+
+      - name: Check English/Japanese documentation sync
+        run: |
+          echo "📚 Checking documentation sync..."
+          make docs-sync
+
+      - name: Check documentation-source consistency
+        run: |
+          echo "🔍 Checking source consistency..."
+          make docs-source
+
+      - name: Generate consistency report
+        if: always()
+        run: |
+          echo "📊 Documentation Check Summary" > $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ All documentation checks passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Documentation checks failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Common Issues" >> $GITHUB_STEP_SUMMARY
+            echo "- Missing Japanese translation" >> $GITHUB_STEP_SUMMARY
+            echo "- Undocumented configuration keys" >> $GITHUB_STEP_SUMMARY
+            echo "- Missing preset documentation" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Fix" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+            echo "make docs-all  # Run locally to see detailed errors" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment on PR (if failed)
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## ❌ Documentation Consistency Check Failed\n\n' +
+                    'Please review the documentation changes:\n\n' +
+                    '- Ensure English and Japanese docs are in sync\n' +
+                    '- Document all new configuration keys\n' +
+                    '- Add new presets to preset documentation\n\n' +
+                    '**Run locally**: `make docs-all`\n\n' +
+                    'See [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+            })

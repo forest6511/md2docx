@@ -253,6 +253,40 @@ if [ -n "$CHANGED_YAML" ]; then
 fi
 
 # ============================================================
+# Documentation Consistency Check
+# ============================================================
+# Check if documentation files changed
+CHANGED_DOCS=$(git diff --name-only --diff-filter=d origin/main...HEAD 2>/dev/null | grep -E '^(docs/|config/presets|README\.md)' || true)
+
+if [ -n "$CHANGED_DOCS" ]; then
+  echo "📚 Documentation consistency check..."
+  echo ""
+
+  # Run lightweight documentation checks using Makefile
+  if [ -f "Makefile" ]; then
+    # Run all documentation checks
+    if make docs-all 2>&1; then
+      echo "✅ Documentation checks passed"
+      echo ""
+    else
+      echo ""
+      echo "❌ Documentation consistency check failed"
+      echo ""
+      echo "📋 Common fixes:"
+      echo "   1. Update Japanese translation: docs/ja/"
+      echo "   2. Add new preset to docs/*/presets.md"
+      echo "   3. Document new configuration keys in docs/*/configuration.md"
+      echo "   4. Run manually: make docs-all"
+      echo ""
+      exit 1
+    fi
+  else
+    echo "⚠️  Warning: Makefile not found, skipping documentation checks"
+    echo ""
+  fi
+fi
+
+# ============================================================
 # Dockerfile Validation
 # ============================================================
 CHANGED_DOCKER=$(echo "$CHANGED_FILES" | grep 'Dockerfile' || true)
