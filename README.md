@@ -29,11 +29,15 @@ Transform your Markdown documents into professionally formatted Word files with 
 ### Using Docker (Recommended)
 
 ```bash
-# Build the image
-cd /path/to/md2docx
-docker build -t md2docx:latest -f Dockerfile .
+# Pull the image from Docker Hub
+docker pull forest6511/md2docx:latest
 
 # Convert a file
+docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
+  input.md -o output.docx -p default --preset-dir /app/config/presets
+
+# Or build locally
+docker build -t md2docx:latest -f Dockerfile .
 docker run --rm -v $(pwd):/workspace md2docx:latest \
   input.md -o output.docx -p default --preset-dir /app/config/presets
 ```
@@ -50,7 +54,7 @@ dotnet run --project src/MarkdownToDocx.CLI/MarkdownToDocx.CLI.csproj -- \
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
-alias md2docx='docker run --rm -v $(pwd):/workspace md2docx:latest'
+alias md2docx='docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest'
 
 # Then use simply:
 md2docx input.md -o output.docx -p default --preset-dir /app/config/presets
@@ -63,7 +67,8 @@ md2docx input.md -o output.docx -p default --preset-dir /app/config/presets
 ### Technical Documentation
 
 ```bash
-md2docx README.md -o README.docx -p technical --preset-dir /app/config/presets
+docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
+  README.md -o README.docx -p technical --preset-dir /app/config/presets
 ```
 
 Perfect for:
@@ -77,7 +82,7 @@ Perfect for:
 ### Business Documents
 
 ```bash
-md2docx proposal.md -o proposal.docx -p default --preset-dir /app/config/presets
+docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest proposal.md -o proposal.docx -p default --preset-dir /app/config/presets
 ```
 
 Perfect for:
@@ -91,7 +96,7 @@ Perfect for:
 ### Japanese Vertical Writing
 
 ```bash
-md2docx novel.md -o novel.docx -p vertical-novel --preset-dir /app/config/vertical
+docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest novel.md -o novel.docx -p vertical-novel --preset-dir /app/config/vertical
 ```
 
 Perfect for:
