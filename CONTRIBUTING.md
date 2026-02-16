@@ -19,7 +19,7 @@ Thank you for your interest in contributing to md2docx! This document provides g
 
 **Current Phase**: Phase 1 - MVP Implementation (In Progress)
 
-We are currently building the foundational architecture and basic conversion capabilities. See [STATUS.md](STATUS.md) for detailed progress.
+We are currently building the foundational architecture and basic conversion capabilities. See [PROGRESS.md](PROGRESS.md) for detailed progress.
 
 **Priority Areas**:
 1. Core layer implementation (OpenXmlDocumentBuilder)
