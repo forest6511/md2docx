@@ -10,6 +10,12 @@
 
 Transform your Markdown documents into professionally formatted Word files with complete control over styling through YAML configuration files. Supports horizontal and vertical (Japanese tategaki) text, making it ideal for technical documentation, business reports, and publishing workflows.
 
+## 📖 Documentation
+
+**[📘 English Documentation](https://forest6511.github.io/md2docx/en/)** | **[📗 日本語ドキュメント](https://forest6511.github.io/md2docx/ja/)**
+
+Visit our comprehensive documentation site for detailed guides, configuration examples, and API references.
+
 ---
 
 ## ✨ Features
@@ -345,6 +351,22 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 ---
 
 ## 📚 Documentation
+
+### Online Documentation
+
+- **[📘 English Documentation](https://forest6511.github.io/md2docx/en/)** - Complete documentation in English
+  - [Getting Started](https://forest6511.github.io/md2docx/en/getting-started) - Installation and first steps
+  - [Configuration](https://forest6511.github.io/md2docx/en/configuration) - YAML configuration guide
+  - [Presets](https://forest6511.github.io/md2docx/en/presets) - Built-in presets reference
+  - [API Reference](https://forest6511.github.io/md2docx/en/api-reference) - C# API documentation
+
+- **[📗 日本語ドキュメント](https://forest6511.github.io/md2docx/ja/)** - 日本語の完全なドキュメント
+  - [はじめに](https://forest6511.github.io/md2docx/ja/getting-started) - インストールと初回使用
+  - [設定](https://forest6511.github.io/md2docx/ja/configuration) - YAML設定ガイド
+  - [プリセット](https://forest6511.github.io/md2docx/ja/presets) - ビルトインプリセットリファレンス
+  - [APIリファレンス](https://forest6511.github.io/md2docx/ja/api-reference) - C# API ドキュメント
+
+### Repository Documentation
 
 - [CLAUDE.md](CLAUDE.md) - Project configuration for Claude Code
 - [DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md) - Complete project structure
