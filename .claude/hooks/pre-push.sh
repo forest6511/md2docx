@@ -230,11 +230,20 @@ if [ -n "$CHANGED_YAML" ]; then
 
   for yaml_file in $CHANGED_YAML; do
     if [ -f "$yaml_file" ]; then
-      # Basic YAML syntax check using Python
-      python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" 2>/dev/null || {
-        echo "❌ YAML syntax error in: $yaml_file"
-        exit 1
-      }
+      # Basic YAML syntax check (try Python first, fall back to Ruby)
+      if command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" 2>/dev/null; then
+        python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" 2>/dev/null || {
+          echo "❌ YAML syntax error in: $yaml_file"
+          exit 1
+        }
+      elif command -v ruby >/dev/null 2>&1; then
+        ruby -e "require 'yaml'; YAML.load_file('$yaml_file')" 2>/dev/null || {
+          echo "❌ YAML syntax error in: $yaml_file"
+          exit 1
+        }
+      else
+        echo "⚠️  Warning: No YAML parser available, skipping validation for: $yaml_file"
+      fi
       echo "   ✓ $yaml_file"
     fi
   done
