@@ -105,14 +105,21 @@ check_yaml_syntax() {
       continue
     fi
 
-    # Validate YAML syntax
-    if ! python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" 2>/dev/null; then
-      echo -e "  ${RED}❌ R001 VIOLATION${NC}: Invalid YAML in ${YELLOW}$yaml_file${NC}"
-
-      # Show specific error
-      python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" 2>&1 | head -3 | sed 's/^/     /'
-
-      yaml_errors=$((yaml_errors + 1))
+    # Validate YAML syntax (try Python first, fall back to Ruby)
+    if command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" 2>/dev/null; then
+      if ! python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" 2>/dev/null; then
+        echo -e "  ${RED}❌ R001 VIOLATION${NC}: Invalid YAML in ${YELLOW}$yaml_file${NC}"
+        python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" 2>&1 | head -3 | sed 's/^/     /'
+        yaml_errors=$((yaml_errors + 1))
+      fi
+    elif command -v ruby >/dev/null 2>&1; then
+      if ! ruby -e "require 'yaml'; YAML.load_file('$yaml_file')" 2>/dev/null; then
+        echo -e "  ${RED}❌ R001 VIOLATION${NC}: Invalid YAML in ${YELLOW}$yaml_file${NC}"
+        ruby -e "require 'yaml'; YAML.load_file('$yaml_file')" 2>&1 | head -3 | sed 's/^/     /'
+        yaml_errors=$((yaml_errors + 1))
+      fi
+    else
+      echo -e "  ${YELLOW}⏭️  R001 Warning${NC}: No YAML parser available (install PyYAML or use Ruby)"
     fi
   done
 
