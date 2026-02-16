@@ -11,26 +11,36 @@ namespace MarkdownToDocx.Core.TextDirection;
 /// </summary>
 public sealed class HorizontalTextProvider : ITextDirectionProvider
 {
+    // Page size constants (A4 portrait, in twips: 1cm = 567 twips)
+    private const uint A4_WIDTH_TWIPS = 8646;   // 15.24cm
+    private const uint A4_HEIGHT_TWIPS = 12950; // 22.86cm
+
+    // Margin constants (in twips)
+    private const int MARGIN_2CM = 1134;     // 2cm
+    private const int MARGIN_2_5CM = 1417;   // 2.5cm
+    private const int MARGIN_1_25CM = 708;   // 1.25cm
+
+    // Line spacing constant
+    private const string LINE_SPACING_1_5X = "360"; // 1.5x line spacing
+
     /// <inheritdoc/>
     public TextDirectionMode Mode => TextDirectionMode.Horizontal;
 
     /// <inheritdoc/>
     public PageConfiguration GetPageConfiguration()
     {
-        // Standard portrait orientation for horizontal text
         return new PageConfiguration
         {
-            Width = new UInt32Value(8646U),    // 15.24cm in twips (15.24 * 567)
-            Height = new UInt32Value(12950U),  // 22.86cm in twips (22.86 * 567)
+            Width = new UInt32Value(A4_WIDTH_TWIPS),
+            Height = new UInt32Value(A4_HEIGHT_TWIPS),
             Orientation = PageOrientationValues.Portrait,
 
-            // Standard margins for horizontal layout
-            TopMargin = 1134,      // 2cm
-            BottomMargin = 1134,   // 2cm
-            LeftMargin = 1417,     // 2.5cm
-            RightMargin = 1417,    // 2.5cm
-            HeaderMargin = 708,    // 1.25cm
-            FooterMargin = 708,    // 1.25cm
+            TopMargin = MARGIN_2CM,
+            BottomMargin = MARGIN_2CM,
+            LeftMargin = MARGIN_2_5CM,
+            RightMargin = MARGIN_2_5CM,
+            HeaderMargin = MARGIN_1_25CM,
+            FooterMargin = MARGIN_1_25CM,
             GutterMargin = 0
         };
     }
@@ -40,9 +50,9 @@ public sealed class HorizontalTextProvider : ITextDirectionProvider
     {
         return new ParagraphConfiguration
         {
-            TextDirection = TextDirectionValues.LefToRightTopToBottom,  // Standard horizontal layout
-            Kinsoku = false,  // Not needed for horizontal Western text
-            LineSpacing = "360",  // 1.5x line spacing
+            TextDirection = TextDirectionValues.LefToRightTopToBottom,
+            Kinsoku = false,
+            LineSpacing = LINE_SPACING_1_5X,
             LineSpacingRule = LineSpacingRuleValues.Auto
         };
     }

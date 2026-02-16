@@ -1,3 +1,4 @@
+using Markdig.Syntax;
 using MarkdownToDocx.CLI;
 using MarkdownToDocx.Core.Interfaces;
 using MarkdownToDocx.Core.Markdown;
@@ -58,47 +59,48 @@ try
 
         foreach (var block in document)
         {
-            var blockType = block.GetType().Name;
+            // Use pattern matching for type-safe block processing
+            // Process FencedCodeBlock before ParagraphBlock (both are LeafBlock types)
+            switch (block)
+            {
+                case HeadingBlock heading:
+                    var headingText = Helpers.GetBlockText(heading);
+                    var headingStyle = styleApplicator.ApplyHeadingStyle(heading.Level, config.Styles);
+                    builder.AddHeading(heading.Level, headingText, headingStyle);
+                    break;
 
-            if (blockType.Contains("Heading"))
-            {
-                var level = Helpers.GetHeadingLevel(block);
-                var text = Helpers.GetBlockText(block);
-                var style = styleApplicator.ApplyHeadingStyle(level, config.Styles);
-                builder.AddHeading(level, text, style);
-            }
-            else if (blockType.Contains("Paragraph") && !blockType.Contains("Fenced"))
-            {
-                var text = Helpers.GetBlockText(block);
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    var style = styleApplicator.ApplyParagraphStyle(config.Styles);
-                    builder.AddParagraph(text, style);
-                }
-            }
-            else if (blockType.Contains("List"))
-            {
-                var items = Helpers.GetListItems(block);
-                var isOrdered = blockType.Contains("Ordered");
-                var style = styleApplicator.ApplyListStyle(config.Styles);
-                builder.AddList(items, isOrdered, style);
-            }
-            else if (blockType.Contains("FencedCode"))
-            {
-                var code = Helpers.GetCodeBlockText(block);
-                var language = Helpers.GetCodeBlockLanguage(block);
-                var style = styleApplicator.ApplyCodeBlockStyle(config.Styles);
-                builder.AddCodeBlock(code, language, style);
-            }
-            else if (blockType.Contains("Quote"))
-            {
-                var text = Helpers.GetQuoteText(block);
-                var style = styleApplicator.ApplyQuoteStyle(config.Styles);
-                builder.AddQuote(text, style);
-            }
-            else if (blockType.Contains("ThematicBreak"))
-            {
-                builder.AddThematicBreak();
+                case FencedCodeBlock code:
+                    var codeText = Helpers.GetCodeBlockText(code);
+                    var language = Helpers.GetCodeBlockLanguage(code);
+                    var codeStyle = styleApplicator.ApplyCodeBlockStyle(config.Styles);
+                    builder.AddCodeBlock(codeText, language, codeStyle);
+                    break;
+
+                case ParagraphBlock paragraph:
+                    var paragraphText = Helpers.GetBlockText(paragraph);
+                    if (!string.IsNullOrWhiteSpace(paragraphText))
+                    {
+                        var paragraphStyle = styleApplicator.ApplyParagraphStyle(config.Styles);
+                        builder.AddParagraph(paragraphText, paragraphStyle);
+                    }
+                    break;
+
+                case ListBlock list:
+                    var items = Helpers.GetListItems(list);
+                    var isOrdered = list.IsOrdered;
+                    var listStyle = styleApplicator.ApplyListStyle(config.Styles);
+                    builder.AddList(items, isOrdered, listStyle);
+                    break;
+
+                case QuoteBlock quote:
+                    var quoteText = Helpers.GetQuoteText(quote);
+                    var quoteStyle = styleApplicator.ApplyQuoteStyle(config.Styles);
+                    builder.AddQuote(quoteText, quoteStyle);
+                    break;
+
+                case ThematicBreakBlock:
+                    builder.AddThematicBreak();
+                    break;
             }
         }
 

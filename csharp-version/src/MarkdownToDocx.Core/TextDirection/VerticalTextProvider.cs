@@ -11,28 +11,41 @@ namespace MarkdownToDocx.Core.TextDirection;
 /// </summary>
 public sealed class VerticalTextProvider : ITextDirectionProvider
 {
+    // Page size constants for vertical layout (A4 landscape, in twips: 1cm = 567 twips)
+    // For vertical text, dimensions are swapped: width and height are reversed
+    private const uint A4_WIDTH_VERTICAL_TWIPS = 12950;  // 22.86cm (original height)
+    private const uint A4_HEIGHT_VERTICAL_TWIPS = 8646;  // 15.24cm (original width)
+
+    // Margin constants (in twips)
+    // In vertical text, margins have different semantic meanings
+    private const int MARGIN_2CM = 1134;     // 2cm - top/bottom become right/left
+    private const int MARGIN_2_5CM = 1417;   // 2.5cm - left/right become top/bottom
+    private const int MARGIN_1_25CM = 708;   // 1.25cm
+
+    // Line spacing constant
+    private const string LINE_SPACING_1_5X = "360"; // 1.5x line spacing
+
     /// <inheritdoc/>
     public TextDirectionMode Mode => TextDirectionMode.Vertical;
 
     /// <inheritdoc/>
     public PageConfiguration GetPageConfiguration()
     {
-        // For vertical text, we use landscape orientation with swapped dimensions
-        // Horizontal 15.24cm x 22.86cm becomes Vertical 22.86cm x 15.24cm
         return new PageConfiguration
         {
-            Width = new UInt32Value(12950U),   // 22.86cm in twips (22.86 * 567)
-            Height = new UInt32Value(8646U),    // 15.24cm in twips (15.24 * 567)
+            Width = new UInt32Value(A4_WIDTH_VERTICAL_TWIPS),
+            Height = new UInt32Value(A4_HEIGHT_VERTICAL_TWIPS),
             Orientation = PageOrientationValues.Landscape,
 
-            // Margins for vertical layout
-            // In vertical text, top/bottom become right/left sides
-            TopMargin = 1134,      // 2cm - becomes right margin in vertical
-            BottomMargin = 1134,   // 2cm - becomes left margin in vertical
-            LeftMargin = 1417,     // 2.5cm - becomes top margin in vertical
-            RightMargin = 1417,    // 2.5cm - becomes bottom margin in vertical
-            HeaderMargin = 708,    // 1.25cm
-            FooterMargin = 708,    // 1.25cm
+            // In vertical text layout, margin semantics change:
+            // Top/Bottom → Right/Left sides in rendered output
+            // Left/Right → Top/Bottom in rendered output
+            TopMargin = MARGIN_2CM,      // Becomes right margin in vertical
+            BottomMargin = MARGIN_2CM,   // Becomes left margin in vertical
+            LeftMargin = MARGIN_2_5CM,   // Becomes top margin in vertical
+            RightMargin = MARGIN_2_5CM,  // Becomes bottom margin in vertical
+            HeaderMargin = MARGIN_1_25CM,
+            FooterMargin = MARGIN_1_25CM,
             GutterMargin = 0
         };
     }
@@ -43,8 +56,8 @@ public sealed class VerticalTextProvider : ITextDirectionProvider
         return new ParagraphConfiguration
         {
             TextDirection = TextDirectionValues.TopToBottomRightToLeft,
-            Kinsoku = true,  // Enable Japanese line breaking rules
-            LineSpacing = "360",  // 1.5x line spacing
+            Kinsoku = true, // Enable Japanese line breaking rules (kinsoku shori)
+            LineSpacing = LINE_SPACING_1_5X,
             LineSpacingRule = LineSpacingRuleValues.Auto
         };
     }

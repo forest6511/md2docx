@@ -7,28 +7,19 @@ namespace MarkdownToDocx.Styling.Configuration;
 
 /// <summary>
 /// Loads conversion configuration from YAML files
-/// Uses YamlDotNet for deserialization with underscored naming convention
+/// Uses YamlDotNet for deserialization with PascalCase naming convention
 /// </summary>
-public sealed class YamlConfigurationLoader : IConfigurationLoader
+/// <param name="presetDirectory">Directory containing preset YAML files</param>
+/// <exception cref="ArgumentNullException">Thrown when presetDirectory is null</exception>
+public sealed class YamlConfigurationLoader(string presetDirectory) : IConfigurationLoader
 {
-    private readonly IDeserializer _deserializer;
-    private readonly string _presetDirectory;
+    private readonly string _presetDirectory = presetDirectory
+        ?? throw new ArgumentNullException(nameof(presetDirectory));
 
-    /// <summary>
-    /// Initializes a new instance of <see cref="YamlConfigurationLoader"/>
-    /// </summary>
-    /// <param name="presetDirectory">Directory containing preset YAML files</param>
-    /// <exception cref="ArgumentNullException">Thrown when presetDirectory is null</exception>
-    public YamlConfigurationLoader(string presetDirectory)
-    {
-        ArgumentNullException.ThrowIfNull(presetDirectory);
-
-        _presetDirectory = presetDirectory;
-        _deserializer = new DeserializerBuilder()
-            .WithNamingConvention(PascalCaseNamingConvention.Instance)
-            .IgnoreUnmatchedProperties()
-            .Build();
-    }
+    private readonly IDeserializer _deserializer = new DeserializerBuilder()
+        .WithNamingConvention(PascalCaseNamingConvention.Instance)
+        .IgnoreUnmatchedProperties()
+        .Build();
 
     /// <inheritdoc/>
     public ConversionConfiguration Load(string configPath)
