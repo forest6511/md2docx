@@ -1,0 +1,52 @@
+{
+  "skills": [
+    {
+      "name": "session-start",
+      "triggers": {
+        "keywords": ["status", "dashboard", "overview", "context", "start"],
+        "paths": ["PROGRESS.md", "docs/decisions/**"],
+        "confidence_threshold": 0.6
+      }
+    },
+    {
+      "name": "session-update",
+      "triggers": {
+        "keywords": ["progress", "update", "checkpoint", "save"],
+        "paths": ["internal-docs/ja/sessions/**"],
+        "confidence_threshold": 0.7
+      }
+    },
+    {
+      "name": "session-end",
+      "triggers": {
+        "keywords": ["end", "finish", "close", "summary", "exit"],
+        "paths": ["internal-docs/ja/sessions/**"],
+        "confidence_threshold": 0.7
+      }
+    },
+    {
+      "name": "adr-source-validator",
+      "triggers": {
+        "keywords": ["adr", "decision", "architecture", "consistency", "validation"],
+        "paths": ["docs/decisions/**"],
+        "confidence_threshold": 0.7
+      }
+    },
+    {
+      "name": "doc-source-sync",
+      "triggers": {
+        "keywords": ["documentation", "readme", "example", "yaml", "preset", "sync"],
+        "paths": ["README.md", "docs/**", "config/**"],
+        "confidence_threshold": 0.7
+      }
+    },
+    {
+      "name": "check-docs-consistency",
+      "triggers": {
+        "keywords": ["consistency", "validation", "check", "verify"],
+        "paths": ["*.md", "docs/**"],
+        "confidence_threshold": 0.6
+      }
+    }
+  ]
+}
