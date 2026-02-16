@@ -228,7 +228,7 @@ plugins:
 `Code`
 
 <!-- Extensions -->
-{Kanji|かんじ}  <!-- Ruby -->
+{Kanji|kanji}  <!-- Ruby annotation example -->
 《《Emphasis》》    <!-- Emphasis marks -->
 ｜30｜         <!-- Tate-chu-yoko -->
 :::warning

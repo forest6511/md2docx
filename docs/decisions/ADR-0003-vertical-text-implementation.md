@@ -10,7 +10,7 @@
 
 **Problem Statement**:
 
-- Need support for Japanese vertical text (tategaki / 縦書き)
+- Need support for Japanese vertical text (tategaki)
 - Novel and document publishing requires vertical layout
 - DocumentFormat.OpenXml API for vertical text is complex
 - Must maintain same YAML configuration simplicity

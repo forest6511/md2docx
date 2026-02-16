@@ -472,7 +472,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         using var builder = new OpenXmlDocumentBuilder(_stream, _verticalProvider);
 
         // Act
-        builder.AddParagraph("縦書きテスト", CreateDefaultParagraphStyle());
+        builder.AddParagraph("Vertical text test", CreateDefaultParagraphStyle());
         builder.Save();
 
         // Assert

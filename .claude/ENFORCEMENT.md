@@ -160,17 +160,17 @@ git push --no-verify
 **Detection Method**:
 ```bash
 # Check Dockerfile and YAML configs
-git diff --cached Dockerfile config/ | grep -iE "游明朝|Yu.*Mincho|Hiragino"
+git diff --cached Dockerfile config/ | grep -iE "Yu Mincho|Yu.*Mincho|Hiragino"
 ```text
 
 **Performance**: ~50-100ms
 
 **Forbidden Patterns**:
 ```text
-游明朝, 游ゴシック
 Yu Mincho, Yu Gothic
-Hiragino, ヒラギノ
-MS 明朝, MS ゴシック
+Yu Mincho, Yu Gothic
+Hiragino, Hiragino
+MS Mincho, MS Gothic
 ```text
 
 **Allowed Fonts**:
@@ -179,13 +179,13 @@ Noto Serif CJK JP
 Noto Sans CJK JP
 Noto Serif
 Noto Sans
-IPA明朝, IPAゴシック (OSS)
+IPA Mincho, IPA Gothic (OSS)
 ```text
 
 **Common Mistake**:
 ```yaml
 # ❌ Wrong
-font: "游明朝"
+font: "Yu Mincho"
 
 # ✅ Correct
 font: "Noto Serif CJK JP"

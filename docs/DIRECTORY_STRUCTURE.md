@@ -2,11 +2,11 @@
 
 **For Codex Review**: This document describes the planned and current directory structure.
 
-**凡例**: ✅ 実装済み | ⏳ 未実装 | 📋 計画中
+**Legend**: ✅ Implemented | ⏳ Not yet implemented | 📋 Planned
 
 ---
 
-## 📁 Directory Structure (計画 + 現状)
+## 📁 Directory Structure (Planned + Current)
 
 ```text
 markdown-to-docx/
@@ -21,23 +21,23 @@ markdown-to-docx/
 │       └── codex-review.md           # Codex review skill guide
 │
 ├── csharp-version/                   # C# implementation
-│   ├── src/                          # ⏳ Source code (未実装)
+│   ├── src/                          # ⏳ Source code (Not yet implemented)
 │   │   ├── MarkdownToDocx.sln        # ✅ Visual Studio solution
-│   │   ├── MarkdownToDocx.Core/      # ⏳ Core conversion logic (未実装)
+│   │   ├── MarkdownToDocx.Core/      # ⏳ Core conversion logic (Not yet implemented)
 │   │   │   ├── MarkdownToDocx.Core.csproj
 │   │   │   ├── Parser/               # Markdown parsing
 │   │   │   ├── Generator/            # DOCX generation
 │   │   │   └── Models/               # Data models
-│   │   ├── MarkdownToDocx.Styling/   # ⏳ YAML config & styling (未実装)
+│   │   ├── MarkdownToDocx.Styling/   # ⏳ YAML config & styling (Not yet implemented)
 │   │   │   ├── MarkdownToDocx.Styling.csproj
 │   │   │   ├── YamlLoader.cs         # YAML configuration loader
 │   │   │   ├── StyleEngine.cs        # Style application
 │   │   │   └── Schema/               # YAML schema validation
-│   │   └── MarkdownToDocx.CLI/       # ⏳ Command-line interface (未実装)
+│   │   └── MarkdownToDocx.CLI/       # ⏳ Command-line interface (Not yet implemented)
 │   │       ├── MarkdownToDocx.CLI.csproj
 │   │       ├── Program.cs            # Entry point
 │   │       └── Commands/             # CLI commands
-│   ├── tests/                        # ⏳ Test suite (未実装)
+│   ├── tests/                        # ⏳ Test suite (Not yet implemented)
 │   │   ├── MarkdownToDocx.Tests/
 │   │   │   ├── Unit/                 # Unit tests
 │   │   │   ├── Integration/          # Integration tests

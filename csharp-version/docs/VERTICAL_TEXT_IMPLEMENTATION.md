@@ -2,7 +2,7 @@
 
 ## ✅ DocumentFormat.OpenXml Vertical Text Support
 
-**Good News**: DocumentFormat.OpenXml **fully supports** Japanese vertical text (縦書き).
+**Good News**: DocumentFormat.OpenXml **fully supports** Japanese vertical text (tategaki).
 
 ---
 
@@ -150,7 +150,7 @@ public Table CreateVerticalTable()
 
 ## 🎌 Japanese-Specific Features
 
-### Ruby (ふりがな) Support
+### Ruby (furigana) Support
 
 ```csharp
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -312,7 +312,7 @@ public void VerticalText_SimpleParagraph_RendersCorrectly()
 [Fact]
 public void VerticalText_WithRuby_RendersCorrectly()
 {
-    var markdown = "{kanji|かんじ}";
+    var markdown = "{kanji|kanji}";
     var converter = new MarkdownConverter("config/publishing/kdp-vertical-novel.yaml");
 
     var docx = converter.Convert(markdown, "test-ruby.docx");
@@ -323,7 +323,7 @@ public void VerticalText_WithRuby_RendersCorrectly()
 
     Assert.NotNull(ruby);
     Assert.Equal("kanji", ruby.Descendants<RubyBase>().First().InnerText);
-    Assert.Equal("かんじ", ruby.Descendants<RubyContent>().First().InnerText);
+    Assert.Equal("kanji", ruby.Descendants<RubyContent>().First().InnerText);
 }
 ```text
 
@@ -468,7 +468,7 @@ Use vertical-specific presets:
 
 - [DocumentFormat.OpenXml - TextDirection](https://docs.microsoft.com/en-us/dotnet/api/documentformat.openxml.wordprocessing.textdirection)
 - [Word Open XML - Vertical Text](https://docs.microsoft.com/en-us/openspecs/office_standards/ms-oe376/f8b3e5d3-2f5d-4c8c-b8e3-7f6b1e3e3e3e)
-- [Japanese Typography in Word](https://support.microsoft.com/ja-jp/office/縦書きテキスト)
+- [Japanese Typography in Word](https://support.microsoft.com/en-us/office/change-text-direction-in-a-document-88a35ac0-5b96-4fb0-ae9b-8b6a5b8c1a43)
 - [Noto CJK Fonts](https://github.com/googlefonts/noto-cjk)
 
 ---

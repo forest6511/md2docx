@@ -79,12 +79,12 @@ All presets must use `schema_version: "2.0"`
 Noto Serif JP as default (SIL OFL licensed)
 
 ## Rejected
-- 游明朝 (Commercial license)
+- Yu Mincho (Commercial license)
 ```text
 
 **Validation**:
 - ✅ Noto Serif JP in Dockerfile
-- ❌ No 游明朝 in Dockerfile or presets
+- ❌ No Yu Mincho in Dockerfile or presets
 
 ### 5. Design Patterns
 

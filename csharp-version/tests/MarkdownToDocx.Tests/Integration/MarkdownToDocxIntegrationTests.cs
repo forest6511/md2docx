@@ -112,13 +112,13 @@ var x = 42;
     public void ConvertMarkdownWithVerticalText_ShouldCreateValidDocx()
     {
         // Arrange
-        var markdown = @"# 縦書きテスト
+        var markdown = @"# Vertical Text Test
 
-これは縦書きの段落です。
+This is a paragraph in vertical text mode.
 
-## セクション１
+## Section 1
 
-日本語の縦書きテキストです。
+Sample vertical text content for testing Japanese tategaki layout.
 ";
 
         var outputPath = Path.Combine(_testOutputDirectory, "vertical.docx");

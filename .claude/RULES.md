@@ -77,10 +77,10 @@ title: "Problem: Solution"  # ✅ Correct
 - Noto Sans
 
 **Forbidden Fonts** (Commercial):
-- 游明朝 (Yu Mincho)
-- 游ゴシック (Yu Gothic)
-- ヒラギノ (Hiragino)
-- MS 明朝/ゴシック
+- Yu Mincho (Yu Mincho)
+- Yu Gothic (Yu Gothic)
+- Hiragino (Hiragino)
+- MS Mincho/Gothic
 - Any bundled Windows/macOS system fonts
 
 ---
