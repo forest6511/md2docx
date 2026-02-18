@@ -112,6 +112,11 @@ public sealed class HeadingStyleConfig
     public string? LineSpacing { get; init; }
 
     /// <summary>
+    /// Whether to insert a page break before this heading
+    /// </summary>
+    public bool PageBreakBefore { get; init; } = false;
+
+    /// <summary>
     /// Spacing before heading in twips (1/20 of a point)
     /// </summary>
     public string SpaceBefore { get; init; } = "240";

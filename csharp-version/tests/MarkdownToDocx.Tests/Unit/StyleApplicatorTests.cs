@@ -137,6 +137,40 @@ public class StyleApplicatorTests
     }
 
     [Fact]
+    public void ApplyHeadingStyle_WithPageBreakBefore_ShouldMapCorrectly()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            H1 = new HeadingStyleConfig
+            {
+                Size = 24,
+                Bold = true,
+                Color = "000000",
+                PageBreakBefore = true,
+                SpaceBefore = "480",
+                SpaceAfter = "240"
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyHeadingStyle(1, config);
+
+        // Assert
+        style.PageBreakBefore.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ApplyHeadingStyle_WithDefaultPageBreakBefore_ShouldBeFalse()
+    {
+        // Act
+        var style = _applicator.ApplyHeadingStyle(1, _testConfig);
+
+        // Assert
+        style.PageBreakBefore.Should().BeFalse();
+    }
+
+    [Fact]
     public void ApplyParagraphStyle_ShouldReturnCorrectStyle()
     {
         // Act

@@ -672,6 +672,147 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         bottomBorder.Color!.Value.Should().Be("e8a735");
     }
 
+    [Fact]
+    public void AddHeading_WithPageBreakBefore_ShouldRenderPageBreak()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            PageBreakBefore = true,
+            SpaceBefore = "240",
+            SpaceAfter = "120"
+        };
+
+        // Act
+        builder.AddHeading(1, "Chapter 1", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var pageBreak = paragraph.ParagraphProperties?.Elements<PageBreakBefore>().FirstOrDefault();
+        pageBreak.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void AddHeading_WithPageBreakBeforeFalse_ShouldNotRenderPageBreak()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            PageBreakBefore = false,
+            SpaceBefore = "240",
+            SpaceAfter = "120"
+        };
+
+        // Act
+        builder.AddHeading(1, "Chapter 1", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var pageBreak = paragraph.ParagraphProperties?.Elements<PageBreakBefore>().FirstOrDefault();
+        pageBreak.Should().BeNull();
+    }
+
+    [Fact]
+    public void AddHeading_WithDefaultStyle_ShouldNotRenderPageBreak()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle();
+
+        // Act
+        builder.AddHeading(1, "Default Heading", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var pageBreak = paragraph.ParagraphProperties?.Elements<PageBreakBefore>().FirstOrDefault();
+        pageBreak.Should().BeNull();
+    }
+
+    [Fact]
+    public void AddHeading_WithPageBreakBeforeAndShowBorder_ShouldRenderBoth()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            PageBreakBefore = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 16,
+            BorderPosition = "bottom",
+            SpaceBefore = "240",
+            SpaceAfter = "120"
+        };
+
+        // Act
+        builder.AddHeading(1, "Chapter With Border", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        paragraph.ParagraphProperties?.Elements<PageBreakBefore>().Should().HaveCount(1);
+        paragraph.ParagraphProperties?.ParagraphBorders.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void AddHeading_SecondHeadingWithPageBreakBefore_ShouldBreakOnlyThatHeading()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var styleNoBreak = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            PageBreakBefore = false,
+            SpaceBefore = "240",
+            SpaceAfter = "120"
+        };
+        var styleWithBreak = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            PageBreakBefore = true,
+            SpaceBefore = "240",
+            SpaceAfter = "120"
+        };
+
+        // Act
+        builder.AddHeading(1, "Chapter 1", styleNoBreak);
+        builder.AddHeading(1, "Chapter 2", styleWithBreak);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        paragraphs[0].ParagraphProperties?.Elements<PageBreakBefore>().Should().BeEmpty();
+        paragraphs[1].ParagraphProperties?.Elements<PageBreakBefore>().Should().HaveCount(1);
+    }
+
     public void Dispose()
     {
         _stream?.Dispose();

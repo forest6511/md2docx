@@ -56,6 +56,11 @@ public sealed record HeadingStyle
     public string? LineSpacing { get; init; }
 
     /// <summary>
+    /// Whether to insert a page break before this heading
+    /// </summary>
+    public bool PageBreakBefore { get; init; } = false;
+
+    /// <summary>
     /// Space before heading in twips
     /// </summary>
     public string SpaceBefore { get; init; } = "400";

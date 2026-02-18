@@ -19,8 +19,8 @@ echo ""
 # Check if config examples in docs match actual preset files
 if [ -d "config/presets" ] && [ -f "docs/en/configuration.md" ]; then
 
-  # Extract YAML keys from actual preset files
-  ACTUAL_YAML_KEYS=$(find config/presets -name "*.yaml" -exec grep -h "^[A-Za-z]" {} \; | cut -d: -f1 | sort -u)
+  # Extract YAML keys from actual preset files (including nested keys)
+  ACTUAL_YAML_KEYS=$(find config/presets -name "*.yaml" -exec grep -h -E "^\s*[A-Za-z]" {} \; | sed 's/^[[:space:]]*//' | cut -d: -f1 | sort -u)
 
   # Extract documented YAML keys from configuration.md
   DOC_YAML_KEYS=$(grep -h -E "^\s*[A-Z][a-zA-Z]+:" docs/en/configuration.md docs/ja/configuration.md 2>/dev/null | sed 's/^[[:space:]]*//' | cut -d: -f1 | sort -u || echo "")
@@ -31,7 +31,7 @@ if [ -d "config/presets" ] && [ -f "docs/en/configuration.md" ]; then
   if [ -n "$UNDOCUMENTED_KEYS" ]; then
     echo "⚠️  Warning: YAML keys not documented in configuration.md:"
     echo "$UNDOCUMENTED_KEYS" | sed 's/^/   - /'
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
     echo ""
   fi
 
@@ -41,7 +41,7 @@ if [ -d "config/presets" ] && [ -f "docs/en/configuration.md" ]; then
   if [ -n "$DOCUMENTED_ONLY" ]; then
     echo "⚠️  Warning: Documented keys not found in YAML files:"
     echo "$DOCUMENTED_ONLY" | sed 's/^/   - /'
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
     echo ""
   fi
 
@@ -74,7 +74,7 @@ if [ -d "config/presets" ] && [ -f "docs/en/presets.md" ]; then
   if [ -n "$UNDOCUMENTED_PRESETS" ]; then
     echo "⚠️  Warning: Preset files not documented in presets.md:"
     echo "$UNDOCUMENTED_PRESETS" | sed 's/^/   - /'
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
     echo ""
   fi
 
@@ -84,7 +84,7 @@ if [ -d "config/presets" ] && [ -f "docs/en/presets.md" ]; then
   if [ -n "$DOCUMENTED_ONLY_PRESETS" ]; then
     echo "⚠️  Warning: Documented presets not found in config/presets/:"
     echo "$DOCUMENTED_ONLY_PRESETS" | sed 's/^/   - /'
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
     echo ""
   fi
 
@@ -117,7 +117,7 @@ if [ -f "csharp-version/src/MarkdownToDocx.CLI/Program.cs" ] && [ -f "docs/en/ge
   if [ -n "$UNDOCUMENTED_OPTIONS" ]; then
     echo "⚠️  Warning: CLI options not documented:"
     echo "$UNDOCUMENTED_OPTIONS" | sed 's/^/   - /'
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
     echo ""
   fi
 
@@ -127,7 +127,7 @@ if [ -f "csharp-version/src/MarkdownToDocx.CLI/Program.cs" ] && [ -f "docs/en/ge
   if [ -n "$DOCUMENTED_ONLY_OPTIONS" ]; then
     echo "⚠️  Warning: Documented CLI options not found in code:"
     echo "$DOCUMENTED_ONLY_OPTIONS" | sed 's/^/   - /'
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
     echo ""
   fi
 
@@ -158,7 +158,7 @@ for doc in docs/en/*.md docs/ja/*.md; do
       # Basic bash syntax check
       if ! bash -n /tmp/code_example_$$.sh 2>/dev/null; then
         echo "⚠️  Warning: Potential syntax error in bash code example in $doc"
-        ((CODE_EXAMPLE_ERRORS++))
+        CODE_EXAMPLE_ERRORS=$((CODE_EXAMPLE_ERRORS + 1))
       fi
     fi
 
@@ -222,7 +222,7 @@ elif [ "$UNIQUE_VERSIONS" -gt 1 ]; then
   for i in "${!VERSION_SOURCES[@]}"; do
     echo "   ${VERSION_SOURCES[$i]}: ${VERSIONS[$i]}"
   done
-  ((ERRORS++))
+  ERRORS=$((ERRORS + 1))
   echo ""
   echo "💡 Fix: Run ./scripts/update-version.sh <version>"
   echo ""

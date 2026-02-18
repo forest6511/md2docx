@@ -200,6 +200,12 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     {
         var props = CreateBaseParagraphProperties();
 
+        // Page break before
+        if (style.PageBreakBefore)
+        {
+            props.AppendChild(new W.PageBreakBefore { Val = OnOffValue.FromBoolean(true) });
+        }
+
         // Border
         if (style.ShowBorder)
         {
