@@ -47,6 +47,14 @@
         "paths": ["*.md", "docs/**"],
         "confidence_threshold": 0.6
       }
+    },
+    {
+      "name": "review-cs",
+      "triggers": {
+        "keywords": ["review", "code review", "quality", "best practice", "refactor", "solid", "csharp"],
+        "paths": ["csharp-version/src/**/*.cs", "csharp-version/tests/**/*.cs"],
+        "confidence_threshold": 0.7
+      }
     }
   ]
 }
