@@ -46,6 +46,13 @@ public interface IDocumentBuilder : IDisposable
     void AddQuote(string text, QuoteStyle style);
 
     /// <summary>
+    /// Adds a table of contents to the document.
+    /// Must be called before any content (headings, paragraphs, etc.) is added.
+    /// </summary>
+    /// <param name="style">Table of contents style configuration</param>
+    void AddTableOfContents(TableOfContentsStyle style);
+
+    /// <summary>
     /// Adds a thematic break (horizontal rule) to the document
     /// </summary>
     void AddThematicBreak();

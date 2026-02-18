@@ -120,4 +120,21 @@ public sealed class StyleApplicator : IStyleApplicator
             SpaceAfter = config.Quote.SpaceAfter
         };
     }
+
+    /// <inheritdoc/>
+    public TableOfContentsStyle ApplyTableOfContentsStyle(ConversionConfiguration config)
+    {
+        ArgumentNullException.ThrowIfNull(config);
+
+        var tocConfig = config.TableOfContents;
+        var depth = Math.Clamp(tocConfig.Depth, 1, 6);
+
+        return new TableOfContentsStyle
+        {
+            Enabled = tocConfig.Enabled,
+            Depth = depth,
+            Title = tocConfig.Title,
+            PageBreakAfter = tocConfig.PageBreakAfter
+        };
+    }
 }

@@ -861,6 +861,164 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         paragraphs[2].ParagraphProperties?.Elements<OutlineLevel>().First().Val!.Value.Should().Be(2);
     }
 
+    [Fact]
+    public void AddTableOfContents_WithNullStyle_ShouldThrowArgumentNullException()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+
+        // Act
+        Action act = () => builder.AddTableOfContents(null!);
+
+        // Assert
+        act.Should().Throw<ArgumentNullException>()
+            .WithParameterName("style");
+    }
+
+    [Fact]
+    public void AddTableOfContents_WhenDisabled_ShouldNotAddContent()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new TableOfContentsStyle { Enabled = false };
+
+        // Act
+        builder.AddTableOfContents(style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        paragraphs.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AddTableOfContents_WhenEnabled_ShouldAddFieldCode()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new TableOfContentsStyle { Enabled = true, Depth = 3 };
+
+        // Act
+        builder.AddTableOfContents(style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var body = doc.MainDocumentPart!.Document.Body!;
+
+        // Should have field chars (begin, separate, end)
+        var fieldChars = body.Descendants<FieldChar>().ToList();
+        fieldChars.Should().HaveCount(3);
+        fieldChars[0].FieldCharType!.Value.Should().Be(FieldCharValues.Begin);
+        fieldChars[1].FieldCharType!.Value.Should().Be(FieldCharValues.Separate);
+        fieldChars[2].FieldCharType!.Value.Should().Be(FieldCharValues.End);
+
+        // Should have instruction text with correct depth
+        var instrText = body.Descendants<FieldCode>().FirstOrDefault();
+        instrText.Should().NotBeNull();
+        instrText!.Text.Should().Contain("TOC");
+        instrText.Text.Should().Contain("1-3");
+    }
+
+    [Theory]
+    [InlineData(1, "1-1")]
+    [InlineData(2, "1-2")]
+    [InlineData(4, "1-4")]
+    [InlineData(6, "1-6")]
+    public void AddTableOfContents_WithVariousDepths_ShouldUseCorrectDepthInFieldCode(int depth, string expectedRange)
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+        var style = new TableOfContentsStyle { Enabled = true, Depth = depth };
+
+        // Act
+        builder.AddTableOfContents(style);
+        builder.Save();
+
+        // Assert
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var instrText = doc.MainDocumentPart!.Document.Body!.Descendants<FieldCode>().First();
+        instrText.Text.Should().Contain(expectedRange);
+    }
+
+    [Fact]
+    public void AddTableOfContents_WithTitle_ShouldAddTitleParagraph()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new TableOfContentsStyle { Enabled = true, Title = "Contents" };
+
+        // Act
+        builder.AddTableOfContents(style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var texts = doc.MainDocumentPart!.Document.Body!.Descendants<Text>().ToList();
+        texts.Should().Contain(t => t.Text == "Contents");
+    }
+
+    [Fact]
+    public void AddTableOfContents_WithoutTitle_ShouldNotAddTitleParagraph()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new TableOfContentsStyle { Enabled = true, Title = null };
+
+        // Act
+        builder.AddTableOfContents(style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var texts = doc.MainDocumentPart!.Document.Body!.Descendants<Text>().ToList();
+        texts.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AddTableOfContents_WithPageBreakAfter_ShouldAddPageBreak()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new TableOfContentsStyle { Enabled = true, PageBreakAfter = true };
+
+        // Act
+        builder.AddTableOfContents(style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var breaks = doc.MainDocumentPart!.Document.Body!.Descendants<Break>().ToList();
+        breaks.Should().ContainSingle();
+        breaks[0].Type!.Value.Should().Be(BreakValues.Page);
+    }
+
+    [Fact]
+    public void AddTableOfContents_WithoutPageBreakAfter_ShouldNotAddPageBreak()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new TableOfContentsStyle { Enabled = true, PageBreakAfter = false };
+
+        // Act
+        builder.AddTableOfContents(style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var breaks = doc.MainDocumentPart!.Document.Body!.Descendants<Break>().ToList();
+        breaks.Should().BeEmpty();
+    }
+
     public void Dispose()
     {
         _stream?.Dispose();
