@@ -174,6 +174,65 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     }
 
     /// <inheritdoc/>
+    public void AddTableOfContents(TableOfContentsStyle style)
+    {
+        ArgumentNullException.ThrowIfNull(style);
+
+        if (!style.Enabled)
+        {
+            return;
+        }
+
+        // Optional title paragraph
+        if (!string.IsNullOrEmpty(style.Title))
+        {
+            var titleParagraph = _body.AppendChild(new Paragraph());
+            var titleProps = CreateBaseParagraphProperties();
+            titleProps.AppendChild(new SpacingBetweenLines { Before = "240", After = "120" });
+            titleParagraph.AppendChild(titleProps);
+
+            var titleRun = titleParagraph.AppendChild(new Run());
+            titleRun.AppendChild(CreateBaseRunProperties(32, "000000", bold: true));
+            titleRun.AppendChild(new Text(style.Title) { Space = SpaceProcessingModeValues.Preserve });
+        }
+
+        // TOC field code paragraph
+        var tocParagraph = _body.AppendChild(new Paragraph());
+        var tocProps = CreateBaseParagraphProperties();
+        tocParagraph.AppendChild(tocProps);
+
+        // Begin field
+        var beginRun = tocParagraph.AppendChild(new Run());
+        beginRun.AppendChild(new FieldChar { FieldCharType = FieldCharValues.Begin });
+
+        // Instruction text
+        var instrRun = tocParagraph.AppendChild(new Run());
+        instrRun.AppendChild(new FieldCode($" TOC \\o \"1-{style.Depth}\" \\h \\z \\u ")
+        {
+            Space = SpaceProcessingModeValues.Preserve
+        });
+
+        // Separate field
+        var separateRun = tocParagraph.AppendChild(new Run());
+        separateRun.AppendChild(new FieldChar { FieldCharType = FieldCharValues.Separate });
+
+        // End field
+        var endRun = tocParagraph.AppendChild(new Run());
+        endRun.AppendChild(new FieldChar { FieldCharType = FieldCharValues.End });
+
+        // Optional page break after TOC
+        if (style.PageBreakAfter)
+        {
+            var breakParagraph = _body.AppendChild(new Paragraph());
+            var breakProps = CreateBaseParagraphProperties();
+            breakParagraph.AppendChild(breakProps);
+
+            var breakRun = breakParagraph.AppendChild(new Run());
+            breakRun.AppendChild(new Break { Type = BreakValues.Page });
+        }
+    }
+
+    /// <inheritdoc/>
     public void AddHeading(int level, string text, HeadingStyle style)
     {
         ArgumentNullException.ThrowIfNull(text);

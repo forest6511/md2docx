@@ -25,6 +25,12 @@ Fonts:
   EastAsia: "Noto Serif CJK JP"
   DefaultSize: 11
 
+TableOfContents:
+  Enabled: false
+  Depth: 3
+  Title: "Contents"
+  PageBreakAfter: true
+
 Styles:
   H1:
     Size: 24

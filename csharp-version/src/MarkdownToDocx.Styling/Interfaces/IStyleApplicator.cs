@@ -43,4 +43,11 @@ public interface IStyleApplicator
     /// <param name="config">Style configuration</param>
     /// <returns>Quote style</returns>
     QuoteStyle ApplyQuoteStyle(StyleConfiguration config);
+
+    /// <summary>
+    /// Apply table of contents configuration
+    /// </summary>
+    /// <param name="config">Conversion configuration containing TOC settings</param>
+    /// <returns>Table of contents style</returns>
+    TableOfContentsStyle ApplyTableOfContentsStyle(ConversionConfiguration config);
 }

@@ -145,6 +145,23 @@ public class YamlConfigurationLoaderTests
     }
 
     [Fact]
+    public void LoadPreset_WithMinimalPreset_ShouldHaveTableOfContentsConfig()
+    {
+        // Arrange
+        const string presetName = "minimal";
+
+        // Act
+        var config = _loader.LoadPreset(presetName);
+
+        // Assert
+        config.TableOfContents.Should().NotBeNull();
+        config.TableOfContents.Enabled.Should().BeFalse();
+        config.TableOfContents.Depth.Should().Be(3);
+        config.TableOfContents.Title.Should().Be("Contents");
+        config.TableOfContents.PageBreakAfter.Should().BeTrue();
+    }
+
+    [Fact]
     public void LoadPreset_WithNonExistentPreset_ShouldThrowFileNotFoundException()
     {
         // Arrange

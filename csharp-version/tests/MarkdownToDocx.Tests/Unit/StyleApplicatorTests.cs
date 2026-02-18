@@ -1,4 +1,5 @@
 using FluentAssertions;
+using MarkdownToDocx.Core.Models;
 using MarkdownToDocx.Styling.Models;
 using MarkdownToDocx.Styling.Styling;
 using Xunit;
@@ -241,6 +242,83 @@ public class StyleApplicatorTests
         style.BorderColor.Should().Be("999999");
         style.BorderPosition.Should().Be("left");
         style.LeftIndent.Should().Be("720");
+    }
+
+    [Fact]
+    public void ApplyTableOfContentsStyle_WithNullConfig_ShouldThrowArgumentNullException()
+    {
+        // Act
+        Action act = () => _applicator.ApplyTableOfContentsStyle(null!);
+
+        // Assert
+        act.Should().Throw<ArgumentNullException>()
+            .WithParameterName("config");
+    }
+
+    [Fact]
+    public void ApplyTableOfContentsStyle_WithDefaults_ShouldReturnDisabledStyle()
+    {
+        // Arrange
+        var config = new ConversionConfiguration();
+
+        // Act
+        var style = _applicator.ApplyTableOfContentsStyle(config);
+
+        // Assert
+        style.Should().NotBeNull();
+        style.Enabled.Should().BeFalse();
+        style.Depth.Should().Be(3);
+        style.Title.Should().BeNull();
+        style.PageBreakAfter.Should().BeFalse();
+    }
+
+    [Fact]
+    public void ApplyTableOfContentsStyle_ShouldMapAllProperties()
+    {
+        // Arrange
+        var config = new ConversionConfiguration
+        {
+            TableOfContents = new TableOfContentsConfig
+            {
+                Enabled = true,
+                Depth = 4,
+                Title = "Table of Contents",
+                PageBreakAfter = true
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyTableOfContentsStyle(config);
+
+        // Assert
+        style.Enabled.Should().BeTrue();
+        style.Depth.Should().Be(4);
+        style.Title.Should().Be("Table of Contents");
+        style.PageBreakAfter.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(7, 6)]
+    [InlineData(-1, 1)]
+    [InlineData(10, 6)]
+    public void ApplyTableOfContentsStyle_WithOutOfRangeDepth_ShouldClamp(int inputDepth, int expectedDepth)
+    {
+        // Arrange
+        var config = new ConversionConfiguration
+        {
+            TableOfContents = new TableOfContentsConfig
+            {
+                Enabled = true,
+                Depth = inputDepth
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyTableOfContentsStyle(config);
+
+        // Assert
+        style.Depth.Should().Be(expectedDepth);
     }
 
     private static StyleConfiguration CreateTestConfiguration()
