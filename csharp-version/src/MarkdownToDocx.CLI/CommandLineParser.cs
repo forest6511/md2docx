@@ -45,7 +45,7 @@ public static class CommandLineParser
             {
                 verbose = true;
             }
-            else if (!arg.StartsWith("-"))
+            else if (!arg.StartsWith('-'))
             {
                 inputPath ??= arg;
             }
