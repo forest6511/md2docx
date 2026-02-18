@@ -92,6 +92,26 @@ public sealed class HeadingStyleConfig
     public uint BorderSize { get; init; } = 12;
 
     /// <summary>
+    /// Space between border and content in points (default: 0)
+    /// </summary>
+    public uint BorderSpace { get; init; } = 0;
+
+    /// <summary>
+    /// Border position ("bottom", "left", "right", "top")
+    /// </summary>
+    public string BorderPosition { get; init; } = "bottom";
+
+    /// <summary>
+    /// Background color in hex format, or null for no background
+    /// </summary>
+    public string? BackgroundColor { get; init; }
+
+    /// <summary>
+    /// Line spacing in twips (exact mode). Null uses default line spacing.
+    /// </summary>
+    public string? LineSpacing { get; init; }
+
+    /// <summary>
     /// Spacing before heading in twips (1/20 of a point)
     /// </summary>
     public string SpaceBefore { get; init; } = "240";
@@ -254,6 +274,11 @@ public sealed class QuoteStyleConfig
     /// Border thickness in eighths of a point (default: 12 = 1.5pt)
     /// </summary>
     public uint BorderSize { get; init; } = 12;
+
+    /// <summary>
+    /// Space between border and content in points (default: 0)
+    /// </summary>
+    public uint BorderSpace { get; init; } = 0;
 
     /// <summary>
     /// Border position ("left", "right", "top", "bottom")

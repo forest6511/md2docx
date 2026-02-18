@@ -39,6 +39,10 @@ public sealed class StyleApplicator : IStyleApplicator
             ShowBorder = headingConfig.ShowBorder,
             BorderColor = headingConfig.BorderColor,
             BorderSize = headingConfig.BorderSize,
+            BorderSpace = headingConfig.BorderSpace,
+            BorderPosition = headingConfig.BorderPosition,
+            BackgroundColor = headingConfig.BackgroundColor,
+            LineSpacing = headingConfig.LineSpacing,
             SpaceBefore = headingConfig.SpaceBefore,
             SpaceAfter = headingConfig.SpaceAfter
         };
@@ -107,6 +111,7 @@ public sealed class StyleApplicator : IStyleApplicator
             ShowBorder = config.Quote.ShowBorder,
             BorderColor = config.Quote.BorderColor,
             BorderSize = config.Quote.BorderSize,
+            BorderSpace = config.Quote.BorderSpace,
             BorderPosition = config.Quote.BorderPosition,
             BackgroundColor = config.Quote.BackgroundColor,
             LeftIndent = config.Quote.LeftIndent,
