@@ -185,7 +185,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         }
 
         var paragraph = _body.AppendChild(new Paragraph());
-        var paragraphProps = CreateHeadingParagraphProperties(style);
+        var paragraphProps = CreateHeadingParagraphProperties(level, style);
         paragraph.AppendChild(paragraphProps);
 
         var run = paragraph.AppendChild(new Run());
@@ -196,9 +196,12 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     /// <summary>
     /// Creates paragraph properties for heading elements
     /// </summary>
-    private ParagraphProperties CreateHeadingParagraphProperties(HeadingStyle style)
+    private ParagraphProperties CreateHeadingParagraphProperties(int level, HeadingStyle style)
     {
         var props = CreateBaseParagraphProperties();
+
+        // Outline level for TOC and navigation support (0-based: H1=0, H2=1, ...)
+        props.AppendChild(new OutlineLevel { Val = level - 1 });
 
         // Page break before
         if (style.PageBreakBefore)

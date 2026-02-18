@@ -813,6 +813,54 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         paragraphs[1].ParagraphProperties?.Elements<PageBreakBefore>().Should().HaveCount(1);
     }
 
+    [Theory]
+    [InlineData(1, 0)]
+    [InlineData(2, 1)]
+    [InlineData(3, 2)]
+    [InlineData(4, 3)]
+    [InlineData(5, 4)]
+    [InlineData(6, 5)]
+    public void AddHeading_ShouldSetOutlineLevelBasedOnHeadingLevel(int headingLevel, int expectedOutlineLevel)
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle();
+
+        // Act
+        builder.AddHeading(headingLevel, $"Heading {headingLevel}", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var outlineLevel = paragraph.ParagraphProperties?.Elements<OutlineLevel>().FirstOrDefault();
+        outlineLevel.Should().NotBeNull();
+        outlineLevel!.Val!.Value.Should().Be(expectedOutlineLevel);
+    }
+
+    [Fact]
+    public void AddHeading_MultipleHeadings_ShouldEachHaveCorrectOutlineLevel()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle();
+
+        // Act
+        builder.AddHeading(1, "Chapter", style);
+        builder.AddHeading(2, "Section", style);
+        builder.AddHeading(3, "Subsection", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        paragraphs[0].ParagraphProperties?.Elements<OutlineLevel>().First().Val!.Value.Should().Be(0);
+        paragraphs[1].ParagraphProperties?.Elements<OutlineLevel>().First().Val!.Value.Should().Be(1);
+        paragraphs[2].ParagraphProperties?.Elements<OutlineLevel>().First().Val!.Value.Should().Be(2);
+    }
+
     public void Dispose()
     {
         _stream?.Dispose();
