@@ -1253,6 +1253,256 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         paragraphs.Should().HaveCount(1, "BorderExtent=text has no effect when ShowBorder=false");
     }
 
+    [Fact]
+    public void AddHeading_WithBorderPositionRight_ShouldRenderRightBorder()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 26,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "4a90e2",
+            BorderSize = 16,
+            BorderPosition = "right",
+            SpaceBefore = "200",
+            SpaceAfter = "200"
+        };
+
+        // Act
+        builder.AddHeading(2, "H2 with right border", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var borders = paragraph.ParagraphProperties?.ParagraphBorders;
+        borders.Should().NotBeNull();
+        borders!.Elements<RightBorder>().Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public void AddHeading_WithBorderPositionTop_ShouldRenderTopBorder()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 26,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 16,
+            BorderPosition = "top",
+            SpaceBefore = "200",
+            SpaceAfter = "200"
+        };
+
+        // Act
+        builder.AddHeading(2, "H2 with top border", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var borders = paragraph.ParagraphProperties?.ParagraphBorders;
+        borders.Should().NotBeNull();
+        borders!.Elements<TopBorder>().Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public void AddHeading_WithAllBorderPositions_ShouldRenderAllBorders()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 26,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "333333",
+            BorderSize = 12,
+            BorderPosition = "left,right,top,bottom",
+            SpaceBefore = "200",
+            SpaceAfter = "200"
+        };
+
+        // Act
+        builder.AddHeading(1, "Heading with all borders", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var borders = paragraph.ParagraphProperties?.ParagraphBorders;
+        borders.Should().NotBeNull();
+        borders!.Elements<LeftBorder>().Should().NotBeEmpty();
+        borders!.Elements<RightBorder>().Should().NotBeEmpty();
+        borders!.Elements<TopBorder>().Should().NotBeEmpty();
+        borders!.Elements<BottomBorder>().Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public void AddQuote_WithShowBorderFalse_ShouldNotRenderBorder()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new QuoteStyle
+        {
+            FontSize = 22,
+            Color = "555555",
+            Italic = true,
+            ShowBorder = false,
+            LeftIndent = "720",
+            SpaceBefore = "120",
+            SpaceAfter = "120"
+        };
+
+        // Act
+        builder.AddQuote("Quote without border", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var borders = paragraph.ParagraphProperties?.ParagraphBorders;
+        borders.Should().BeNull();
+    }
+
+    [Fact]
+    public void AddQuote_WithBackgroundColor_ShouldRenderShading()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new QuoteStyle
+        {
+            FontSize = 22,
+            Color = "555555",
+            Italic = true,
+            ShowBorder = true,
+            BorderPosition = "left",
+            BorderColor = "3498db",
+            BorderSize = 12,
+            BackgroundColor = "f0f4f8",
+            LeftIndent = "720",
+            SpaceBefore = "120",
+            SpaceAfter = "120"
+        };
+
+        // Act
+        builder.AddQuote("Quote with background", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var shading = paragraph.ParagraphProperties?.Shading;
+        shading.Should().NotBeNull();
+        shading!.Fill!.Value.Should().Be("f0f4f8");
+    }
+
+    [Fact]
+    public void AddQuote_WithNoBorderAndNoBackground_ShouldRenderMinimalProperties()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new QuoteStyle
+        {
+            FontSize = 22,
+            Color = "555555",
+            Italic = false,
+            ShowBorder = false,
+            BackgroundColor = null,
+            LeftIndent = "720",
+            SpaceBefore = "120",
+            SpaceAfter = "120"
+        };
+
+        // Act
+        builder.AddQuote("Minimal quote", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        paragraph.ParagraphProperties?.ParagraphBorders.Should().BeNull();
+        paragraph.ParagraphProperties?.Shading.Should().BeNull();
+        var textContent = string.Join("", paragraph.Descendants<Text>().Select(t => t.Text));
+        textContent.Should().Contain("Minimal quote");
+    }
+
+    [Fact]
+    public void AddHeading_WithLineSpacing_ShouldRenderExactSpacing()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = false,
+            LineSpacing = "480",
+            SpaceBefore = "240",
+            SpaceAfter = "120"
+        };
+
+        // Act
+        builder.AddHeading(1, "Heading with line spacing", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var spacing = paragraph.ParagraphProperties?.Elements<SpacingBetweenLines>().FirstOrDefault();
+        spacing.Should().NotBeNull();
+        spacing!.Line!.Value.Should().Be("480");
+        spacing!.LineRule!.Value.Should().Be(LineSpacingRuleValues.Exact);
+    }
+
+    [Fact]
+    public void AddHeading_WithBorderExtentText_NoSpaceBefore_NoPageBreak_ShouldSkipBeforeSpacer()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 32,
+            BorderPosition = "bottom",
+            BorderExtent = "text",
+            PageBreakBefore = false,
+            SpaceBefore = "0",
+            SpaceAfter = "240"
+        };
+
+        // Act
+        builder.AddHeading(1, "No before spacer", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        // Should only have main heading + after-spacer (no before-spacer)
+        paragraphs.Should().HaveCount(2, "no before-spacer when SpaceBefore=0 and PageBreakBefore=false");
+    }
+
     public void Dispose()
     {
         _stream?.Dispose();
