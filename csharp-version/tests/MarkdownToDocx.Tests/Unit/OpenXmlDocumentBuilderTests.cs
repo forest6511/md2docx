@@ -921,6 +921,10 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         instrText.Should().NotBeNull();
         instrText!.Text.Should().Contain("TOC");
         instrText.Text.Should().Contain("1-3");
+
+        // Should have placeholder text between separate and end markers
+        var texts = body.Descendants<Text>().ToList();
+        texts.Should().Contain(t => t.Text.Contains("Update Field"));
     }
 
     [Theory]
@@ -979,7 +983,9 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         _stream.Position = 0;
         using var doc = WordprocessingDocument.Open(_stream, false);
         var texts = doc.MainDocumentPart!.Document.Body!.Descendants<Text>().ToList();
-        texts.Should().BeEmpty();
+        // No title text, only placeholder instruction text
+        texts.Should().NotContain(t => t.Text == "Contents");
+        texts.Should().Contain(t => t.Text.Contains("Update Field"));
     }
 
     [Fact]

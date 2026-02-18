@@ -124,10 +124,10 @@ public class TitlePageTests : IDisposable
         var body = doc.MainDocumentPart!.Document.Body!;
         var paragraphs = body.Elements<Paragraph>().ToList();
 
-        // Should have 2 paragraphs: image paragraph + page break paragraph
-        paragraphs.Should().HaveCount(2);
+        // Should have 1 paragraph: image with section break (not a separate page break paragraph)
+        paragraphs.Should().HaveCount(1);
 
-        // First paragraph should be centered with a Drawing element
+        // Paragraph should be centered with a Drawing element
         var imageParagraph = paragraphs[0];
         var justification = imageParagraph.ParagraphProperties?.Justification;
         justification.Should().NotBeNull();
@@ -136,11 +136,17 @@ public class TitlePageTests : IDisposable
         var drawing = imageParagraph.Descendants<Drawing>().FirstOrDefault();
         drawing.Should().NotBeNull();
 
-        // Second paragraph should have page break
-        var breakParagraph = paragraphs[1];
-        var pageBreak = breakParagraph.Descendants<Break>().FirstOrDefault();
-        pageBreak.Should().NotBeNull();
-        pageBreak!.Type!.Value.Should().Be(BreakValues.Page);
+        // Section break with vertical centering should be in paragraph properties
+        var sectionProps = imageParagraph.ParagraphProperties?.Elements<SectionProperties>().FirstOrDefault();
+        sectionProps.Should().NotBeNull();
+
+        var vAlign = sectionProps!.Elements<VerticalTextAlignmentOnPage>().FirstOrDefault();
+        vAlign.Should().NotBeNull();
+        vAlign!.Val!.Value.Should().Be(VerticalJustificationValues.Center);
+
+        var sectionType = sectionProps.Elements<SectionType>().FirstOrDefault();
+        sectionType.Should().NotBeNull();
+        sectionType!.Val!.Value.Should().Be(SectionMarkValues.NextPage);
 
         // Should have an image part
         doc.MainDocumentPart.ImageParts.Should().HaveCount(1);
