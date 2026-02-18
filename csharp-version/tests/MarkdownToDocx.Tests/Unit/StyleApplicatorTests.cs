@@ -97,6 +97,46 @@ public class StyleApplicatorTests
     }
 
     [Fact]
+    public void ApplyHeadingStyle_ShouldMapBorderPositionAndBackgroundColor()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            H2 = new HeadingStyleConfig
+            {
+                Size = 13,
+                Bold = true,
+                Color = "333333",
+                ShowBorder = true,
+                BorderColor = "e8a735",
+                BorderSize = 16,
+                BorderPosition = "left",
+                BackgroundColor = "faf5eb"
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyHeadingStyle(2, config);
+
+        // Assert
+        style.BorderPosition.Should().Be("left");
+        style.BackgroundColor.Should().Be("faf5eb");
+        style.ShowBorder.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ApplyHeadingStyle_WithDefaultBorderPosition_ShouldBeBottom()
+    {
+        // Arrange - H1 in test config has no explicit BorderPosition
+        // Act
+        var style = _applicator.ApplyHeadingStyle(1, _testConfig);
+
+        // Assert
+        style.BorderPosition.Should().Be("bottom");
+        style.BackgroundColor.Should().BeNull();
+    }
+
+    [Fact]
     public void ApplyParagraphStyle_ShouldReturnCorrectStyle()
     {
         // Act

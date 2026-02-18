@@ -520,6 +520,158 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         textContent.Should().Contain("Important note");
     }
 
+    [Fact]
+    public void AddHeading_WithShowBorderOnH2_ShouldRenderBorder()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 26,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 16,
+            BorderPosition = "bottom",
+            SpaceBefore = "200",
+            SpaceAfter = "200"
+        };
+
+        // Act
+        builder.AddHeading(2, "H2 with border", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var borders = paragraph.ParagraphProperties?.ParagraphBorders;
+        borders.Should().NotBeNull();
+        borders!.Elements<BottomBorder>().Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public void AddHeading_WithBorderPositionLeft_ShouldRenderLeftBorder()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 26,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "4a90e2",
+            BorderSize = 24,
+            BorderPosition = "left",
+            SpaceBefore = "200",
+            SpaceAfter = "200"
+        };
+
+        // Act
+        builder.AddHeading(3, "H3 with left border", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var borders = paragraph.ParagraphProperties?.ParagraphBorders;
+        borders.Should().NotBeNull();
+        borders!.Elements<LeftBorder>().Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public void AddHeading_WithBackgroundColor_ShouldRenderShading()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 22,
+            Color = "ffffff",
+            Bold = true,
+            ShowBorder = false,
+            BackgroundColor = "f0b64d",
+            SpaceBefore = "200",
+            SpaceAfter = "200"
+        };
+
+        // Act
+        builder.AddHeading(3, "H3 with background", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var shading = paragraph.ParagraphProperties?.Shading;
+        shading.Should().NotBeNull();
+        shading!.Fill!.Value.Should().Be("f0b64d");
+    }
+
+    [Fact]
+    public void AddHeading_WithNullBackgroundColor_ShouldNotRenderShading()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = false,
+            BackgroundColor = null,
+            SpaceBefore = "240",
+            SpaceAfter = "120"
+        };
+
+        // Act
+        builder.AddHeading(1, "H1 without background", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var shading = paragraph.ParagraphProperties?.Shading;
+        shading.Should().BeNull();
+    }
+
+    [Fact]
+    public void AddHeading_WithDefaultBorderPosition_ShouldRenderBottomBorder()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 32,
+            // BorderPosition not set - should default to "bottom"
+            SpaceBefore = "240",
+            SpaceAfter = "240"
+        };
+
+        // Act
+        builder.AddHeading(1, "H1 default border", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var borders = paragraph.ParagraphProperties?.ParagraphBorders;
+        borders.Should().NotBeNull();
+        borders!.Elements<BottomBorder>().Should().NotBeEmpty();
+        var bottomBorder = borders.Elements<BottomBorder>().First();
+        bottomBorder.Color!.Value.Should().Be("e8a735");
+    }
+
     public void Dispose()
     {
         _stream?.Dispose();

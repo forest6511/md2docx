@@ -36,6 +36,26 @@ public sealed record HeadingStyle
     public uint BorderSize { get; init; } = 24;
 
     /// <summary>
+    /// Space between border and content in points
+    /// </summary>
+    public uint BorderSpace { get; init; } = 0;
+
+    /// <summary>
+    /// Border position ("bottom", "left", "right", "top")
+    /// </summary>
+    public string BorderPosition { get; init; } = "bottom";
+
+    /// <summary>
+    /// Background color in hexadecimal format (optional)
+    /// </summary>
+    public string? BackgroundColor { get; init; }
+
+    /// <summary>
+    /// Line spacing in twips (exact mode). Null uses default line spacing.
+    /// </summary>
+    public string? LineSpacing { get; init; }
+
+    /// <summary>
     /// Space before heading in twips
     /// </summary>
     public string SpaceBefore { get; init; } = "400";

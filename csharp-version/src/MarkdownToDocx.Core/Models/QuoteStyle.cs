@@ -41,6 +41,11 @@ public sealed record QuoteStyle
     public uint BorderSize { get; init; } = 24;
 
     /// <summary>
+    /// Space between border and content in points
+    /// </summary>
+    public uint BorderSpace { get; init; } = 0;
+
+    /// <summary>
     /// Background color in hexadecimal format (optional)
     /// </summary>
     public string? BackgroundColor { get; init; }

@@ -17,6 +17,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     private readonly WordprocessingDocument _document;
     private readonly Body _body;
     private readonly ITextDirectionProvider _textDirection;
+    private readonly ParagraphConfiguration _paragraphConfig;
     private bool _disposed;
 
     /// <summary>
@@ -31,6 +32,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         ArgumentNullException.ThrowIfNull(textDirection);
 
         _textDirection = textDirection;
+        _paragraphConfig = textDirection.GetParagraphConfiguration();
         _document = WordprocessingDocument.Create(outputStream, WordprocessingDocumentType.Document);
 
         InitializeDocument();
@@ -58,12 +60,11 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     private SectionProperties CreateSectionProperties()
     {
         var pageConfig = _textDirection.GetPageConfiguration();
-        var paragraphConfig = _textDirection.GetParagraphConfiguration();
 
         var sectionProps = new SectionProperties();
 
         // Text direction
-        sectionProps.AppendChild(new W.TextDirection { Val = paragraphConfig.TextDirection });
+        sectionProps.AppendChild(new W.TextDirection { Val = _paragraphConfig.TextDirection });
 
         // Page size
         sectionProps.AppendChild(new PageSize
@@ -88,6 +89,90 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         return sectionProps;
     }
 
+    /// <summary>
+    /// Creates ParagraphProperties pre-configured with text direction and kinsoku settings
+    /// </summary>
+    private ParagraphProperties CreateBaseParagraphProperties()
+    {
+        var props = new ParagraphProperties();
+
+        props.AppendChild(new W.TextDirection { Val = _paragraphConfig.TextDirection });
+
+        if (_paragraphConfig.Kinsoku)
+        {
+            props.AppendChild(new Kinsoku { Val = OnOffValue.FromBoolean(true) });
+        }
+
+        return props;
+    }
+
+    /// <summary>
+    /// Creates a ParagraphBorders element from a comma-separated position string
+    /// </summary>
+    private static ParagraphBorders CreateBordersFromPositions(
+        string borderPosition,
+        string borderColor,
+        uint borderSize,
+        uint borderSpace)
+    {
+        var positions = borderPosition
+            .ToLowerInvariant()
+            .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        var paragraphBorders = new ParagraphBorders();
+
+        foreach (var pos in positions)
+        {
+            OpenXmlElement border = pos switch
+            {
+                "left" => new LeftBorder { Val = BorderValues.Single, Color = borderColor, Size = borderSize, Space = borderSpace },
+                "right" => new RightBorder { Val = BorderValues.Single, Color = borderColor, Size = borderSize, Space = borderSpace },
+                "top" => new TopBorder { Val = BorderValues.Single, Color = borderColor, Size = borderSize, Space = borderSpace },
+                _ => new BottomBorder { Val = BorderValues.Single, Color = borderColor, Size = borderSize, Space = borderSpace }
+            };
+            paragraphBorders.AppendChild(border);
+        }
+
+        return paragraphBorders;
+    }
+
+    /// <summary>
+    /// Creates a background shading element
+    /// </summary>
+    private static Shading CreateBackgroundShading(string fillColor) => new()
+    {
+        Val = ShadingPatternValues.Clear,
+        Color = "auto",
+        Fill = fillColor
+    };
+
+    /// <summary>
+    /// Creates base RunProperties with font size, color, and optional bold/italic
+    /// </summary>
+    private static RunProperties CreateBaseRunProperties(
+        int fontSize,
+        string color,
+        bool bold = false,
+        bool italic = false)
+    {
+        var props = new RunProperties();
+
+        if (bold)
+        {
+            props.AppendChild(new Bold());
+        }
+
+        if (italic)
+        {
+            props.AppendChild(new Italic());
+        }
+
+        props.AppendChild(new FontSize { Val = fontSize.ToString() });
+        props.AppendChild(new Color { Val = color });
+
+        return props;
+    }
+
     /// <inheritdoc/>
     public void AddHeading(int level, string text, HeadingStyle style)
     {
@@ -100,70 +185,49 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         }
 
         var paragraph = _body.AppendChild(new Paragraph());
-        var paragraphProps = CreateHeadingParagraphProperties(level, style);
+        var paragraphProps = CreateHeadingParagraphProperties(style);
         paragraph.AppendChild(paragraphProps);
 
         var run = paragraph.AppendChild(new Run());
-        var runProps = CreateHeadingRunProperties(style);
-        run.AppendChild(runProps);
+        run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color, bold: style.Bold));
         run.AppendChild(new Text(text) { Space = SpaceProcessingModeValues.Preserve });
     }
 
     /// <summary>
     /// Creates paragraph properties for heading elements
     /// </summary>
-    private ParagraphProperties CreateHeadingParagraphProperties(int level, HeadingStyle style)
+    private ParagraphProperties CreateHeadingParagraphProperties(HeadingStyle style)
     {
-        var paragraphConfig = _textDirection.GetParagraphConfiguration();
-        var props = new ParagraphProperties();
+        var props = CreateBaseParagraphProperties();
 
-        // Text direction
-        props.AppendChild(new W.TextDirection { Val = paragraphConfig.TextDirection });
-
-        // Kinsoku (Japanese line breaking)
-        if (paragraphConfig.Kinsoku)
+        // Border
+        if (style.ShowBorder)
         {
-            props.AppendChild(new Kinsoku { Val = OnOffValue.FromBoolean(true) });
+            props.AppendChild(CreateBordersFromPositions(
+                style.BorderPosition,
+                style.BorderColor ?? "3498db",
+                style.BorderSize,
+                style.BorderSpace));
         }
 
-        // Border (for level 1 headings or if specified)
-        if (level == 1 && style.ShowBorder)
+        // Background shading
+        if (!string.IsNullOrEmpty(style.BackgroundColor))
         {
-            props.AppendChild(new ParagraphBorders(
-                new LeftBorder
-                {
-                    Val = BorderValues.Single,
-                    Color = style.BorderColor ?? "3498db",
-                    Size = style.BorderSize,
-                    Space = 10U
-                }
-            ));
+            props.AppendChild(CreateBackgroundShading(style.BackgroundColor));
         }
 
         // Spacing
-        props.AppendChild(new SpacingBetweenLines
+        var spacing = new SpacingBetweenLines
         {
             Before = style.SpaceBefore,
             After = style.SpaceAfter
-        });
-
-        return props;
-    }
-
-    /// <summary>
-    /// Creates run properties for heading text
-    /// </summary>
-    private static RunProperties CreateHeadingRunProperties(HeadingStyle style)
-    {
-        var props = new RunProperties();
-
-        if (style.Bold)
+        };
+        if (!string.IsNullOrEmpty(style.LineSpacing))
         {
-            props.AppendChild(new Bold());
+            spacing.Line = style.LineSpacing;
+            spacing.LineRule = LineSpacingRuleValues.Exact;
         }
-
-        props.AppendChild(new FontSize { Val = style.FontSize.ToString() });
-        props.AppendChild(new Color { Val = style.Color });
+        props.AppendChild(spacing);
 
         return props;
     }
@@ -179,8 +243,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         paragraph.AppendChild(paragraphProps);
 
         var run = paragraph.AppendChild(new Run());
-        var runProps = CreateParagraphRunProperties(style);
-        run.AppendChild(runProps);
+        run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color));
         run.AppendChild(new Text(text) { Space = SpaceProcessingModeValues.Preserve });
     }
 
@@ -189,17 +252,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     /// </summary>
     private ParagraphProperties CreateParagraphProperties(ParagraphStyle style)
     {
-        var paragraphConfig = _textDirection.GetParagraphConfiguration();
-        var props = new ParagraphProperties();
-
-        // Text direction
-        props.AppendChild(new W.TextDirection { Val = paragraphConfig.TextDirection });
-
-        // Kinsoku
-        if (paragraphConfig.Kinsoku)
-        {
-            props.AppendChild(new Kinsoku { Val = OnOffValue.FromBoolean(true) });
-        }
+        var props = CreateBaseParagraphProperties();
 
         // Line spacing
         props.AppendChild(new SpacingBetweenLines
@@ -218,17 +271,6 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         return props;
     }
 
-    /// <summary>
-    /// Creates run properties for paragraph text
-    /// </summary>
-    private static RunProperties CreateParagraphRunProperties(ParagraphStyle style)
-    {
-        var props = new RunProperties();
-        props.AppendChild(new FontSize { Val = style.FontSize.ToString() });
-        props.AppendChild(new Color { Val = style.Color });
-        return props;
-    }
-
     /// <inheritdoc/>
     public void AddList(IEnumerable<CoreListItem> items, bool isOrdered, ListStyle style)
     {
@@ -243,8 +285,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
             paragraph.AppendChild(paragraphProps);
 
             var run = paragraph.AppendChild(new Run());
-            var runProps = CreateListRunProperties(style);
-            run.AppendChild(runProps);
+            run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color));
 
             // Add bullet or number
             string bullet = isOrdered ? $"{itemNumber}. " : "• ";
@@ -262,17 +303,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     /// </summary>
     private ParagraphProperties CreateListParagraphProperties(ListStyle style)
     {
-        var paragraphConfig = _textDirection.GetParagraphConfiguration();
-        var props = new ParagraphProperties();
-
-        // Text direction
-        props.AppendChild(new W.TextDirection { Val = paragraphConfig.TextDirection });
-
-        // Kinsoku
-        if (paragraphConfig.Kinsoku)
-        {
-            props.AppendChild(new Kinsoku { Val = OnOffValue.FromBoolean(true) });
-        }
+        var props = CreateBaseParagraphProperties();
 
         // Indentation
         props.AppendChild(new Indentation
@@ -291,17 +322,6 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         return props;
     }
 
-    /// <summary>
-    /// Creates run properties for list item text
-    /// </summary>
-    private static RunProperties CreateListRunProperties(ListStyle style)
-    {
-        var props = new RunProperties();
-        props.AppendChild(new FontSize { Val = style.FontSize.ToString() });
-        props.AppendChild(new Color { Val = style.Color });
-        return props;
-    }
-
     /// <inheritdoc/>
     public void AddCodeBlock(string code, string? language, CodeBlockStyle style)
     {
@@ -313,7 +333,12 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         paragraph.AppendChild(paragraphProps);
 
         var run = paragraph.AppendChild(new Run());
-        var runProps = CreateCodeBlockRunProperties(style);
+        var runProps = CreateBaseRunProperties(style.FontSize, style.Color);
+        runProps.AppendChild(new RunFonts
+        {
+            Ascii = style.MonospaceFontAscii,
+            EastAsia = style.MonospaceFontEastAsia
+        });
         run.AppendChild(runProps);
 
         // Add code with preserved whitespace
@@ -333,17 +358,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     /// </summary>
     private ParagraphProperties CreateCodeBlockParagraphProperties(CodeBlockStyle style)
     {
-        var paragraphConfig = _textDirection.GetParagraphConfiguration();
-        var props = new ParagraphProperties();
-
-        // Text direction
-        props.AppendChild(new W.TextDirection { Val = paragraphConfig.TextDirection });
-
-        // Kinsoku
-        if (paragraphConfig.Kinsoku)
-        {
-            props.AppendChild(new Kinsoku { Val = OnOffValue.FromBoolean(true) });
-        }
+        var props = CreateBaseParagraphProperties();
 
         // Borders
         props.AppendChild(new ParagraphBorders(
@@ -354,12 +369,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         ));
 
         // Background shading
-        props.AppendChild(new Shading
-        {
-            Val = ShadingPatternValues.Clear,
-            Color = "auto",
-            Fill = style.BackgroundColor
-        });
+        props.AppendChild(CreateBackgroundShading(style.BackgroundColor));
 
         // Spacing
         props.AppendChild(new SpacingBetweenLines
@@ -370,22 +380,6 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
             LineRule = LineSpacingRuleValues.Auto
         });
 
-        return props;
-    }
-
-    /// <summary>
-    /// Creates run properties for code block text
-    /// </summary>
-    private static RunProperties CreateCodeBlockRunProperties(CodeBlockStyle style)
-    {
-        var props = new RunProperties();
-        props.AppendChild(new RunFonts
-        {
-            Ascii = style.MonospaceFontAscii,
-            EastAsia = style.MonospaceFontEastAsia
-        });
-        props.AppendChild(new FontSize { Val = style.FontSize.ToString() });
-        props.AppendChild(new Color { Val = style.Color });
         return props;
     }
 
@@ -400,8 +394,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         paragraph.AppendChild(paragraphProps);
 
         var run = paragraph.AppendChild(new Run());
-        var runProps = CreateQuoteRunProperties(style);
-        run.AppendChild(runProps);
+        run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color, italic: style.Italic));
         run.AppendChild(new Text(text) { Space = SpaceProcessingModeValues.Preserve });
     }
 
@@ -410,39 +403,22 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     /// </summary>
     private ParagraphProperties CreateQuoteParagraphProperties(QuoteStyle style)
     {
-        var paragraphConfig = _textDirection.GetParagraphConfiguration();
-        var props = new ParagraphProperties();
+        var props = CreateBaseParagraphProperties();
 
-        // Text direction
-        props.AppendChild(new W.TextDirection { Val = paragraphConfig.TextDirection });
-
-        // Kinsoku
-        if (paragraphConfig.Kinsoku)
-        {
-            props.AppendChild(new Kinsoku { Val = OnOffValue.FromBoolean(true) });
-        }
-
-        // Border (if enabled)
+        // Border
         if (style.ShowBorder)
         {
-            OpenXmlElement border = style.BorderPosition.ToLowerInvariant() switch
-            {
-                "right" => new RightBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = 10U },
-                "top" => new TopBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = 10U },
-                "bottom" => new BottomBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = 10U },
-                _ => new LeftBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = 10U }
-            };
-            props.AppendChild(new ParagraphBorders(border));
+            props.AppendChild(CreateBordersFromPositions(
+                style.BorderPosition,
+                style.BorderColor,
+                style.BorderSize,
+                style.BorderSpace));
         }
 
-        // Background (if specified)
+        // Background shading
         if (!string.IsNullOrEmpty(style.BackgroundColor))
         {
-            props.AppendChild(new Shading
-            {
-                Val = ShadingPatternValues.Clear,
-                Fill = style.BackgroundColor
-            });
+            props.AppendChild(CreateBackgroundShading(style.BackgroundColor));
         }
 
         // Indentation
@@ -458,31 +434,12 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         return props;
     }
 
-    /// <summary>
-    /// Creates run properties for quote text
-    /// </summary>
-    private static RunProperties CreateQuoteRunProperties(QuoteStyle style)
-    {
-        var props = new RunProperties();
-
-        if (style.Italic)
-        {
-            props.AppendChild(new Italic());
-        }
-
-        props.AppendChild(new FontSize { Val = style.FontSize.ToString() });
-        props.AppendChild(new Color { Val = style.Color });
-        return props;
-    }
-
     /// <inheritdoc/>
     public void AddThematicBreak()
     {
         var paragraph = _body.AppendChild(new Paragraph());
-        var paragraphConfig = _textDirection.GetParagraphConfiguration();
 
-        var props = new ParagraphProperties();
-        props.AppendChild(new W.TextDirection { Val = paragraphConfig.TextDirection });
+        var props = CreateBaseParagraphProperties();
         props.AppendChild(new ParagraphBorders(
             new BottomBorder
             {
