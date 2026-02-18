@@ -131,6 +131,20 @@ public class YamlConfigurationLoaderTests
     }
 
     [Fact]
+    public void LoadPreset_WithMinimalPreset_ShouldHaveDefaultPageBreakBefore()
+    {
+        // Arrange
+        const string presetName = "minimal";
+
+        // Act
+        var config = _loader.LoadPreset(presetName);
+
+        // Assert - PageBreakBefore defaults to false when not specified in YAML
+        config.Styles.H1.PageBreakBefore.Should().BeFalse();
+        config.Styles.H2.PageBreakBefore.Should().BeFalse();
+    }
+
+    [Fact]
     public void LoadPreset_WithNonExistentPreset_ShouldThrowFileNotFoundException()
     {
         // Arrange

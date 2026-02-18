@@ -43,6 +43,7 @@ public sealed class StyleApplicator : IStyleApplicator
             BorderPosition = headingConfig.BorderPosition,
             BackgroundColor = headingConfig.BackgroundColor,
             LineSpacing = headingConfig.LineSpacing,
+            PageBreakBefore = headingConfig.PageBreakBefore,
             SpaceBefore = headingConfig.SpaceBefore,
             SpaceAfter = headingConfig.SpaceAfter
         };

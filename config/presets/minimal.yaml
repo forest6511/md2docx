@@ -31,6 +31,7 @@ Styles:
     Bold: true
     Color: "000000"
     ShowBorder: false
+    PageBreakBefore: false
     SpaceBefore: "480"
     SpaceAfter: "240"
   H2:
