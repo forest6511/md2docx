@@ -243,6 +243,22 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
             throw new ArgumentOutOfRangeException(nameof(level), "Heading level must be between 1 and 6");
         }
 
+        if (style.ShowBorder && string.Equals(style.BorderExtent, "text", StringComparison.OrdinalIgnoreCase))
+        {
+            AddHeadingWithSpacers(level, text, style);
+        }
+        else
+        {
+            AddHeadingSingleParagraph(level, text, style);
+        }
+    }
+
+    /// <summary>
+    /// Adds a heading as a single paragraph (default behavior).
+    /// Border encompasses the full paragraph box including spacing.
+    /// </summary>
+    private void AddHeadingSingleParagraph(int level, string text, HeadingStyle style)
+    {
         var paragraph = _body.AppendChild(new Paragraph());
         var paragraphProps = CreateHeadingParagraphProperties(level, style);
         paragraph.AppendChild(paragraphProps);
@@ -250,6 +266,91 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         var run = paragraph.AppendChild(new Run());
         run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color, bold: style.Bold));
         run.AppendChild(new Text(text) { Space = SpaceProcessingModeValues.Preserve });
+    }
+
+    /// <summary>
+    /// Adds a heading using spacer paragraphs so the border hugs the text only.
+    /// Up to 3 paragraphs: before-spacer (SpaceBefore), main heading (border, zero spacing),
+    /// after-spacer (SpaceAfter).
+    /// </summary>
+    private void AddHeadingWithSpacers(int level, string text, HeadingStyle style)
+    {
+        bool hasSpaceBefore = style.SpaceBefore != "0" && !string.IsNullOrEmpty(style.SpaceBefore);
+        bool hasSpaceAfter = style.SpaceAfter != "0" && !string.IsNullOrEmpty(style.SpaceAfter);
+
+        // Before-spacer paragraph: carries SpaceBefore and PageBreakBefore
+        if (hasSpaceBefore || style.PageBreakBefore)
+        {
+            var beforeParagraph = _body.AppendChild(new Paragraph());
+            var beforeProps = CreateBaseParagraphProperties();
+
+            if (style.PageBreakBefore)
+            {
+                beforeProps.AppendChild(new W.PageBreakBefore { Val = OnOffValue.FromBoolean(true) });
+            }
+
+            var beforeSpacing = new SpacingBetweenLines
+            {
+                Before = hasSpaceBefore ? style.SpaceBefore : "0",
+                After = "0"
+            };
+            beforeProps.AppendChild(beforeSpacing);
+
+            beforeParagraph.AppendChild(beforeProps);
+        }
+
+        // Main heading paragraph: border + OutlineLevel + BackgroundColor, zero spacing
+        {
+            var mainParagraph = _body.AppendChild(new Paragraph());
+            var mainProps = CreateBaseParagraphProperties();
+
+            // Outline level for TOC and navigation (only on main paragraph)
+            mainProps.AppendChild(new OutlineLevel { Val = level - 1 });
+
+            // Border
+            mainProps.AppendChild(CreateBordersFromPositions(
+                style.BorderPosition,
+                style.BorderColor ?? "3498db",
+                style.BorderSize,
+                style.BorderSpace));
+
+            // Background shading
+            if (!string.IsNullOrEmpty(style.BackgroundColor))
+            {
+                mainProps.AppendChild(CreateBackgroundShading(style.BackgroundColor));
+            }
+
+            // Zero spacing so border hugs the text
+            var mainSpacing = new SpacingBetweenLines { Before = "0", After = "0" };
+            if (!string.IsNullOrEmpty(style.LineSpacing))
+            {
+                mainSpacing.Line = style.LineSpacing;
+                mainSpacing.LineRule = LineSpacingRuleValues.Exact;
+            }
+            mainProps.AppendChild(mainSpacing);
+
+            mainParagraph.AppendChild(mainProps);
+
+            var run = mainParagraph.AppendChild(new Run());
+            run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color, bold: style.Bold));
+            run.AppendChild(new Text(text) { Space = SpaceProcessingModeValues.Preserve });
+        }
+
+        // After-spacer paragraph: carries SpaceAfter
+        if (hasSpaceAfter)
+        {
+            var afterParagraph = _body.AppendChild(new Paragraph());
+            var afterProps = CreateBaseParagraphProperties();
+
+            var afterSpacing = new SpacingBetweenLines
+            {
+                Before = "0",
+                After = style.SpaceAfter
+            };
+            afterProps.AppendChild(afterSpacing);
+
+            afterParagraph.AppendChild(afterProps);
+        }
     }
 
     /// <summary>

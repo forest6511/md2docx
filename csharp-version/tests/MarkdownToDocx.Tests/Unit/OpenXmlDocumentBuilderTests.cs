@@ -1019,6 +1019,234 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         breaks.Should().BeEmpty();
     }
 
+    [Fact]
+    public void AddHeading_WithBorderExtentText_ShouldCreateThreeParagraphs()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 32,
+            BorderPosition = "bottom",
+            BorderExtent = "text",
+            SpaceBefore = "240",
+            SpaceAfter = "240"
+        };
+
+        // Act
+        builder.AddHeading(1, "Bordered Heading", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        paragraphs.Should().HaveCount(3, "before-spacer + main heading + after-spacer");
+    }
+
+    [Fact]
+    public void AddHeading_WithBorderExtentText_OutlineLevelOnlyOnMainParagraph()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 32,
+            BorderExtent = "text",
+            SpaceBefore = "240",
+            SpaceAfter = "240"
+        };
+
+        // Act
+        builder.AddHeading(2, "Heading Level 2", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+
+        // Before-spacer: no OutlineLevel
+        paragraphs[0].ParagraphProperties?.Elements<OutlineLevel>().Should().BeEmpty();
+        // Main heading: OutlineLevel = 1 (H2)
+        var outlineLevel = paragraphs[1].ParagraphProperties?.Elements<OutlineLevel>().FirstOrDefault();
+        outlineLevel.Should().NotBeNull();
+        outlineLevel!.Val!.Value.Should().Be(1);
+        // After-spacer: no OutlineLevel
+        paragraphs[2].ParagraphProperties?.Elements<OutlineLevel>().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AddHeading_WithBorderExtentText_BorderOnlyOnMainParagraph()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 32,
+            BorderPosition = "bottom",
+            BorderExtent = "text",
+            SpaceBefore = "240",
+            SpaceAfter = "240"
+        };
+
+        // Act
+        builder.AddHeading(1, "Bordered", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+
+        // Before-spacer: no border
+        paragraphs[0].ParagraphProperties?.ParagraphBorders.Should().BeNull();
+        // Main heading: has border
+        paragraphs[1].ParagraphProperties?.ParagraphBorders.Should().NotBeNull();
+        paragraphs[1].ParagraphProperties!.ParagraphBorders!.Elements<BottomBorder>().Should().NotBeEmpty();
+        // After-spacer: no border
+        paragraphs[2].ParagraphProperties?.ParagraphBorders.Should().BeNull();
+    }
+
+    [Fact]
+    public void AddHeading_WithBorderExtentText_MainParagraphHasZeroSpacing()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 32,
+            BorderExtent = "text",
+            SpaceBefore = "240",
+            SpaceAfter = "240"
+        };
+
+        // Act
+        builder.AddHeading(1, "Zero Spacing Main", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+
+        var mainSpacing = paragraphs[1].ParagraphProperties?.Elements<SpacingBetweenLines>().FirstOrDefault();
+        mainSpacing.Should().NotBeNull();
+        mainSpacing!.Before!.Value.Should().Be("0");
+        mainSpacing.After!.Value.Should().Be("0");
+    }
+
+    [Fact]
+    public void AddHeading_WithBorderExtentParagraph_ShouldStaySingleParagraph()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 32,
+            BorderExtent = "paragraph",
+            SpaceBefore = "240",
+            SpaceAfter = "240"
+        };
+
+        // Act
+        builder.AddHeading(1, "Single Paragraph", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        paragraphs.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void AddHeading_WithBorderExtentText_PageBreakBeforeGoesOnBeforeSpacer()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderColor = "e8a735",
+            BorderSize = 32,
+            BorderExtent = "text",
+            PageBreakBefore = true,
+            SpaceBefore = "240",
+            SpaceAfter = "240"
+        };
+
+        // Act
+        builder.AddHeading(1, "Page Break Heading", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        paragraphs.Should().HaveCount(3);
+
+        // PageBreakBefore on before-spacer
+        paragraphs[0].ParagraphProperties?.Elements<PageBreakBefore>().Should().HaveCount(1);
+        // Not on main heading
+        paragraphs[1].ParagraphProperties?.Elements<PageBreakBefore>().Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AddHeading_WithBorderExtentTextAndShowBorderFalse_ShouldStaySingleParagraph()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = false,
+            BorderExtent = "text",
+            SpaceBefore = "240",
+            SpaceAfter = "240"
+        };
+
+        // Act
+        builder.AddHeading(1, "No Border Text Extent", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        paragraphs.Should().HaveCount(1, "BorderExtent=text has no effect when ShowBorder=false");
+    }
+
     public void Dispose()
     {
         _stream?.Dispose();

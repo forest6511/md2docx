@@ -321,6 +321,42 @@ public class StyleApplicatorTests
         style.Depth.Should().Be(expectedDepth);
     }
 
+    [Fact]
+    public void ApplyHeadingStyle_WithBorderExtent_ShouldMapCorrectly()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            H1 = new HeadingStyleConfig
+            {
+                Size = 24,
+                Bold = true,
+                Color = "000000",
+                ShowBorder = true,
+                BorderColor = "e8a735",
+                BorderExtent = "text",
+                SpaceBefore = "480",
+                SpaceAfter = "240"
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyHeadingStyle(1, config);
+
+        // Assert
+        style.BorderExtent.Should().Be("text");
+    }
+
+    [Fact]
+    public void ApplyHeadingStyle_WithDefaultBorderExtent_ShouldBeParagraph()
+    {
+        // Act
+        var style = _applicator.ApplyHeadingStyle(1, _testConfig);
+
+        // Assert
+        style.BorderExtent.Should().Be("paragraph");
+    }
+
     private static StyleConfiguration CreateTestConfiguration()
     {
         return new StyleConfiguration

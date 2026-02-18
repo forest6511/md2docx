@@ -69,4 +69,11 @@ public sealed record HeadingStyle
     /// Space after heading in twips
     /// </summary>
     public string SpaceAfter { get; init; } = "200";
+
+    /// <summary>
+    /// Controls how the border interacts with paragraph spacing.
+    /// "paragraph" (default): border encompasses spacing area.
+    /// "text": border hugs text only, using spacer paragraphs for spacing.
+    /// </summary>
+    public string BorderExtent { get; init; } = "paragraph";
 }

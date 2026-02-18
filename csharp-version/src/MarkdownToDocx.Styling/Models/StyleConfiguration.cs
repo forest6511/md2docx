@@ -125,6 +125,13 @@ public sealed class HeadingStyleConfig
     /// Spacing after heading in twips (1/20 of a point)
     /// </summary>
     public string SpaceAfter { get; init; } = "120";
+
+    /// <summary>
+    /// Controls how the border interacts with paragraph spacing.
+    /// "paragraph" (default): border encompasses spacing area.
+    /// "text": border hugs text only, using spacer paragraphs for spacing.
+    /// </summary>
+    public string BorderExtent { get; init; } = "paragraph";
 }
 
 /// <summary>
