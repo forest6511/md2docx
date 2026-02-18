@@ -57,6 +57,15 @@ try
     {
         Console.WriteLine("Converting to DOCX...");
 
+        // Title/cover page
+        var titlePageStyle = styleApplicator.ApplyTitlePageStyle(
+            config, options.InputPath, options.CoverImagePath);
+        builder.AddTitlePage(titlePageStyle);
+
+        // Table of contents
+        var tocStyle = styleApplicator.ApplyTableOfContentsStyle(config);
+        builder.AddTableOfContents(tocStyle);
+
         foreach (var block in document)
         {
             // Use pattern matching for type-safe block processing

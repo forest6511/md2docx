@@ -46,6 +46,11 @@ public sealed class ConversionConfiguration
     /// Table of contents configuration
     /// </summary>
     public TableOfContentsConfig TableOfContents { get; init; } = new();
+
+    /// <summary>
+    /// Title page configuration
+    /// </summary>
+    public TitlePageConfig TitlePage { get; init; } = new();
 }
 
 /// <summary>
@@ -170,6 +175,37 @@ public sealed class TableOfContentsConfig
     /// Whether to insert a page break after the TOC
     /// </summary>
     public bool PageBreakAfter { get; init; } = false;
+}
+
+/// <summary>
+/// Title page configuration
+/// </summary>
+public sealed class TitlePageConfig
+{
+    /// <summary>
+    /// Whether title page generation is enabled
+    /// </summary>
+    public bool Enabled { get; init; }
+
+    /// <summary>
+    /// Path to cover image (relative to input file, or absolute)
+    /// </summary>
+    public string? ImagePath { get; init; }
+
+    /// <summary>
+    /// Maximum width of the image as percentage of printable area (1-100)
+    /// </summary>
+    public int ImageMaxWidthPercent { get; init; } = 80;
+
+    /// <summary>
+    /// Maximum height of the image as percentage of printable area (1-100)
+    /// </summary>
+    public int ImageMaxHeightPercent { get; init; } = 80;
+
+    /// <summary>
+    /// Whether to insert a page break after the title page
+    /// </summary>
+    public bool PageBreakAfter { get; init; } = true;
 }
 
 /// <summary>

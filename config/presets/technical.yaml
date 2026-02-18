@@ -25,6 +25,12 @@ Fonts:
   EastAsia: "Noto Sans CJK JP"
   DefaultSize: 10
 
+TitlePage:
+  Enabled: false
+  ImageMaxWidthPercent: 80
+  ImageMaxHeightPercent: 80
+  PageBreakAfter: true
+
 Styles:
   H1:
     Size: 24

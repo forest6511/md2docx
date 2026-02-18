@@ -46,6 +46,13 @@ public interface IDocumentBuilder : IDisposable
     void AddQuote(string text, QuoteStyle style);
 
     /// <summary>
+    /// Adds a title page with a cover image to the document.
+    /// Must be called before any other content is added.
+    /// </summary>
+    /// <param name="style">Title page style configuration</param>
+    void AddTitlePage(TitlePageStyle style);
+
+    /// <summary>
     /// Adds a table of contents to the document.
     /// Must be called before any content (headings, paragraphs, etc.) is added.
     /// </summary>

@@ -17,6 +17,7 @@ public static class CommandLineParser
         string? inputPath = null;
         string? outputPath = null;
         string? configPath = null;
+        string? coverImagePath = null;
         string presetName = "minimal";
         string presetDirectory = "config/presets";
         bool verbose = false;
@@ -41,6 +42,10 @@ public static class CommandLineParser
             {
                 if (i + 1 < args.Length) presetDirectory = args[++i];
             }
+            else if (arg == "--cover-image")
+            {
+                if (i + 1 < args.Length) coverImagePath = args[++i];
+            }
             else if (arg == "-v" || arg == "--verbose")
             {
                 verbose = true;
@@ -64,6 +69,7 @@ public static class CommandLineParser
             InputPath = inputPath,
             OutputPath = outputPath,
             ConfigPath = configPath,
+            CoverImagePath = coverImagePath,
             PresetName = presetName,
             PresetDirectory = presetDirectory,
             Verbose = verbose,
@@ -81,6 +87,7 @@ public static class CommandLineParser
         Console.WriteLine("  -o, --output <file>    Output file (default: input.docx)");
         Console.WriteLine("  -p, --preset <name>    Preset name (default: minimal)");
         Console.WriteLine("  -c, --config <file>    Custom config file");
+        Console.WriteLine("  --cover-image <file>   Cover image for title page");
         Console.WriteLine("  --preset-dir <dir>     Preset directory");
         Console.WriteLine("  -v, --verbose          Verbose output");
         Console.WriteLine("  -h, --help             Show help");
