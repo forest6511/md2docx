@@ -50,4 +50,13 @@ public interface IStyleApplicator
     /// <param name="config">Conversion configuration containing TOC settings</param>
     /// <returns>Table of contents style</returns>
     TableOfContentsStyle ApplyTableOfContentsStyle(ConversionConfiguration config);
+
+    /// <summary>
+    /// Apply title page configuration, resolving image paths
+    /// </summary>
+    /// <param name="config">Conversion configuration containing title page settings</param>
+    /// <param name="inputFilePath">Path to the input markdown file (for relative path resolution)</param>
+    /// <param name="coverImageOverride">CLI override for cover image path (implicitly enables title page)</param>
+    /// <returns>Title page style</returns>
+    TitlePageStyle ApplyTitlePageStyle(ConversionConfiguration config, string inputFilePath, string? coverImageOverride = null);
 }

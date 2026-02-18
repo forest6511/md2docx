@@ -1,9 +1,13 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using MarkdownToDocx.Core.Imaging;
 using MarkdownToDocx.Core.Interfaces;
 using MarkdownToDocx.Core.Models;
 using CoreListItem = MarkdownToDocx.Core.Models.ListItem;
+using A = DocumentFormat.OpenXml.Drawing;
+using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
 using W = DocumentFormat.OpenXml.Wordprocessing;
 
 namespace MarkdownToDocx.Core.OpenXml;
@@ -171,6 +175,123 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         props.AppendChild(new Color { Val = color });
 
         return props;
+    }
+
+    /// <inheritdoc/>
+    public void AddTitlePage(TitlePageStyle style)
+    {
+        ArgumentNullException.ThrowIfNull(style);
+
+        if (!style.Enabled || string.IsNullOrEmpty(style.ImagePath))
+        {
+            return;
+        }
+
+        if (!File.Exists(style.ImagePath))
+        {
+            throw new FileNotFoundException($"Cover image not found: {style.ImagePath}", style.ImagePath);
+        }
+
+        var mainPart = _document.MainDocumentPart
+            ?? throw new InvalidOperationException("MainDocumentPart is not initialized");
+
+        // Read image dimensions and calculate display size
+        var (imageWidth, imageHeight) = ImageDimensionReader.GetDimensions(style.ImagePath);
+        var contentType = ImageDimensionReader.GetContentType(style.ImagePath);
+
+        // Calculate printable area in EMUs (1 twip = 635 EMUs)
+        var pageConfig = _textDirection.GetPageConfiguration();
+        long printableWidthEmu = ((long)(uint)pageConfig.Width - pageConfig.LeftMargin - pageConfig.RightMargin) * 635L;
+        long printableHeightEmu = ((long)(uint)pageConfig.Height - pageConfig.TopMargin - pageConfig.BottomMargin) * 635L;
+
+        // Max dimensions based on configured percentages
+        long maxWidthEmu = printableWidthEmu * Math.Clamp(style.ImageMaxWidthPercent, 1, 100) / 100;
+        long maxHeightEmu = printableHeightEmu * Math.Clamp(style.ImageMaxHeightPercent, 1, 100) / 100;
+
+        // Scale image to fit within max area, maintaining aspect ratio, no upscaling
+        long imageWidthEmu = (long)imageWidth * 914400L / 96L;  // pixels to EMUs (96 DPI)
+        long imageHeightEmu = (long)imageHeight * 914400L / 96L;
+
+        double scaleX = imageWidthEmu > maxWidthEmu ? (double)maxWidthEmu / imageWidthEmu : 1.0;
+        double scaleY = imageHeightEmu > maxHeightEmu ? (double)maxHeightEmu / imageHeightEmu : 1.0;
+        double scale = Math.Min(scaleX, scaleY);
+
+        long displayWidthEmu = (long)(imageWidthEmu * scale);
+        long displayHeightEmu = (long)(imageHeightEmu * scale);
+
+        // Add image part
+        var imagePart = mainPart.AddImagePart(contentType switch
+        {
+            "image/png" => ImagePartType.Png,
+            _ => ImagePartType.Jpeg
+        });
+
+        using (var imageStream = File.OpenRead(style.ImagePath))
+        {
+            imagePart.FeedData(imageStream);
+        }
+
+        string relationshipId = mainPart.GetIdOfPart(imagePart);
+
+        // Build Drawing element with inline image
+        var drawing = CreateImageDrawing(relationshipId, displayWidthEmu, displayHeightEmu);
+
+        // Create centered paragraph with the image
+        var paragraph = _body.AppendChild(new Paragraph());
+        var paragraphProps = CreateBaseParagraphProperties();
+        paragraphProps.AppendChild(new Justification { Val = JustificationValues.Center });
+        paragraph.AppendChild(paragraphProps);
+
+        var run = paragraph.AppendChild(new Run());
+        run.AppendChild(drawing);
+
+        // Optional page break after title page
+        if (style.PageBreakAfter)
+        {
+            var breakParagraph = _body.AppendChild(new Paragraph());
+            var breakProps = CreateBaseParagraphProperties();
+            breakParagraph.AppendChild(breakProps);
+
+            var breakRun = breakParagraph.AppendChild(new Run());
+            breakRun.AppendChild(new Break { Type = BreakValues.Page });
+        }
+    }
+
+    /// <summary>
+    /// Creates a Drawing element containing an inline image with the specified dimensions
+    /// </summary>
+    private static Drawing CreateImageDrawing(string relationshipId, long widthEmu, long heightEmu)
+    {
+        return new Drawing(
+            new DW.Inline(
+                new DW.Extent { Cx = widthEmu, Cy = heightEmu },
+                new DW.EffectExtent { LeftEdge = 0, TopEdge = 0, RightEdge = 0, BottomEdge = 0 },
+                new DW.DocProperties { Id = 1U, Name = "Cover Image" },
+                new DW.NonVisualGraphicFrameDrawingProperties(
+                    new A.GraphicFrameLocks { NoChangeAspect = true }),
+                new A.Graphic(
+                    new A.GraphicData(
+                        new PIC.Picture(
+                            new PIC.NonVisualPictureProperties(
+                                new PIC.NonVisualDrawingProperties { Id = 0U, Name = "cover" },
+                                new PIC.NonVisualPictureDrawingProperties()),
+                            new PIC.BlipFill(
+                                new A.Blip { Embed = relationshipId },
+                                new A.Stretch(new A.FillRectangle())),
+                            new PIC.ShapeProperties(
+                                new A.Transform2D(
+                                    new A.Offset { X = 0, Y = 0 },
+                                    new A.Extents { Cx = widthEmu, Cy = heightEmu }),
+                                new A.PresetGeometry(new A.AdjustValueList())
+                                { Preset = A.ShapeTypeValues.Rectangle }))
+                    )
+                    { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" }))
+            {
+                DistanceFromTop = 0U,
+                DistanceFromBottom = 0U,
+                DistanceFromLeft = 0U,
+                DistanceFromRight = 0U
+            });
     }
 
     /// <inheritdoc/>

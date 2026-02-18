@@ -7,6 +7,7 @@ public sealed class CommandLineOptions
     public string PresetName { get; init; } = "minimal";
     public string? ConfigPath { get; init; }
     public string PresetDirectory { get; init; } = "config/presets";
+    public string? CoverImagePath { get; init; }
     public bool Verbose { get; init; }
     public bool ShowHelp { get; init; }
 }

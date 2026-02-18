@@ -138,4 +138,41 @@ public sealed class StyleApplicator : IStyleApplicator
             PageBreakAfter = tocConfig.PageBreakAfter
         };
     }
+
+    /// <inheritdoc/>
+    public TitlePageStyle ApplyTitlePageStyle(ConversionConfiguration config, string inputFilePath, string? coverImageOverride = null)
+    {
+        ArgumentNullException.ThrowIfNull(config);
+        ArgumentNullException.ThrowIfNull(inputFilePath);
+
+        var titlePageConfig = config.TitlePage;
+
+        // CLI override takes precedence and implicitly enables title page
+        string? imagePath = coverImageOverride ?? titlePageConfig.ImagePath;
+        bool enabled = coverImageOverride != null || titlePageConfig.Enabled;
+
+        if (!enabled || string.IsNullOrEmpty(imagePath))
+        {
+            return new TitlePageStyle { Enabled = false };
+        }
+
+        // Resolve relative path against input file directory
+        if (!Path.IsPathRooted(imagePath))
+        {
+            var inputDirectory = Path.GetDirectoryName(Path.GetFullPath(inputFilePath));
+            if (inputDirectory != null)
+            {
+                imagePath = Path.GetFullPath(Path.Combine(inputDirectory, imagePath));
+            }
+        }
+
+        return new TitlePageStyle
+        {
+            Enabled = true,
+            ImagePath = imagePath,
+            ImageMaxWidthPercent = Math.Clamp(titlePageConfig.ImageMaxWidthPercent, 1, 100),
+            ImageMaxHeightPercent = Math.Clamp(titlePageConfig.ImageMaxHeightPercent, 1, 100),
+            PageBreakAfter = titlePageConfig.PageBreakAfter
+        };
+    }
 }
