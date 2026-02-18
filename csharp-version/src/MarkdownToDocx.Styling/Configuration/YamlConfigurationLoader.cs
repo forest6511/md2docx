@@ -34,13 +34,7 @@ public sealed class YamlConfigurationLoader(string presetDirectory) : IConfigura
         try
         {
             var yaml = File.ReadAllText(configPath);
-            var config = _deserializer.Deserialize<ConversionConfiguration>(yaml);
-
-            if (config == null)
-            {
-                throw new InvalidDataException($"Failed to deserialize configuration from: {configPath}");
-            }
-
+            var config = _deserializer.Deserialize<ConversionConfiguration>(yaml) ?? throw new InvalidDataException($"Failed to deserialize configuration from: {configPath}");
             ValidateConfiguration(config);
             return config;
         }

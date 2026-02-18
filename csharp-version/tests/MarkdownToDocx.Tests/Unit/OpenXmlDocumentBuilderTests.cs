@@ -1250,6 +1250,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     public void Dispose()
     {
         _stream?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     // Helper methods to create default styles

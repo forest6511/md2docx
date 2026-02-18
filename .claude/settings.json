@@ -1,3 +1,16 @@
 {
-  "hooks": {}
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/check-cs-quality.sh",
+            "timeout": 30000
+          }
+        ]
+      }
+    ]
+  }
 }
