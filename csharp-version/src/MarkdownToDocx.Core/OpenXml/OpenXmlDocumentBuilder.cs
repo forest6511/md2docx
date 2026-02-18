@@ -240,21 +240,24 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         var paragraph = _body.AppendChild(new Paragraph());
         var paragraphProps = CreateBaseParagraphProperties();
         paragraphProps.AppendChild(new Justification { Val = JustificationValues.Center });
+
+        // Use a section break to create an independent title page section
+        // with vertical centering, instead of a simple page break
+        if (style.PageBreakAfter)
+        {
+            var titleSectionProps = CreateSectionProperties();
+            titleSectionProps.AppendChild(new VerticalTextAlignmentOnPage
+            {
+                Val = VerticalJustificationValues.Center
+            });
+            titleSectionProps.AppendChild(new SectionType { Val = SectionMarkValues.NextPage });
+            paragraphProps.AppendChild(titleSectionProps);
+        }
+
         paragraph.AppendChild(paragraphProps);
 
         var run = paragraph.AppendChild(new Run());
         run.AppendChild(drawing);
-
-        // Optional page break after title page
-        if (style.PageBreakAfter)
-        {
-            var breakParagraph = _body.AppendChild(new Paragraph());
-            var breakProps = CreateBaseParagraphProperties();
-            breakParagraph.AppendChild(breakProps);
-
-            var breakRun = breakParagraph.AppendChild(new Run());
-            breakRun.AppendChild(new Break { Type = BreakValues.Page });
-        }
     }
 
     /// <summary>
@@ -328,7 +331,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
 
         // Instruction text
         var instrRun = tocParagraph.AppendChild(new Run());
-        instrRun.AppendChild(new FieldCode($" TOC \\o \"1-{style.Depth}\" \\h \\z \\u ")
+        instrRun.AppendChild(new FieldCode($" TOC \\o \"1-{style.Depth}\" \\u ")
         {
             Space = SpaceProcessingModeValues.Preserve
         });
@@ -336,6 +339,15 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         // Separate field
         var separateRun = tocParagraph.AppendChild(new Run());
         separateRun.AppendChild(new FieldChar { FieldCharType = FieldCharValues.Separate });
+
+        // Placeholder text shown until user updates the field
+        var placeholderRun = tocParagraph.AppendChild(new Run());
+        placeholderRun.AppendChild(CreateBaseRunProperties(22, "808080"));
+        placeholderRun.AppendChild(new Text(
+            "Right-click here and select 'Update Field' to generate the table of contents.")
+        {
+            Space = SpaceProcessingModeValues.Preserve
+        });
 
         // End field
         var endRun = tocParagraph.AppendChild(new Run());
