@@ -121,6 +121,37 @@ Fonts:
 
 **注意**：.NET CLIを使用する場合は、システムにフォントがインストールされていることを確認するか、一貫したフォント処理のためにDockerを使用してください。
 
+### タイトルページ
+
+表紙/タイトルページに中央配置の画像を設定:
+
+```yaml
+TitlePage:
+  Enabled: false                    # タイトルページを有効化
+  ImagePath: "cover.jpg"           # 画像パス（入力ファイルからの相対パスまたは絶対パス）
+  ImageMaxWidthPercent: 80          # 印刷可能領域に対する最大幅（%）
+  ImageMaxHeightPercent: 80         # 印刷可能領域に対する最大高さ（%）
+  PageBreakAfter: true              # タイトルページ後の改ページ
+```
+
+**CLIオーバーライド**: `--cover-image <file>` でコマンドラインからカバー画像を指定できます。これによりタイトルページが暗黙的に有効化され、YAMLの `ImagePath` がオーバーライドされます。
+
+**対応フォーマット**: PNG、JPEG
+
+### 目次
+
+自動生成される目次を設定:
+
+```yaml
+TableOfContents:
+  Enabled: false                    # 目次生成を有効化
+  Depth: 3                          # 見出しの深さ（1-6）
+  Title: "Contents"                # 目次タイトル（オプション）
+  PageBreakAfter: true              # 目次後の改ページ
+```
+
+**注意**: 目次はWordフィールドコードを使用します。Wordでドキュメントを開いた後、目次エリアを右クリックして「フィールドの更新」を選択してください。
+
 ### スタイル
 
 各Markdown要素のスタイリングを定義します。

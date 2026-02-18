@@ -22,6 +22,7 @@ Built-in presets in `config/presets/`:
 | [minimal](#minimal) | `config/presets/` | Simple documents, quick conversions | Horizontal |
 | [default](#default) | `config/presets/` | General-purpose documents | Horizontal |
 | [technical](#technical) | `config/presets/` | Technical documentation, API docs | Horizontal |
+| [vertical-novel](#vertical-novel) | `config/vertical/` | Japanese novels, vertical text | Vertical |
 
 ## Standard Presets
 

@@ -22,6 +22,7 @@ md2docxには、さまざまなユースケースに最適化されたいくつ�
 | [minimal](#minimal) | `config/presets/` | シンプルなドキュメント、クイック変換 | 横書き |
 | [default](#default) | `config/presets/` | 汎用ドキュメント | 横書き |
 | [technical](#technical) | `config/presets/` | 技術ドキュメント、APIドキュメント | 横書き |
+| [vertical-novel](#vertical-novel) | `config/vertical/` | 日本語小説、縦書き | 縦書き |
 
 ## 標準プリセット
 

@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-02-18
+
+### Added
+
+#### Cover Page / Title Page
+- **Cover image support** with centered display (horizontal and vertical centering via section break)
+- CLI option `--cover-image <file>` to specify cover image (overrides YAML, implicitly enables title page)
+- YAML `TitlePage` configuration: `Enabled`, `ImagePath`, `ImageMaxWidthPercent`, `ImageMaxHeightPercent`, `PageBreakAfter`
+- Cross-platform image dimension reader for PNG (IHDR chunk) and JPEG (SOF0/SOF2 markers) without System.Drawing dependency
+
+#### Table of Contents
+- **Auto-generated TOC** with configurable depth (1-6 levels) and custom title
+- TOC field codes compatible with Word field update workflow
+- Removed `\h` and `\z` switches from TOC field for KDP PDF compatibility
+- English placeholder text guiding users to update the field
+- YAML `TableOfContents` configuration: `Enabled`, `Depth`, `Title`, `PageBreakAfter`
+
+#### Heading Enhancements
+- **Outline level** on headings for TOC and Word navigation pane support
+- **PageBreakBefore** property for chapter-style page breaks
+- **BorderExtent** property: `"text"` (border hugs text) or `"paragraph"` (border spans full width)
+
+#### Quality Infrastructure
+- 3-layer C# code quality automation (dotnet format + analyzers on pre-push hook)
+- Test suite expanded from 82 to **160 tests** (all passing)
+
+### Fixed
+- TOC was not generated despite all infrastructure being complete (CLI wiring bug)
+- dotnet format warnings (IDE0270, CA1866) resolved
+
+### Known Limitations
+- No inline image support (only cover/title page images)
+- No nested list support
+- Table support planned for future release
+
+---
+
 ## [0.1.0] - 2026-02-16
 
 ### Added
@@ -54,9 +91,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docker strategy documentation
 - Project vision and design philosophy
 
-### Known Limitations
+### Known Limitations (v0.1.0)
 - No nested list support in current version
-- Image embedding not yet implemented
+- Image embedding not yet implemented (added in v0.2.0)
 - Table support planned for future release
 - Hyperlink conversion not yet available
 
@@ -79,4 +116,5 @@ The codebase has achieved high test coverage (90.1%) and follows modern C# best 
 
 ---
 
+[0.2.0]: https://github.com/forest6511/md2docx/releases/tag/v0.2.0
 [0.1.0]: https://github.com/forest6511/md2docx/releases/tag/v0.1.0
