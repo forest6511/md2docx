@@ -10,7 +10,10 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <NoWarn>CA1707</NoWarn>
+    <!-- CA1707: Test method underscores, CS8602: Null dereference in assertions,
+         CA1806: Unused constructor return in exception tests, CA1816: SuppressFinalize in test Dispose,
+         CA1507: Use nameof - parameter name strings reference external code -->
+    <NoWarn>CA1707;CS8602;CA1806;CA1816;CA1507</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

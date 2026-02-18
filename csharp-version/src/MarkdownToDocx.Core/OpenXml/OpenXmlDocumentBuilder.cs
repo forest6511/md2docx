@@ -1,3 +1,4 @@
+using System.Globalization;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -171,7 +172,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
             props.AppendChild(new Italic());
         }
 
-        props.AppendChild(new FontSize { Val = fontSize.ToString() });
+        props.AppendChild(new FontSize { Val = fontSize.ToString(CultureInfo.InvariantCulture) });
         props.AppendChild(new Color { Val = color });
 
         return props;

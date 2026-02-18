@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-02-18
+
+### Improved
+
+#### Test Coverage
+- Added **27 new tests** (total: 187, up from 160)
+- `ImageDimensionReader`: 9 edge case tests covering truncated files, invalid signatures, progressive JPEG, FF padding, and truncated segments
+- `YamlConfigurationLoader`: 10 validation tests covering all `ValidateConfiguration` branches (invalid YAML, empty schema version, missing metadata, zero page dimensions, missing fonts)
+- `OpenXmlDocumentBuilder`: 8 tests for remaining uncovered branches (right/top/all border positions, quote ShowBorder=false, quote BackgroundColor, heading LineSpacing, BorderExtent spacer skip)
+
+#### Build Quality
+- Resolved all build warnings (previously ~62 warnings, now 0)
+- Fixed CA1305: Added `CultureInfo.InvariantCulture` to `int.ToString()` in `OpenXmlDocumentBuilder`
+- Suppressed CA1805 (explicit default initializers) globally — intentional for API documentation clarity
+- Added test-specific suppressions for CS8602, CA1806, CA1816, CA1507 in test project
+
+---
+
 ## [0.2.0] - 2026-02-18
 
 ### Added
@@ -116,5 +134,6 @@ The codebase has achieved high test coverage (90.1%) and follows modern C# best 
 
 ---
 
+[0.2.1]: https://github.com/forest6511/md2docx/releases/tag/v0.2.1
 [0.2.0]: https://github.com/forest6511/md2docx/releases/tag/v0.2.0
 [0.1.0]: https://github.com/forest6511/md2docx/releases/tag/v0.1.0

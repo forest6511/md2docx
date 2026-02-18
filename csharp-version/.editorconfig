@@ -103,6 +103,8 @@ dotnet_style_readonly_field = true:warning
 # Analyzer severity overrides
 # CA1062: Validate arguments of public methods - handled by nullable
 dotnet_diagnostic.CA1062.severity = none
+# CA1805: Explicit default initializers on model properties are intentional for API documentation clarity
+dotnet_diagnostic.CA1805.severity = none
 # CA1848: Use LoggerMessage delegates - not using ILogger yet
 dotnet_diagnostic.CA1848.severity = none
 # CA1812: Avoid uninstantiated internal classes - false positives with DI
@@ -113,5 +115,5 @@ dotnet_diagnostic.CA2007.severity = suggestion
 dotnet_diagnostic.IDE0058.severity = suggestion
 
 [**/tests/**/*.cs]
-# CA1707: Test methods conventionally use underscores for readability
+# Test-specific suppressions are handled in the test project's csproj via NoWarn
 dotnet_diagnostic.CA1707.severity = none

@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>md2docx</AssemblyName>
     <RootNamespace>MarkdownToDocx.CLI</RootNamespace>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <Authors>Hisao Yoshitome</Authors>
     <Description>Command-line tool for converting Markdown to Word (DOCX)</Description>
     <PackageProjectUrl>https://github.com/forest6511/md2docx</PackageProjectUrl>
