@@ -121,6 +121,37 @@ Fonts:
 
 **Note**: When using .NET CLI, ensure fonts are installed on your system or use Docker for consistent font handling.
 
+### Title Page
+
+Configure a cover/title page with a centered image:
+
+```yaml
+TitlePage:
+  Enabled: false                    # Enable title page
+  ImagePath: "cover.jpg"           # Image path (relative to input file or absolute)
+  ImageMaxWidthPercent: 80          # Max width as % of printable area
+  ImageMaxHeightPercent: 80         # Max height as % of printable area
+  PageBreakAfter: true              # Page break after title page
+```
+
+**CLI Override**: Use `--cover-image <file>` to specify a cover image from the command line. This implicitly enables the title page and overrides the YAML `ImagePath`.
+
+**Supported Formats**: PNG, JPEG
+
+### Table of Contents
+
+Configure auto-generated table of contents:
+
+```yaml
+TableOfContents:
+  Enabled: false                    # Enable TOC generation
+  Depth: 3                          # Heading depth (1-6)
+  Title: "Contents"                # TOC title (optional)
+  PageBreakAfter: true              # Page break after TOC
+```
+
+**Note**: The TOC uses Word field codes. After opening the document in Word, right-click the TOC area and select "Update Field" to populate it.
+
 ### Styles
 
 Define styling for each Markdown element.
@@ -138,6 +169,8 @@ Styles:
     BorderColor: "3498db"       # Border color (hex)
     BorderSize: 6               # Border thickness in eighths of a point
     BorderPosition: "bottom"    # "top", "bottom", "left", "right"
+    BorderExtent: "text"        # "text" (hugs text) or "paragraph" (full width)
+    PageBreakBefore: false      # Insert page break before heading
     SpaceBefore: "600"          # Space before (in twips, 1/20 point)
     SpaceAfter: "300"           # Space after (in twips)
 ```

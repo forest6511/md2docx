@@ -128,10 +128,10 @@ docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
   -o, --output <ファイル>         出力DOCXファイル (デフォルト: input.docx)
   -p, --preset <名前>             プリセット名 (minimal, default, technical)
   -c, --config <ファイル>         カスタムYAML設定ファイル
+  --cover-image <ファイル>        タイトルページ用カバー画像
   --preset-dir <ディレクトリ>     プリセットディレクトリのパス
   -v, --verbose                   詳細な出力
-  --help                          ヘルプ情報を表示
-  --version                       バージョン情報を表示
+  -h, --help                      ヘルプ情報を表示
 ```
 
 ## シェルエイリアス（オプション）

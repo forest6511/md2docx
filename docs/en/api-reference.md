@@ -29,7 +29,7 @@ using MarkdownToDocx.Core;
 using MarkdownToDocx.Styling;
 
 // Load YAML configuration
-var config = YamlConfigLoader.LoadFromFile("config/presets/default.yaml");
+var config = YamlConfigurationLoader.LoadFromFile("config/presets/default.yaml");
 
 // Convert Markdown to DOCX
 var converter = new MarkdownConverter(config);
@@ -42,7 +42,7 @@ converter.ConvertFile("input.md", "output.docx");
 using MarkdownToDocx.Styling;
 
 // Load built-in preset
-var config = YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+var config = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
 
 // Convert with preset
 var converter = new MarkdownConverter(config);
@@ -60,7 +60,7 @@ Main converter class that orchestrates the conversion process.
 #### Constructor
 
 ```csharp
-public MarkdownConverter(StyleConfig config)
+public MarkdownConverter(ConversionConfiguration config)
 ```
 
 **Parameters**:
@@ -69,7 +69,7 @@ public MarkdownConverter(StyleConfig config)
 **Example**:
 
 ```csharp
-var config = YamlConfigLoader.LoadFromFile("config.yaml");
+var config = YamlConfigurationLoader.LoadFromFile("config.yaml");
 var converter = new MarkdownConverter(config);
 ```
 
@@ -159,7 +159,7 @@ return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessin
 
 ---
 
-### YamlConfigLoader
+### YamlConfigurationLoader
 
 Loads and parses YAML configuration files.
 
@@ -170,7 +170,7 @@ Loads and parses YAML configuration files.
 ##### LoadFromFile
 
 ```csharp
-public static StyleConfig LoadFromFile(string yamlPath)
+public static ConversionConfiguration LoadFromFile(string yamlPath)
 ```
 
 Loads configuration from a YAML file.
@@ -178,7 +178,7 @@ Loads configuration from a YAML file.
 **Parameters**:
 - `yamlPath` - Path to YAML configuration file
 
-**Returns**: `StyleConfig` - Parsed configuration
+**Returns**: `ConversionConfiguration` - Parsed configuration
 
 **Throws**:
 - `FileNotFoundException` - YAML file not found
@@ -188,13 +188,13 @@ Loads configuration from a YAML file.
 **Example**:
 
 ```csharp
-var config = YamlConfigLoader.LoadFromFile("config/custom/my-style.yaml");
+var config = YamlConfigurationLoader.LoadFromFile("config/custom/my-style.yaml");
 ```
 
 ##### LoadPreset
 
 ```csharp
-public static StyleConfig LoadPreset(string presetName, string presetDir)
+public static ConversionConfiguration LoadPreset(string presetName, string presetDir)
 ```
 
 Loads a built-in preset by name.
@@ -203,18 +203,18 @@ Loads a built-in preset by name.
 - `presetName` - Preset name (without `.yaml` extension)
 - `presetDir` - Directory containing presets
 
-**Returns**: `StyleConfig` - Preset configuration
+**Returns**: `ConversionConfiguration` - Preset configuration
 
 **Example**:
 
 ```csharp
-var config = YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+var config = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
 ```
 
 ##### Validate
 
 ```csharp
-public static bool Validate(StyleConfig config, out List<string> errors)
+public static bool Validate(ConversionConfiguration config, out List<string> errors)
 ```
 
 Validates a configuration object.
@@ -228,8 +228,8 @@ Validates a configuration object.
 **Example**:
 
 ```csharp
-var config = YamlConfigLoader.LoadFromFile("config.yaml");
-if (!YamlConfigLoader.Validate(config, out var errors))
+var config = YamlConfigurationLoader.LoadFromFile("config.yaml");
+if (!YamlConfigurationLoader.Validate(config, out var errors))
 {
     foreach (var error in errors)
     {
@@ -240,16 +240,16 @@ if (!YamlConfigLoader.Validate(config, out var errors))
 
 ---
 
-### StyleConfig
+### ConversionConfiguration
 
 Configuration model representing YAML structure.
 
-**Namespace**: `MarkdownToDocx.Styling.Models`
+**Namespace**: `MarkdownToDocx.Styling`
 
 #### Properties
 
 ```csharp
-public class StyleConfig
+public class ConversionConfiguration
 {
     public string SchemaVersion { get; set; }
     public Metadata Metadata { get; set; }
@@ -329,7 +329,7 @@ public class Styles
 Create configuration programmatically without YAML:
 
 ```csharp
-var config = new StyleConfig
+var config = new ConversionConfiguration
 {
     SchemaVersion = "2.0",
     Metadata = new Metadata
@@ -395,7 +395,7 @@ converter.ConvertFile("input.md", "output.docx");
 Convert multiple files with the same configuration:
 
 ```csharp
-var config = YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+var config = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
 var converter = new MarkdownConverter(config);
 
 var files = Directory.GetFiles("input", "*.md");
@@ -430,12 +430,12 @@ using MarkdownToDocx.Styling;
 public class ConvertController : ControllerBase
 {
     private readonly ILogger<ConvertController> _logger;
-    private readonly StyleConfig _defaultConfig;
+    private readonly ConversionConfiguration _defaultConfig;
 
     public ConvertController(ILogger<ConvertController> logger)
     {
         _logger = logger;
-        _defaultConfig = YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+        _defaultConfig = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
     }
 
     [HttpPost]
@@ -479,7 +479,7 @@ public class DocumentService
     {
         var document = _repository.GetDocument(documentId);
 
-        var config = YamlConfigLoader.LoadPreset(
+        var config = YamlConfigurationLoader.LoadPreset(
             document.Preset ?? "default",
             "/app/config/presets"
         );
@@ -526,7 +526,7 @@ Thrown when YAML configuration is invalid.
 ```csharp
 try
 {
-    var config = YamlConfigLoader.LoadFromFile("config.yaml");
+    var config = YamlConfigurationLoader.LoadFromFile("config.yaml");
 }
 catch (ConfigValidationException ex)
 {
@@ -559,8 +559,8 @@ catch (InvalidMarkdownException ex)
 1. **Always validate configuration before use**:
 
 ```csharp
-var config = YamlConfigLoader.LoadFromFile("config.yaml");
-if (!YamlConfigLoader.Validate(config, out var errors))
+var config = YamlConfigurationLoader.LoadFromFile("config.yaml");
+if (!YamlConfigurationLoader.Validate(config, out var errors))
 {
     throw new InvalidOperationException($"Invalid config: {string.Join(", ", errors)}");
 }
@@ -598,8 +598,8 @@ using var stream = converter.ConvertToStream(markdown);
 
 ```csharp
 // Load once
-private static readonly StyleConfig _defaultConfig =
-    YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+private static readonly ConversionConfiguration _defaultConfig =
+    YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
 
 // Reuse
 public void Convert(string input, string output)
@@ -623,7 +623,7 @@ public void Convert(string input, string output)
 
 ```csharp
 // Good
-var config = YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+var config = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
 for (int i = 0; i < 100; i++)
 {
     var converter = new MarkdownConverter(config);
@@ -633,7 +633,7 @@ for (int i = 0; i < 100; i++)
 // Avoid
 for (int i = 0; i < 100; i++)
 {
-    var config = YamlConfigLoader.LoadPreset("default", "/app/config/presets"); // Wasteful
+    var config = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets"); // Wasteful
     // ...
 }
 ```
@@ -677,7 +677,7 @@ public class ConverterTests
     public void ConvertString_ValidMarkdown_CreatesDocx()
     {
         // Arrange
-        var config = YamlConfigLoader.LoadPreset("minimal", "config/presets");
+        var config = YamlConfigurationLoader.LoadPreset("minimal", "config/presets");
         var converter = new MarkdownConverter(config);
         var markdown = "# Test\n\nParagraph.";
         var output = "test_output.docx";
@@ -698,7 +698,7 @@ public class ConverterTests
     {
         // Arrange & Act & Assert
         Assert.Throws<FileNotFoundException>(() =>
-            YamlConfigLoader.LoadPreset("nonexistent", "config/presets")
+            YamlConfigurationLoader.LoadPreset("nonexistent", "config/presets")
         );
     }
 }

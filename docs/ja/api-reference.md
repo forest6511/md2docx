@@ -29,7 +29,7 @@ using MarkdownToDocx.Core;
 using MarkdownToDocx.Styling;
 
 // YAML設定を読み込む
-var config = YamlConfigLoader.LoadFromFile("config/presets/default.yaml");
+var config = YamlConfigurationLoader.LoadFromFile("config/presets/default.yaml");
 
 // MarkdownをDOCXに変換
 var converter = new MarkdownConverter(config);
@@ -42,7 +42,7 @@ converter.ConvertFile("input.md", "output.docx");
 using MarkdownToDocx.Styling;
 
 // ビルトインプリセットを読み込む
-var config = YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+var config = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
 
 // プリセットで変換
 var converter = new MarkdownConverter(config);
@@ -60,7 +60,7 @@ converter.ConvertFile("input.md", "output.docx");
 #### コンストラクタ
 
 ```csharp
-public MarkdownConverter(StyleConfig config)
+public MarkdownConverter(ConversionConfiguration config)
 ```
 
 **パラメータ**：
@@ -69,7 +69,7 @@ public MarkdownConverter(StyleConfig config)
 **例**：
 
 ```csharp
-var config = YamlConfigLoader.LoadFromFile("config.yaml");
+var config = YamlConfigurationLoader.LoadFromFile("config.yaml");
 var converter = new MarkdownConverter(config);
 ```
 
@@ -159,7 +159,7 @@ return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessin
 
 ---
 
-### YamlConfigLoader
+### YamlConfigurationLoader
 
 YAML設定ファイルを読み込んで解析します。
 
@@ -170,7 +170,7 @@ YAML設定ファイルを読み込んで解析します。
 ##### LoadFromFile
 
 ```csharp
-public static StyleConfig LoadFromFile(string yamlPath)
+public static ConversionConfiguration LoadFromFile(string yamlPath)
 ```
 
 YAMLファイルから設定を読み込みます。
@@ -178,7 +178,7 @@ YAMLファイルから設定を読み込みます。
 **パラメータ**：
 - `yamlPath` - YAML設定ファイルへのパス
 
-**戻り値**：`StyleConfig` - 解析された設定
+**戻り値**：`ConversionConfiguration` - 解析された設定
 
 **例外**：
 - `FileNotFoundException` - YAMLファイルが見つからない
@@ -188,13 +188,13 @@ YAMLファイルから設定を読み込みます。
 **例**：
 
 ```csharp
-var config = YamlConfigLoader.LoadFromFile("config/custom/my-style.yaml");
+var config = YamlConfigurationLoader.LoadFromFile("config/custom/my-style.yaml");
 ```
 
 ##### LoadPreset
 
 ```csharp
-public static StyleConfig LoadPreset(string presetName, string presetDir)
+public static ConversionConfiguration LoadPreset(string presetName, string presetDir)
 ```
 
 名前でビルトインプリセットを読み込みます。
@@ -203,18 +203,18 @@ public static StyleConfig LoadPreset(string presetName, string presetDir)
 - `presetName` - プリセット名（`.yaml`拡張子なし）
 - `presetDir` - プリセットを含むディレクトリ
 
-**戻り値**：`StyleConfig` - プリセット設定
+**戻り値**：`ConversionConfiguration` - プリセット設定
 
 **例**：
 
 ```csharp
-var config = YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+var config = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
 ```
 
 ##### Validate
 
 ```csharp
-public static bool Validate(StyleConfig config, out List<string> errors)
+public static bool Validate(ConversionConfiguration config, out List<string> errors)
 ```
 
 設定オブジェクトを検証します。
@@ -228,8 +228,8 @@ public static bool Validate(StyleConfig config, out List<string> errors)
 **例**：
 
 ```csharp
-var config = YamlConfigLoader.LoadFromFile("config.yaml");
-if (!YamlConfigLoader.Validate(config, out var errors))
+var config = YamlConfigurationLoader.LoadFromFile("config.yaml");
+if (!YamlConfigurationLoader.Validate(config, out var errors))
 {
     foreach (var error in errors)
     {
@@ -240,7 +240,7 @@ if (!YamlConfigLoader.Validate(config, out var errors))
 
 ---
 
-### StyleConfig
+### ConversionConfiguration
 
 YAML構造を表す設定モデル。
 
@@ -249,7 +249,7 @@ YAML構造を表す設定モデル。
 #### プロパティ
 
 ```csharp
-public class StyleConfig
+public class ConversionConfiguration
 {
     public string SchemaVersion { get; set; }
     public Metadata Metadata { get; set; }
@@ -329,7 +329,7 @@ public class Styles
 YAMLなしでプログラム的に設定を作成：
 
 ```csharp
-var config = new StyleConfig
+var config = new ConversionConfiguration
 {
     SchemaVersion = "2.0",
     Metadata = new Metadata
@@ -395,7 +395,7 @@ converter.ConvertFile("input.md", "output.docx");
 同じ設定で複数のファイルを変換：
 
 ```csharp
-var config = YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+var config = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
 var converter = new MarkdownConverter(config);
 
 var files = Directory.GetFiles("input", "*.md");
@@ -430,12 +430,12 @@ using MarkdownToDocx.Styling;
 public class ConvertController : ControllerBase
 {
     private readonly ILogger<ConvertController> _logger;
-    private readonly StyleConfig _defaultConfig;
+    private readonly ConversionConfiguration _defaultConfig;
 
     public ConvertController(ILogger<ConvertController> logger)
     {
         _logger = logger;
-        _defaultConfig = YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+        _defaultConfig = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
     }
 
     [HttpPost]
@@ -479,7 +479,7 @@ public class DocumentService
     {
         var document = _repository.GetDocument(documentId);
 
-        var config = YamlConfigLoader.LoadPreset(
+        var config = YamlConfigurationLoader.LoadPreset(
             document.Preset ?? "default",
             "/app/config/presets"
         );
@@ -526,7 +526,7 @@ YAML設定が無効なときにスローされます。
 ```csharp
 try
 {
-    var config = YamlConfigLoader.LoadFromFile("config.yaml");
+    var config = YamlConfigurationLoader.LoadFromFile("config.yaml");
 }
 catch (ConfigValidationException ex)
 {
@@ -559,8 +559,8 @@ catch (InvalidMarkdownException ex)
 1. **使用前に常に設定を検証**：
 
 ```csharp
-var config = YamlConfigLoader.LoadFromFile("config.yaml");
-if (!YamlConfigLoader.Validate(config, out var errors))
+var config = YamlConfigurationLoader.LoadFromFile("config.yaml");
+if (!YamlConfigurationLoader.Validate(config, out var errors))
 {
     throw new InvalidOperationException($"無効な設定: {string.Join(", ", errors)}");
 }
@@ -598,8 +598,8 @@ using var stream = converter.ConvertToStream(markdown);
 
 ```csharp
 // 一度読み込む
-private static readonly StyleConfig _defaultConfig =
-    YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+private static readonly ConversionConfiguration _defaultConfig =
+    YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
 
 // 再利用
 public void Convert(string input, string output)
@@ -623,7 +623,7 @@ public void Convert(string input, string output)
 
 ```csharp
 // 良い例
-var config = YamlConfigLoader.LoadPreset("default", "/app/config/presets");
+var config = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets");
 for (int i = 0; i < 100; i++)
 {
     var converter = new MarkdownConverter(config);
@@ -633,7 +633,7 @@ for (int i = 0; i < 100; i++)
 // 避けるべき例
 for (int i = 0; i < 100; i++)
 {
-    var config = YamlConfigLoader.LoadPreset("default", "/app/config/presets"); // 無駄
+    var config = YamlConfigurationLoader.LoadPreset("default", "/app/config/presets"); // 無駄
     // ...
 }
 ```
@@ -677,7 +677,7 @@ public class ConverterTests
     public void ConvertString_ValidMarkdown_CreatesDocx()
     {
         // Arrange
-        var config = YamlConfigLoader.LoadPreset("minimal", "config/presets");
+        var config = YamlConfigurationLoader.LoadPreset("minimal", "config/presets");
         var converter = new MarkdownConverter(config);
         var markdown = "# テスト\n\n段落。";
         var output = "test_output.docx";
@@ -698,7 +698,7 @@ public class ConverterTests
     {
         // Arrange & Act & Assert
         Assert.Throws<FileNotFoundException>(() =>
-            YamlConfigLoader.LoadPreset("存在しない", "config/presets")
+            YamlConfigurationLoader.LoadPreset("存在しない", "config/presets")
         );
     }
 }

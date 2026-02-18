@@ -128,10 +128,10 @@ Options:
   -o, --output <file>         Output DOCX file (default: input.docx)
   -p, --preset <name>         Preset name (minimal, default, technical)
   -c, --config <file>         Custom YAML configuration file
+  --cover-image <file>        Cover image for title page
   --preset-dir <directory>    Preset directory path
   -v, --verbose               Verbose output
-  --help                      Show help information
-  --version                   Show version information
+  -h, --help                  Show help information
 ```
 
 ## Shell Alias (Optional)

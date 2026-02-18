@@ -1,10 +1,10 @@
 # Markdown to Word Converter
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/forest6511/md2docx/releases)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/forest6511/md2docx/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
-[![Tests](https://img.shields.io/badge/tests-82%2F82%20passing-brightgreen.svg)]()
-[![Coverage](https://img.shields.io/badge/coverage-90.1%25-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-160%20passing-brightgreen.svg)]()
+[![Coverage](https://img.shields.io/badge/coverage-90%25+-brightgreen.svg)]()
 
 **A flexible, high-quality Markdown to Word (DOCX) converter with YAML-based styling customization.**
 
@@ -22,6 +22,8 @@ Visit our comprehensive documentation site for detailed guides, configuration ex
 
 - **🎨 YAML-Based Styling**: Customize fonts, colors, borders, backgrounds, spacing through simple YAML files
 - **📝 Rich Formatting**: Headings (H1-H6), paragraphs, lists, code blocks, quotes with full styling control
+- **📖 Table of Contents**: Auto-generated TOC with configurable depth and title
+- **🖼️ Cover Page**: Title page with centered cover image and configurable sizing
 - **🌐 Cross-Platform**: Docker-based distribution works on Windows, Mac, Linux
 - **🎌 Japanese Support**: Full vertical text (tategaki) support for novel and document formatting
 - **🔧 Extensible**: Easy-to-create custom presets for any use case
@@ -148,16 +150,18 @@ Perfect for:
 ## 🔧 Supported Markdown Elements
 
 ✅ **Currently Supported**:
-- Headings (H1-H6)
+- Headings (H1-H6) with configurable borders, page breaks, and outline levels
 - Paragraphs with inline formatting (bold, italic)
 - Ordered and unordered lists
 - Fenced code blocks with language specification
-- Blockquotes
+- Blockquotes with left border styling
 - Horizontal rules (thematic breaks)
+- Table of Contents (auto-generated with configurable depth)
+- Cover/Title page with centered image
 
 🚧 **Planned for Future Releases**:
 - Tables
-- Images
+- Inline images
 - Inline code
 - Links
 - Task lists
@@ -193,6 +197,18 @@ Fonts:
   EastAsia: "Noto Serif CJK JP"
   DefaultSize: 11
 
+TitlePage:
+  Enabled: false
+  ImageMaxWidthPercent: 80
+  ImageMaxHeightPercent: 80
+  PageBreakAfter: true
+
+TableOfContents:
+  Enabled: false
+  Depth: 3
+  Title: "Contents"
+  PageBreakAfter: true
+
 Styles:
   H1:
     Size: 26
@@ -202,6 +218,8 @@ Styles:
     BorderColor: "3498db"
     BorderSize: 6
     BorderPosition: "bottom"
+    BorderExtent: "text"
+    PageBreakBefore: true
     SpaceBefore: "600"
     SpaceAfter: "300"
 
@@ -319,10 +337,10 @@ md2docx/
 cd csharp-version
 dotnet test
 
-# Current test coverage: 82/82 tests passing (90.1% coverage)
-# - Core layer: 42 tests (91.5% coverage)
-# - Styling layer: 37 tests (87.1% coverage)
-# - Integration: 3 tests
+# Current test coverage: 160 tests passing
+# - Core layer: Unit tests for builder, parser, imaging
+# - Styling layer: Unit tests for config loader, style applicator
+# - Integration: End-to-end conversion tests
 ```
 
 ### Development Workflow
