@@ -23,7 +23,7 @@
         <a href="{{ site.baseurl }}/ja/" class="btn">ドキュメント</a>
         <a href="{{ site.baseurl }}/en/" class="btn">English</a>
       {% endif %}
-      <a href="{{ site.github.repository_url }}" class="btn">View on GitHub</a>
+      <a href="{{ site.github.repository_url | default: site.github_url }}" class="btn">View on GitHub</a>
       {% if site.github.is_project_page %}
         <a href="{{ site.github.releases_url }}" class="btn">Releases</a>
       {% endif %}
