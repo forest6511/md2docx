@@ -1,9 +1,9 @@
 # Markdown to Word Converter
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/forest6511/md2docx/releases)
+[![Version](https://img.shields.io/badge/version-0.2.1-blue.svg)](https://github.com/forest6511/md2docx/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
-[![Tests](https://img.shields.io/badge/tests-160%20passing-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-202%20passing-brightgreen.svg)]()
 [![Coverage](https://img.shields.io/badge/coverage-90%25+-brightgreen.svg)]()
 
 **A flexible, high-quality Markdown to Word (DOCX) converter with YAML-based styling customization.**
@@ -158,10 +158,10 @@ Perfect for:
 - Horizontal rules (thematic breaks)
 - Table of Contents (auto-generated with configurable depth)
 - Cover/Title page with centered image
+- Inline images (PNG/JPEG with configurable max width and alignment)
 
 🚧 **Planned for Future Releases**:
 - Tables
-- Inline images
 - Inline code
 - Links
 - Task lists
@@ -237,6 +237,7 @@ Styles:
     BorderColor: "bdc3c7"
     MonospaceFontAscii: "Noto Sans Mono"
     MonospaceFontEastAsia: "Noto Sans Mono CJK JP"
+    BorderSpace: 4
     ShowBorder: true
 ```
 
@@ -337,7 +338,7 @@ md2docx/
 cd csharp-version
 dotnet test
 
-# Current test coverage: 160 tests passing
+# Current test coverage: 202 tests passing
 # - Core layer: Unit tests for builder, parser, imaging
 # - Styling layer: Unit tests for config loader, style applicator
 # - Integration: End-to-end conversion tests
@@ -361,7 +362,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 ### Areas for Contribution
 
 - **Presets**: Create new YAML presets for specific use cases
-- **Features**: Implement tables, images, inline code, links
+- **Features**: Implement tables, inline code, links, nested lists
 - **Bug Fixes**: Report and fix issues
 - **Documentation**: Improve docs, add examples
 - **Testing**: Add test cases, improve coverage
