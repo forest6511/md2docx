@@ -5,15 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.1] - 2026-02-18
+## [0.2.1] - 2026-02-25
+
+### Added
+
+#### Inline Image Support
+- **Inline image rendering** in body content via standard Markdown syntax (`![alt](path)`)
+- Images are embedded directly into the DOCX using `AddImage(path, altText, style)`
+- Proportional scaling: images are scaled to fit `MaxWidthPercent` of the printable width while preserving aspect ratio
+- New `Image` style configuration section in YAML: `MaxWidthPercent` (default: 100) and `Alignment` (default: `"center"`)
+- Image paths resolved relative to the input Markdown file directory
+- Supported formats: PNG and JPEG (reuses existing `ImageDimensionReader`)
+- Unique `DocProperties.Id` per image via internal counter (prevents corrupt DOCX with multiple images)
+
+#### CodeBlock BorderSpace Configuration
+- New `BorderSpace` property on `CodeBlock` style: controls spacing between border and text (in points)
+- Default value: `4` (previously hardcoded to `8`, which produced excessive padding)
+- Propagated through all layers: YAML → `CodeBlockStyleConfig` → `StyleApplicator` → `CodeBlockStyle` → `OpenXmlDocumentBuilder`
+
+### Fixed
+
+- **ListStyleConfig.Size default** changed from `0` to `10`: previously, if the YAML key was misnamed (e.g. `ListItem` instead of `List`), YamlDotNet silently ignored it leaving `Size=0`, resulting in invisible list text
 
 ### Improved
 
 #### Test Coverage
+- Added **15 new tests** (total: 202, up from 187)
+- `StyleApplicatorTests`: 4 new tests for `ApplyImageStyle` (defaults, custom config, clamp, null guard) and 1 test for `ApplyListStyle` default size
+- `StyleApplicatorTests`: 2 new tests for `ApplyCodeBlockStyle` (BorderSpace mapping, default value)
+- `OpenXmlDocumentBuilderTests`: 5 new tests for `AddImage` (null path, null alt text, missing file, valid PNG embed, multiple images)
+
+#### Earlier Test Coverage (2026-02-18)
 - Added **27 new tests** (total: 187, up from 160)
 - `ImageDimensionReader`: 9 edge case tests covering truncated files, invalid signatures, progressive JPEG, FF padding, and truncated segments
-- `YamlConfigurationLoader`: 10 validation tests covering all `ValidateConfiguration` branches (invalid YAML, empty schema version, missing metadata, zero page dimensions, missing fonts)
-- `OpenXmlDocumentBuilder`: 8 tests for remaining uncovered branches (right/top/all border positions, quote ShowBorder=false, quote BackgroundColor, heading LineSpacing, BorderExtent spacer skip)
+- `YamlConfigurationLoader`: 10 validation tests covering all `ValidateConfiguration` branches
+- `OpenXmlDocumentBuilder`: 8 tests for remaining uncovered branches
 
 #### Build Quality
 - Resolved all build warnings (previously ~62 warnings, now 0)

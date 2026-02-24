@@ -232,7 +232,23 @@ Styles:
     SpaceAfter: "300"                    # 後の間隔
     ShowBorder: true                     # 枠線を表示
     BorderSize: 4                        # 枠線の太さ
+    BorderSpace: 4                       # 枠線とテキスト間の余白（ポイント）
 ```
+
+#### 画像スタイル
+
+```yaml
+Styles:
+  Image:
+    MaxWidthPercent: 100        # 印刷可能領域に対する最大幅（%、1-100）
+    Alignment: "center"         # "left"、"center"、"right"
+```
+
+**注意**：
+- **対応フォーマット**：PNGおよびJPEG
+- **MaxWidthPercent**：画像は印刷可能幅のこの割合に収まるよう比例縮小されます。デフォルトは `100`。
+- **Alignment**：画像を含む段落の配置を制御します。デフォルトは `"center"`。
+- Markdownで指定した画像パスは、入力 `.md` ファイルのディレクトリからの相対パスで解決されます。
 
 #### 引用ブロックスタイル
 
@@ -428,4 +444,4 @@ ruby -e "require 'yaml'; YAML.load_file('config/custom/my-style.yaml')"
 
 ---
 
-**最終更新**: 2026-02-17
+**最終更新**: 2026-02-25

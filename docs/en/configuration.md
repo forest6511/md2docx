@@ -234,7 +234,23 @@ Styles:
     SpaceAfter: "300"                    # Space after
     ShowBorder: true                     # Display border
     BorderSize: 4                        # Border thickness
+    BorderSpace: 4                       # Space between border and text (in points)
 ```
+
+#### Image Style
+
+```yaml
+Styles:
+  Image:
+    MaxWidthPercent: 100        # Max width as % of printable area (1-100)
+    Alignment: "center"         # "left", "center", or "right"
+```
+
+**Notes**:
+- **Supported formats**: PNG and JPEG
+- **MaxWidthPercent**: The image is scaled proportionally to fit within this percentage of the printable width. Defaults to `100`.
+- **Alignment**: Controls paragraph alignment for the image. Defaults to `"center"`.
+- Image paths in Markdown are resolved relative to the input `.md` file directory.
 
 #### Quote Block Style
 
@@ -430,4 +446,4 @@ See `config/presets/default.yaml` for a complete, well-commented example configu
 
 ---
 
-**Last Updated**: 2026-02-17
+**Last Updated**: 2026-02-25
