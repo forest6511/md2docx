@@ -124,6 +124,18 @@ public sealed class StyleApplicator : IStyleApplicator
     }
 
     /// <inheritdoc/>
+    public ImageStyle ApplyImageStyle(StyleConfiguration config)
+    {
+        ArgumentNullException.ThrowIfNull(config);
+
+        return new ImageStyle
+        {
+            MaxWidthPercent = Math.Clamp(config.Image.MaxWidthPercent, 1, 100),
+            Alignment = config.Image.Alignment
+        };
+    }
+
+    /// <inheritdoc/>
     public TableOfContentsStyle ApplyTableOfContentsStyle(ConversionConfiguration config)
     {
         ArgumentNullException.ThrowIfNull(config);

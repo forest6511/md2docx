@@ -24,6 +24,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     private readonly ITextDirectionProvider _textDirection;
     private readonly ParagraphConfiguration _paragraphConfig;
     private bool _disposed;
+    private uint _drawingId;
 
     /// <summary>
     /// Initializes a new instance of <see cref="OpenXmlDocumentBuilder"/>
@@ -235,7 +236,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         string relationshipId = mainPart.GetIdOfPart(imagePart);
 
         // Build Drawing element with inline image
-        var drawing = CreateImageDrawing(relationshipId, displayWidthEmu, displayHeightEmu);
+        var drawing = CreateImageDrawing(relationshipId, displayWidthEmu, displayHeightEmu, ++_drawingId, "Cover Image", "cover");
 
         // Create centered paragraph with the image
         var paragraph = _body.AppendChild(new Paragraph());
@@ -264,20 +265,26 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     /// <summary>
     /// Creates a Drawing element containing an inline image with the specified dimensions
     /// </summary>
-    private static Drawing CreateImageDrawing(string relationshipId, long widthEmu, long heightEmu)
+    private static Drawing CreateImageDrawing(
+        string relationshipId,
+        long widthEmu,
+        long heightEmu,
+        uint docPropertiesId,
+        string docPropertiesName,
+        string pictureName)
     {
         return new Drawing(
             new DW.Inline(
                 new DW.Extent { Cx = widthEmu, Cy = heightEmu },
                 new DW.EffectExtent { LeftEdge = 0, TopEdge = 0, RightEdge = 0, BottomEdge = 0 },
-                new DW.DocProperties { Id = 1U, Name = "Cover Image" },
+                new DW.DocProperties { Id = docPropertiesId, Name = docPropertiesName },
                 new DW.NonVisualGraphicFrameDrawingProperties(
                     new A.GraphicFrameLocks { NoChangeAspect = true }),
                 new A.Graphic(
                     new A.GraphicData(
                         new PIC.Picture(
                             new PIC.NonVisualPictureProperties(
-                                new PIC.NonVisualDrawingProperties { Id = 0U, Name = "cover" },
+                                new PIC.NonVisualDrawingProperties { Id = 0U, Name = pictureName },
                                 new PIC.NonVisualPictureDrawingProperties()),
                             new PIC.BlipFill(
                                 new A.Blip { Embed = relationshipId },
@@ -296,6 +303,74 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
                 DistanceFromLeft = 0U,
                 DistanceFromRight = 0U
             });
+    }
+
+    /// <inheritdoc/>
+    public void AddImage(string imagePath, string altText, ImageStyle style)
+    {
+        ArgumentNullException.ThrowIfNull(imagePath);
+        ArgumentNullException.ThrowIfNull(altText);
+        ArgumentNullException.ThrowIfNull(style);
+
+        if (!File.Exists(imagePath))
+        {
+            throw new FileNotFoundException($"Image file not found: {imagePath}", imagePath);
+        }
+
+        var mainPart = _document.MainDocumentPart
+            ?? throw new InvalidOperationException("MainDocumentPart is not initialized");
+
+        // Read image dimensions and calculate display size
+        var (imageWidth, imageHeight) = ImageDimensionReader.GetDimensions(imagePath);
+        var contentType = ImageDimensionReader.GetContentType(imagePath);
+
+        // Calculate printable area in EMUs (1 twip = 635 EMUs)
+        var pageConfig = _textDirection.GetPageConfiguration();
+        long printableWidthEmu = ((long)(uint)pageConfig.Width - pageConfig.LeftMargin - pageConfig.RightMargin) * 635L;
+
+        // Max width based on configured percentage
+        long maxWidthEmu = printableWidthEmu * Math.Clamp(style.MaxWidthPercent, 1, 100) / 100;
+
+        // Scale image to fit within max width, maintaining aspect ratio, no upscaling
+        long imageWidthEmu = (long)imageWidth * 914400L / 96L;   // pixels → EMUs (96 DPI)
+        long imageHeightEmu = (long)imageHeight * 914400L / 96L;
+
+        double scale = imageWidthEmu > maxWidthEmu ? (double)maxWidthEmu / imageWidthEmu : 1.0;
+        long displayWidthEmu = (long)(imageWidthEmu * scale);
+        long displayHeightEmu = (long)(imageHeightEmu * scale);
+
+        // Add image part
+        var imagePart = mainPart.AddImagePart(contentType switch
+        {
+            "image/png" => ImagePartType.Png,
+            _ => ImagePartType.Jpeg
+        });
+
+        using (var imageStream = File.OpenRead(imagePath))
+        {
+            imagePart.FeedData(imageStream);
+        }
+
+        string relationshipId = mainPart.GetIdOfPart(imagePart);
+        uint id = ++_drawingId;
+
+        var drawing = CreateImageDrawing(relationshipId, displayWidthEmu, displayHeightEmu, id, altText, altText);
+
+        // Create paragraph with alignment
+        var paragraph = _body.AppendChild(new Paragraph());
+        var paragraphProps = CreateBaseParagraphProperties();
+
+        var justification = style.Alignment.ToLowerInvariant() switch
+        {
+            "right" => JustificationValues.Right,
+            "left" => JustificationValues.Left,
+            _ => JustificationValues.Center
+        };
+        paragraphProps.AppendChild(new Justification { Val = justification });
+        paragraph.AppendChild(paragraphProps);
+
+        var run = paragraph.AppendChild(new Run());
+        run.AppendChild(drawing);
     }
 
     /// <inheritdoc/>

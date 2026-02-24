@@ -1,6 +1,7 @@
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MarkdownToDocx.Core.Models;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace MarkdownToDocx.CLI;
@@ -115,6 +116,39 @@ public static class Helpers
             return fencedCode.Info;
         }
         return null;
+    }
+
+    /// <summary>
+    /// Returns true when a ParagraphBlock contains a single standalone image inline.
+    /// Outputs the resolved image path and alt text.
+    /// </summary>
+    public static bool IsStandaloneImage(
+        ParagraphBlock paragraph,
+        [NotNullWhen(true)] out string? imagePath,
+        out string altText)
+    {
+        imagePath = null;
+        altText = string.Empty;
+
+        if (paragraph.Inline == null)
+        {
+            return false;
+        }
+
+        // Collect non-whitespace inlines
+        var inlines = paragraph.Inline
+            .Where(i => i is not LineBreakInline)
+            .ToList();
+
+        if (inlines.Count != 1 || inlines[0] is not LinkInline { IsImage: true } link)
+        {
+            return false;
+        }
+
+        imagePath = link.Url;
+        altText = link.FirstChild is LiteralInline lit ? lit.Content.ToString() : string.Empty;
+
+        return imagePath != null;
     }
 
     public static string GetQuoteText(object block)

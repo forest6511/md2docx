@@ -7,6 +7,7 @@ using MarkdownToDocx.Core.OpenXml;
 using MarkdownToDocx.Core.TextDirection;
 using Xunit;
 using CoreListItem = MarkdownToDocx.Core.Models.ListItem;
+using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 
 namespace MarkdownToDocx.Tests.Unit;
 
@@ -447,6 +448,100 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         var borderedParagraph = paragraphs.FirstOrDefault(p =>
             p.ParagraphProperties?.ParagraphBorders != null);
         borderedParagraph.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void AddImage_WithNullPath_ShouldThrowArgumentNullException()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new ImageStyle();
+
+        // Act
+        Action act = () => builder.AddImage(null!, "alt text", style);
+
+        // Assert
+        act.Should().Throw<ArgumentNullException>()
+            .WithParameterName("imagePath");
+    }
+
+    [Fact]
+    public void AddImage_WithNullAltText_ShouldThrowArgumentNullException()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new ImageStyle();
+
+        // Act
+        Action act = () => builder.AddImage("some/path.png", null!, style);
+
+        // Assert
+        act.Should().Throw<ArgumentNullException>()
+            .WithParameterName("altText");
+    }
+
+    [Fact]
+    public void AddImage_WithNonExistentFile_ShouldThrowFileNotFoundException()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new ImageStyle();
+
+        // Act
+        Action act = () => builder.AddImage("/nonexistent/image.png", "alt text", style);
+
+        // Assert
+        act.Should().Throw<FileNotFoundException>();
+    }
+
+    [Fact]
+    public void AddImage_WithValidPng_ShouldEmbedImageInDocument()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var imagePath = Path.Combine(AppContext.BaseDirectory, "TestAssets", "test-image.png");
+        var style = new ImageStyle { MaxWidthPercent = 80, Alignment = "center" };
+
+        // Act
+        builder.AddImage(imagePath, "Test image", style);
+        builder.Save();
+
+        // Assert: document should contain an image part
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        doc.MainDocumentPart!.ImageParts.Should().NotBeEmpty();
+
+        // Assert: document body should contain a Drawing element
+        var drawings = doc.MainDocumentPart.Document.Body!.Descendants<Drawing>().ToList();
+        drawings.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public void AddImage_MultipleTimes_ShouldEmbedMultipleImages()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var imagePath = Path.Combine(AppContext.BaseDirectory, "TestAssets", "test-image.png");
+        var style = new ImageStyle();
+
+        // Act
+        builder.AddImage(imagePath, "Image 1", style);
+        builder.AddImage(imagePath, "Image 2", style);
+        builder.Save();
+
+        // Assert: two separate image parts and Drawing elements
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        doc.MainDocumentPart!.ImageParts.Count().Should().Be(2);
+
+        var drawings = doc.MainDocumentPart.Document.Body!.Descendants<Drawing>().ToList();
+        drawings.Should().HaveCount(2);
+
+        // DocProperties IDs must be unique
+        var ids = drawings
+            .Select(d => d.Descendants<DW.DocProperties>().First().Id!.Value)
+            .ToList();
+        ids.Should().OnlyHaveUniqueItems();
     }
 
     [Fact]
