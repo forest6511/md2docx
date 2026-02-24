@@ -3,6 +3,8 @@ title: md2docx
 description: Flexible Markdown to Word (DOCX) converter with YAML-based styling
 baseurl: "/md2docx"
 url: "https://forest6511.github.io"
+repository: forest6511/md2docx
+github_url: "https://github.com/forest6511/md2docx"
 
 # Build settings
 theme: jekyll-theme-cayman
