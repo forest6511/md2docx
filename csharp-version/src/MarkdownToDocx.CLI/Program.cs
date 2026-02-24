@@ -86,11 +86,29 @@ try
                     break;
 
                 case ParagraphBlock paragraph:
-                    var paragraphText = Helpers.GetBlockText(paragraph);
-                    if (!string.IsNullOrWhiteSpace(paragraphText))
+                    if (Helpers.IsStandaloneImage(paragraph, out var imagePath, out var imageAltText))
                     {
-                        var paragraphStyle = styleApplicator.ApplyParagraphStyle(config.Styles);
-                        builder.AddParagraph(paragraphText, paragraphStyle);
+                        // Resolve image path relative to the input Markdown file directory
+                        if (!Path.IsPathRooted(imagePath))
+                        {
+                            var inputDir = Path.GetDirectoryName(Path.GetFullPath(options.InputPath));
+                            if (inputDir != null)
+                            {
+                                imagePath = Path.GetFullPath(Path.Combine(inputDir, imagePath));
+                            }
+                        }
+
+                        var imageStyle = styleApplicator.ApplyImageStyle(config.Styles);
+                        builder.AddImage(imagePath, imageAltText, imageStyle);
+                    }
+                    else
+                    {
+                        var paragraphText = Helpers.GetBlockText(paragraph);
+                        if (!string.IsNullOrWhiteSpace(paragraphText))
+                        {
+                            var paragraphStyle = styleApplicator.ApplyParagraphStyle(config.Styles);
+                            builder.AddParagraph(paragraphText, paragraphStyle);
+                        }
                     }
                     break;
 

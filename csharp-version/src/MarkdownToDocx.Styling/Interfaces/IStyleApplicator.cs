@@ -45,6 +45,13 @@ public interface IStyleApplicator
     QuoteStyle ApplyQuoteStyle(StyleConfiguration config);
 
     /// <summary>
+    /// Apply style configuration to inline image
+    /// </summary>
+    /// <param name="config">Style configuration</param>
+    /// <returns>Image style</returns>
+    ImageStyle ApplyImageStyle(StyleConfiguration config);
+
+    /// <summary>
     /// Apply table of contents configuration
     /// </summary>
     /// <param name="config">Conversion configuration containing TOC settings</param>

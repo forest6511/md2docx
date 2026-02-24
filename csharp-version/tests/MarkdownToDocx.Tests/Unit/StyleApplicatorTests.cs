@@ -300,6 +300,65 @@ public class StyleApplicatorTests
     }
 
     [Fact]
+    public void ApplyImageStyle_WithDefaultConfig_ShouldReturnDefaults()
+    {
+        // Act
+        var style = _applicator.ApplyImageStyle(_testConfig);
+
+        // Assert
+        style.Should().NotBeNull();
+        style.MaxWidthPercent.Should().Be(100);
+        style.Alignment.Should().Be("center");
+    }
+
+    [Fact]
+    public void ApplyImageStyle_WithCustomConfig_ShouldMapProperties()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            Image = new ImageStyleConfig { MaxWidthPercent = 60, Alignment = "left" }
+        };
+
+        // Act
+        var style = _applicator.ApplyImageStyle(config);
+
+        // Assert
+        style.MaxWidthPercent.Should().Be(60);
+        style.Alignment.Should().Be("left");
+    }
+
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(101, 100)]
+    [InlineData(50, 50)]
+    public void ApplyImageStyle_MaxWidthPercent_ShouldClamp(int input, int expected)
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            Image = new ImageStyleConfig { MaxWidthPercent = input }
+        };
+
+        // Act
+        var style = _applicator.ApplyImageStyle(config);
+
+        // Assert
+        style.MaxWidthPercent.Should().Be(expected);
+    }
+
+    [Fact]
+    public void ApplyImageStyle_WithNullConfig_ShouldThrowArgumentNullException()
+    {
+        // Act
+        Action act = () => _applicator.ApplyImageStyle(null!);
+
+        // Assert
+        act.Should().Throw<ArgumentNullException>()
+            .WithParameterName("config");
+    }
+
+    [Fact]
     public void ApplyTableOfContentsStyle_WithNullConfig_ShouldThrowArgumentNullException()
     {
         // Act

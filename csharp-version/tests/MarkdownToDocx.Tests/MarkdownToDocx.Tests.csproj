@@ -35,4 +35,10 @@
     <ProjectReference Include="..\..\src\MarkdownToDocx.Styling\MarkdownToDocx.Styling.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestAssets\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

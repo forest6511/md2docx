@@ -60,6 +60,14 @@ public interface IDocumentBuilder : IDisposable
     void AddTableOfContents(TableOfContentsStyle style);
 
     /// <summary>
+    /// Adds an inline image to the document
+    /// </summary>
+    /// <param name="imagePath">Absolute path to the image file (PNG or JPEG)</param>
+    /// <param name="altText">Alternative text for accessibility</param>
+    /// <param name="style">Image style configuration</param>
+    void AddImage(string imagePath, string altText, ImageStyle style);
+
+    /// <summary>
     /// Adds a thematic break (horizontal rule) to the document
     /// </summary>
     void AddThematicBreak();

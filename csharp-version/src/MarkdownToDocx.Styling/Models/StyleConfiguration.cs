@@ -54,6 +54,11 @@ public sealed class StyleConfiguration
     /// Style configuration for quote blocks
     /// </summary>
     public QuoteStyleConfig Quote { get; init; } = new();
+
+    /// <summary>
+    /// Style configuration for inline images
+    /// </summary>
+    public ImageStyleConfig Image { get; init; } = new();
 }
 
 /// <summary>
@@ -324,4 +329,21 @@ public sealed class QuoteStyleConfig
     /// Spacing after quote block in twips (1/20 of a point)
     /// </summary>
     public string SpaceAfter { get; init; } = "240";
+}
+
+/// <summary>
+/// Style configuration for inline images
+/// </summary>
+public sealed class ImageStyleConfig
+{
+    /// <summary>
+    /// Maximum width of the image as a percentage of the printable area (1-100).
+    /// The image is scaled down if wider, but never upscaled.
+    /// </summary>
+    public int MaxWidthPercent { get; init; } = 100;
+
+    /// <summary>
+    /// Horizontal alignment of the image paragraph ("left", "center", "right")
+    /// </summary>
+    public string Alignment { get; init; } = "center";
 }
