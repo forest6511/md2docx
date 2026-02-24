@@ -49,4 +49,10 @@ public sealed record CodeBlockStyle
     /// Line spacing within code block
     /// </summary>
     public string LineSpacing { get; init; } = "240";
+
+    /// <summary>
+    /// Distance between the border line and the text in points (OpenXML Space attribute).
+    /// Applied to all four sides of the code block border.
+    /// </summary>
+    public uint BorderSpace { get; init; } = 4;
 }

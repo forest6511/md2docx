@@ -354,6 +354,31 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     }
 
     [Fact]
+    public void AddCodeBlock_ShouldUseBorderSpaceFromStyle()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultCodeBlockStyle() with { BorderSpace = 2U };
+
+        // Act
+        builder.AddCodeBlock("echo hello", null, style);
+        builder.Save();
+
+        // Assert: all four paragraph borders must carry Space = 2
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        var borders = paragraph.ParagraphProperties!.ParagraphBorders!;
+        borders.GetFirstChild<TopBorder>()!.Space!.Value.Should().Be(2U);
+        borders.GetFirstChild<BottomBorder>()!.Space!.Value.Should().Be(2U);
+        borders.GetFirstChild<LeftBorder>()!.Space!.Value.Should().Be(2U);
+        borders.GetFirstChild<RightBorder>()!.Space!.Value.Should().Be(2U);
+    }
+
+    [Fact]
     public void AddQuote_WithNullText_ShouldThrowArgumentNullException()
     {
         // Arrange

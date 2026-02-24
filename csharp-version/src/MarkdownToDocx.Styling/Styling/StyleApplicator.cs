@@ -96,7 +96,8 @@ public sealed class StyleApplicator : IStyleApplicator
             MonospaceFontEastAsia = config.CodeBlock.MonospaceFontEastAsia,
             LineSpacing = config.CodeBlock.LineSpacing,
             SpaceBefore = config.CodeBlock.SpaceBefore,
-            SpaceAfter = config.CodeBlock.SpaceAfter
+            SpaceAfter = config.CodeBlock.SpaceAfter,
+            BorderSpace = config.CodeBlock.BorderSpace
         };
     }
 
