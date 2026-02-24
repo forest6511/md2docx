@@ -212,6 +212,24 @@ public class StyleApplicatorTests
     }
 
     [Fact]
+    public void ApplyListStyle_WithDefaultConfig_ShouldReturnReadableFontSize()
+    {
+        // Arrange - simulate misconfigured YAML (e.g. "ListItem" key used instead of "List")
+        // YamlDotNet silently ignores unmatched keys, leaving ListStyleConfig at defaults
+        var config = new StyleConfiguration
+        {
+            List = new ListStyleConfig() // no Size set — uses default
+        };
+
+        // Act
+        var style = _applicator.ApplyListStyle(config);
+
+        // Assert: default Size=10 must result in readable (non-zero) FontSize
+        style.FontSize.Should().Be(10 * 2); // 10pt = 20 half-points
+        style.FontSize.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
     public void ApplyCodeBlockStyle_ShouldReturnCorrectStyle()
     {
         // Act

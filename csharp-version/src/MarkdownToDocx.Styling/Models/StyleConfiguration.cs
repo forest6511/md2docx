@@ -171,9 +171,10 @@ public sealed class ParagraphStyleConfig
 public sealed class ListStyleConfig
 {
     /// <summary>
-    /// Font size in points (pt)
+    /// Font size in points (pt). Defaults to 10pt to prevent invisible text
+    /// when the YAML key is misconfigured (e.g. "ListItem" instead of "List").
     /// </summary>
-    public int Size { get; init; }
+    public int Size { get; init; } = 10;
 
     /// <summary>
     /// Text color in hex format (e.g., "000000" for black)
