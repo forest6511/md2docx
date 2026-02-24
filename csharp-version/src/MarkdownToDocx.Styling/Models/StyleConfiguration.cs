@@ -251,6 +251,13 @@ public sealed class CodeBlockStyleConfig
     /// Spacing after code block in twips (1/20 of a point)
     /// </summary>
     public string SpaceAfter { get; init; } = "240";
+
+    /// <summary>
+    /// Distance between the border line and the text in points (default: 4).
+    /// Controls internal padding on all four sides of the code block border.
+    /// Reducing this value makes single-line code blocks appear more compact.
+    /// </summary>
+    public uint BorderSpace { get; init; } = 4;
 }
 
 /// <summary>

@@ -665,10 +665,10 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
 
         // Borders
         props.AppendChild(new ParagraphBorders(
-            new TopBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = 4, Space = 8 },
-            new BottomBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = 4, Space = 8 },
-            new LeftBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = 4, Space = 8 },
-            new RightBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = 4, Space = 8 }
+            new TopBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = 4, Space = style.BorderSpace },
+            new BottomBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = 4, Space = style.BorderSpace },
+            new LeftBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = 4, Space = style.BorderSpace },
+            new RightBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = 4, Space = style.BorderSpace }
         ));
 
         // Background shading

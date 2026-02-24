@@ -246,6 +246,43 @@ public class StyleApplicatorTests
     }
 
     [Fact]
+    public void ApplyCodeBlockStyle_ShouldMapBorderSpace()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            CodeBlock = new CodeBlockStyleConfig
+            {
+                Size = 9,
+                Color = "000000",
+                BorderSpace = 2
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyCodeBlockStyle(config);
+
+        // Assert
+        style.BorderSpace.Should().Be(2U);
+    }
+
+    [Fact]
+    public void ApplyCodeBlockStyle_WithDefaultBorderSpace_ShouldBeFour()
+    {
+        // Arrange - default CodeBlockStyleConfig
+        var config = new StyleConfiguration
+        {
+            CodeBlock = new CodeBlockStyleConfig { Size = 9, Color = "000000" }
+        };
+
+        // Act
+        var style = _applicator.ApplyCodeBlockStyle(config);
+
+        // Assert: default BorderSpace=4, not the old hardcoded 8
+        style.BorderSpace.Should().Be(4U);
+    }
+
+    [Fact]
     public void ApplyQuoteStyle_ShouldReturnCorrectStyle()
     {
         // Act
