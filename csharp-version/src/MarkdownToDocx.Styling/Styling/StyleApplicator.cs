@@ -120,7 +120,8 @@ public sealed class StyleApplicator : IStyleApplicator
             BackgroundColor = config.Quote.BackgroundColor,
             LeftIndent = config.Quote.LeftIndent,
             SpaceBefore = config.Quote.SpaceBefore,
-            SpaceAfter = config.Quote.SpaceAfter
+            SpaceAfter = config.Quote.SpaceAfter,
+            PaddingSpace = config.Quote.PaddingSpace
         };
     }
 

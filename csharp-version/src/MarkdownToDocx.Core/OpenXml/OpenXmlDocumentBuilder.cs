@@ -795,14 +795,42 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     {
         var props = CreateBaseParagraphProperties();
 
-        // Border
-        if (style.ShowBorder)
+        // Border and/or padding
+        bool hasPadding = style.PaddingSpace > 0 && !string.IsNullOrEmpty(style.BackgroundColor);
+        if (style.ShowBorder || hasPadding)
         {
-            props.AppendChild(CreateBordersFromPositions(
-                style.BorderPosition,
-                style.BorderColor,
-                style.BorderSize,
-                style.BorderSpace));
+            var borders = new ParagraphBorders();
+
+            if (style.ShowBorder)
+            {
+                var positions = style.BorderPosition
+                    .ToLowerInvariant()
+                    .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                foreach (var pos in positions)
+                {
+                    OpenXmlElement border = pos switch
+                    {
+                        "left" => new LeftBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = style.BorderSpace },
+                        "right" => new RightBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = style.BorderSpace },
+                        "top" => new TopBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = style.BorderSpace },
+                        _ => new BottomBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = style.BorderSpace }
+                    };
+                    borders.AppendChild(border);
+                }
+            }
+
+            if (hasPadding)
+            {
+                // Add invisible padding borders on top/right/bottom (skip positions already occupied by visible border)
+                if (borders.GetFirstChild<TopBorder>() == null)
+                    borders.AppendChild(new TopBorder { Val = BorderValues.Single, Color = style.BackgroundColor!, Size = 4, Space = style.PaddingSpace });
+                if (borders.GetFirstChild<RightBorder>() == null)
+                    borders.AppendChild(new RightBorder { Val = BorderValues.Single, Color = style.BackgroundColor!, Size = 4, Space = style.PaddingSpace });
+                if (borders.GetFirstChild<BottomBorder>() == null)
+                    borders.AppendChild(new BottomBorder { Val = BorderValues.Single, Color = style.BackgroundColor!, Size = 4, Space = style.PaddingSpace });
+            }
+
+            props.AppendChild(borders);
         }
 
         // Background shading
