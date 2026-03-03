@@ -662,12 +662,12 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     }
 
     /// <inheritdoc/>
-    public void AddList(IEnumerable<CoreListItem> items, bool isOrdered, ListStyle style)
+    public void AddList(IEnumerable<CoreListItem> items, bool isOrdered, ListStyle style, int startNumber = 1)
     {
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(style);
 
-        int itemNumber = 1;
+        int itemNumber = startNumber;
         foreach (var item in items)
         {
             var paragraph = _body.AppendChild(new Paragraph());

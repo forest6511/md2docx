@@ -305,6 +305,36 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     }
 
     [Fact]
+    public void AddList_WithOrderedListAndStartNumber_ShouldBeginFromSpecifiedNumber()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var items = new List<CoreListItem>
+        {
+            new CoreListItem { Text = "Individual settings" },
+            new CoreListItem { Text = "Project settings" },
+            new CoreListItem { Text = "Local override" }
+        };
+        var style = CreateDefaultListStyle();
+
+        // Act - simulate a list starting at 2 (interrupted by a code block)
+        builder.AddList(items, true, style, startNumber: 2);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var textContent = string.Join("", doc.MainDocumentPart!.Document.Body!
+            .Descendants<Text>()
+            .Select(t => t.Text));
+
+        textContent.Should().Contain("2. Individual settings");
+        textContent.Should().Contain("3. Project settings");
+        textContent.Should().Contain("4. Local override");
+        textContent.Should().NotContain("1. Individual settings");
+    }
+
+    [Fact]
     public void AddCodeBlock_WithNullCode_ShouldThrowArgumentNullException()
     {
         // Arrange

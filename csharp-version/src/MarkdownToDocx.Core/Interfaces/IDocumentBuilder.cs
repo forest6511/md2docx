@@ -28,7 +28,8 @@ public interface IDocumentBuilder : IDisposable
     /// <param name="items">List items</param>
     /// <param name="isOrdered">True for numbered list, false for bullet list</param>
     /// <param name="style">List style configuration</param>
-    void AddList(IEnumerable<ListItem> items, bool isOrdered, ListStyle style);
+    /// <param name="startNumber">First number for ordered lists (default: 1)</param>
+    void AddList(IEnumerable<ListItem> items, bool isOrdered, ListStyle style, int startNumber = 1);
 
     /// <summary>
     /// Adds a code block to the document
