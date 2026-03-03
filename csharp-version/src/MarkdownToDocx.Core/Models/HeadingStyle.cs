@@ -81,4 +81,11 @@ public sealed record HeadingStyle
     /// Left margin indent in twips (1/20 of a point). Null means no indentation.
     /// </summary>
     public string? LeftIndent { get; init; }
+
+    /// <summary>
+    /// When set, suppresses PageBreakBefore if the immediately preceding block is a heading
+    /// at the specified level. For example, setting 1 on H2 prevents a page break when
+    /// H2 directly follows H1.
+    /// </summary>
+    public int? SuppressPageBreakIfPrevHeadingLevel { get; init; }
 }
