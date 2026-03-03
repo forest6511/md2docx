@@ -300,6 +300,23 @@ public class StyleApplicatorTests
     }
 
     [Fact]
+    public void ApplyQuoteStyle_WithDefaultConfig_ShouldHaveCompactSpacing()
+    {
+        // Arrange - use default QuoteStyleConfig (no explicit SpaceBefore/SpaceAfter)
+        var config = new StyleConfiguration
+        {
+            Quote = new QuoteStyleConfig()
+        };
+
+        // Act
+        var style = _applicator.ApplyQuoteStyle(config);
+
+        // Assert: default spacing should be 120 twips (6pt), not 240 (12pt)
+        style.SpaceBefore.Should().Be("120");
+        style.SpaceAfter.Should().Be("120");
+    }
+
+    [Fact]
     public void ApplyImageStyle_WithDefaultConfig_ShouldReturnDefaults()
     {
         // Act

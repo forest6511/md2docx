@@ -58,10 +58,10 @@ public sealed record QuoteStyle
     /// <summary>
     /// Space before quote in twips
     /// </summary>
-    public string SpaceBefore { get; init; } = "200";
+    public string SpaceBefore { get; init; } = "120";
 
     /// <summary>
     /// Space after quote in twips
     /// </summary>
-    public string SpaceAfter { get; init; } = "200";
+    public string SpaceAfter { get; init; } = "120";
 }
