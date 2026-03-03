@@ -471,6 +471,40 @@ public class StyleApplicatorTests
         style.BorderExtent.Should().Be("paragraph");
     }
 
+    [Fact]
+    public void ApplyHeadingStyle_WithLeftIndent_ShouldMapCorrectly()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            H3 = new HeadingStyleConfig
+            {
+                Size = 16,
+                Bold = true,
+                Color = "000000",
+                ShowBorder = true,
+                BorderPosition = "left",
+                LeftIndent = "400"
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyHeadingStyle(3, config);
+
+        // Assert
+        style.LeftIndent.Should().Be("400");
+    }
+
+    [Fact]
+    public void ApplyHeadingStyle_WithDefaultLeftIndent_ShouldBeNull()
+    {
+        // Act
+        var style = _applicator.ApplyHeadingStyle(1, _testConfig);
+
+        // Assert
+        style.LeftIndent.Should().BeNull();
+    }
+
     private static StyleConfiguration CreateTestConfiguration()
     {
         return new StyleConfiguration

@@ -76,4 +76,9 @@ public sealed record HeadingStyle
     /// "text": border hugs text only, using spacer paragraphs for spacing.
     /// </summary>
     public string BorderExtent { get; init; } = "paragraph";
+
+    /// <summary>
+    /// Left margin indent in twips (1/20 of a point). Null means no indentation.
+    /// </summary>
+    public string? LeftIndent { get; init; }
 }

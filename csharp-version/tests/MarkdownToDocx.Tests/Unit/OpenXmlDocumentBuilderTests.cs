@@ -1623,6 +1623,94 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         paragraphs.Should().HaveCount(2, "no before-spacer when SpaceBefore=0 and PageBreakBefore=false");
     }
 
+    [Fact]
+    public void AddHeading_WithLeftIndent_ShouldRenderIndentation()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderPosition = "left",
+            BorderColor = "3498db",
+            BorderSize = 24,
+            SpaceBefore = "240",
+            SpaceAfter = "120",
+            LeftIndent = "400"
+        };
+
+        // Act
+        builder.AddHeading(3, "H3 with left indent", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var indentation = paragraph.ParagraphProperties?.Elements<Indentation>().FirstOrDefault();
+        indentation.Should().NotBeNull();
+        indentation!.Left!.Value.Should().Be("400");
+    }
+
+    [Fact]
+    public void AddHeading_WithDefaultLeftIndent_ShouldNotRenderIndentation()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle();
+
+        // Act
+        builder.AddHeading(1, "Default heading", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var indentation = paragraph.ParagraphProperties?.Elements<Indentation>().FirstOrDefault();
+        indentation.Should().BeNull();
+    }
+
+    [Fact]
+    public void AddHeading_WithLeftIndentAndBorderExtentText_ShouldRenderIndentationOnMainParagraph()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new HeadingStyle
+        {
+            FontSize = 32,
+            Color = "333333",
+            Bold = true,
+            ShowBorder = true,
+            BorderPosition = "left",
+            BorderColor = "3498db",
+            BorderSize = 24,
+            BorderExtent = "text",
+            SpaceBefore = "240",
+            SpaceAfter = "120",
+            LeftIndent = "400"
+        };
+
+        // Act
+        builder.AddHeading(3, "H3 spacer mode with indent", style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        // BorderExtent=text produces before-spacer, main, after-spacer => 3 paragraphs
+        paragraphs.Should().HaveCount(3);
+        // Main paragraph is index 1 (after before-spacer)
+        var mainParagraph = paragraphs[1];
+        var indentation = mainParagraph.ParagraphProperties?.Elements<Indentation>().FirstOrDefault();
+        indentation.Should().NotBeNull();
+        indentation!.Left!.Value.Should().Be("400");
+    }
+
     public void Dispose()
     {
         _stream?.Dispose();

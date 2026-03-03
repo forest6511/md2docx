@@ -529,6 +529,12 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
                 mainProps.AppendChild(CreateBackgroundShading(style.BackgroundColor));
             }
 
+            // Indentation
+            if (!string.IsNullOrEmpty(style.LeftIndent) && style.LeftIndent != "0")
+            {
+                mainProps.AppendChild(new Indentation { Left = style.LeftIndent });
+            }
+
             // Zero spacing so border hugs the text
             var mainSpacing = new SpacingBetweenLines { Before = "0", After = "0" };
             if (!string.IsNullOrEmpty(style.LineSpacing))
@@ -592,6 +598,12 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         if (!string.IsNullOrEmpty(style.BackgroundColor))
         {
             props.AppendChild(CreateBackgroundShading(style.BackgroundColor));
+        }
+
+        // Indentation
+        if (!string.IsNullOrEmpty(style.LeftIndent))
+        {
+            props.AppendChild(new Indentation { Left = style.LeftIndent });
         }
 
         // Spacing
