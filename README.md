@@ -135,7 +135,13 @@ Perfect for:
   - Sans-serif fonts (Noto Sans)
   - Compact layout (10pt base)
   - Emphasized code blocks
-  - Simple monochrome palette
+  - GitHub-inspired color palette
+
+- **`business`** - Professional business documents
+  - Wide margins (3.0cm) for formal documents
+  - Navy/blue heading palette (#1a5490, #2e5c8a)
+  - Generous line spacing (1.75×) for readability
+  - Proposals, reports, meeting minutes
 
 ### Vertical Text Presets (`config/vertical/`)
 
@@ -270,7 +276,7 @@ docker build -t md2docx:latest -f Dockerfile .
 | Base Image | mcr.microsoft.com/dotnet/runtime:8.0 |
 | Size | ~560MB |
 | Included Fonts | Noto Serif, Noto Sans, Noto CJK JP, Noto Mono |
-| Presets | 4 built-in (minimal, default, technical, vertical-novel) |
+| Presets | 5 built-in (minimal, default, technical, business, vertical-novel) |
 
 ### Testing Docker Image
 

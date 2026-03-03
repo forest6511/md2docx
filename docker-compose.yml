@@ -38,19 +38,19 @@ services:
       - ./output:/workspace/output
     command: ["input/sample.md", "-o", "output/sample-full.docx"]
 
-  # KDP conversion
-  kdp:
+  # Business document conversion
+  business:
     build:
       context: .
       dockerfile: Dockerfile
     image: md2word:latest
     volumes:
-      - ./chapters:/workspace/chapters:ro
+      - ./input:/workspace/input:ro
       - ./output:/workspace/output
       - ./config:/app/config:ro
-    command: ["chapters/*.md", "-o", "output/manuscript.docx", "--preset", "publishing/kdp-6x9-horizontal"]
+    command: ["input/sample.md", "-o", "output/sample-business.docx", "--preset", "business"]
 
-  # Vertical text conversion
+  # Vertical text conversion (Japanese novels)
   vertical:
     build:
       context: .
@@ -59,7 +59,8 @@ services:
     volumes:
       - ./novel:/workspace/novel:ro
       - ./output:/workspace/output
-    command: ["novel/chapter1.md", "-o", "output/chapter1.docx", "--preset", "publishing/kdp-vertical-novel"]
+      - ./config:/app/config:ro
+    command: ["novel/chapter1.md", "-o", "output/chapter1.docx", "--preset", "vertical-novel", "--preset-dir", "/app/config/vertical"]
 
   # Technical documentation conversion
   technical:

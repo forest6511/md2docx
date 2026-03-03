@@ -186,11 +186,11 @@ Styles:
   Paragraph:
     Size: 11                    # フォントサイズ
     Color: "2c3e50"            # テキストカラー
-    LineSpacing: "360"          # 行間（twips）
+    LineSpacing: "360"          # 行間（twips：240=1.0、360=1.5、480=2.0）
     FirstLineIndent: "0"        # 1行目のインデント（twips）
     LeftIndent: "0"             # 左インデント（twips）
-    SpaceBefore: "0"            # 前の間隔
-    SpaceAfter: "180"           # 後の間隔
+    InlineCodeFontAscii: "Courier New"          # インラインコードのASCIIフォント
+    InlineCodeFontEastAsia: "Noto Sans Mono CJK JP"  # インラインコードの東アジアフォント
 ```
 
 **行間の例**：
@@ -260,12 +260,16 @@ Styles:
     Italic: true                # 斜体
     ShowBorder: true            # 左枠線を表示
     BorderColor: "3498db"       # 枠線の色
-    BorderSize: 16              # 枠線の太さ
-    BorderPosition: "left"      # 枠線の位置
-    LeftIndent: "720"           # 左インデント
-    BackgroundColor: "f8f9fa"   # 背景色
-    SpaceBefore: "300"          # 前の間隔
-    SpaceAfter: "300"           # 後の間隔
+    BorderSize: 16              # 枠線の太さ（1/8ポイント単位：16=2pt、24=3pt）
+    BorderSpace: 0              # 枠線とテキストの間隔（ポイント）
+    BorderPosition: "left"      # 枠線の位置（left/right/top/bottom）
+    BackgroundColor: "f8f9fa"   # 背景色（省略可）
+    LeftIndent: "720"           # 左インデント（twips）
+    SpaceBefore: "300"          # 前の間隔（twips）
+    SpaceAfter: "300"           # 後の間隔（twips）
+    PaddingSpace: 0             # BackgroundColor設定時の内側パディング（ポイント）
+    InlineCodeFontAscii: "Courier New"          # インラインコードのASCIIフォント
+    InlineCodeFontEastAsia: "Noto Sans Mono CJK JP"  # インラインコードの東アジアフォント
 ```
 
 ## カスタムプリセットの作成

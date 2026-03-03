@@ -71,5 +71,5 @@ CMD ["--help"]
 
 # Labels
 LABEL maintainer="your-email@example.com"
-LABEL version="1.0.0-full"
+LABEL version="0.2.1-full"
 LABEL description="Markdown to Word Converter (Full) with comprehensive font support"

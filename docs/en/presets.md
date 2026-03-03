@@ -14,6 +14,7 @@ Built-in presets in `config/presets/`:
 - `minimal` - Simple documents
 - `default` - General-purpose documents
 - `technical` - Technical documentation
+- `business` - Professional business documents
 
 ## Overview
 
@@ -22,6 +23,7 @@ Built-in presets in `config/presets/`:
 | [minimal](#minimal) | `config/presets/` | Simple documents, quick conversions | Horizontal |
 | [default](#default) | `config/presets/` | General-purpose documents | Horizontal |
 | [technical](#technical) | `config/presets/` | Technical documentation, API docs | Horizontal |
+| [business](#business) | `config/presets/` | Business reports, proposals, minutes | Horizontal |
 | [vertical-novel](#vertical-novel) | `config/vertical/` | Japanese novels, vertical text | Vertical |
 
 ## Standard Presets
@@ -147,27 +149,69 @@ docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
 
 ---
 
+### business
+
+**Location**: `config/presets/business.yaml`
+
+**Description**: Professional styling for formal business documents with wide margins and a navy/blue color palette.
+
+**Characteristics**:
+- **Page Size**: A4 (21.0 × 29.7 cm)
+- **Fonts**: Noto Serif / Noto Serif CJK JP
+- **Base Font Size**: 11pt
+- **Margins**: Wide (3.0 cm left/top/bottom, 2.5 cm right) for formal documents
+- **Color Scheme**: Navy (#1a5490) and dark blue (#2e5c8a) headings
+- **Line Spacing**: 1.75× for enhanced readability
+
+**Style Details**:
+
+```yaml
+H1: 24pt, Bold, Navy (#1a5490), No border
+H2: 16pt, Bold, Dark Blue (#2e5c8a), Blue bottom border (#4a90e2)
+H3: 13pt, Bold, Charcoal (#34495e)
+Paragraph: 11pt, 1.75 line spacing, Dark (#2c3e50)
+Code Block: 9pt, Consolas, Light gray background (#f5f5f5)
+Quote: 11pt, Blue left border, Light blue background (#eef2f7)
+```
+
+**Use Cases**:
+- Business proposals
+- Project reports
+- Meeting minutes
+- Company documentation
+- Formal correspondence
+
+**Example Usage**:
+
+```bash
+docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
+  report.md -o report.docx -p business --preset-dir /app/config/presets
+```
+
+---
+
 ## Comparison Table
 
 ### Visual Characteristics
 
-| Feature | minimal | default | technical |
-|---------|---------|---------|-----------|
-| **Font Family** | Serif | Serif | Sans-serif |
-| **Base Size** | 11pt | 11pt | 10pt |
-| **Colors** | B&W | Navy/Blue/Gray | Dark/Blue |
-| **H1 Borders** | No | Bottom | Bottom |
-| **Code Blocks** | Gray BG | Gray BG | Gray BG + Border |
-| **Quote Blocks** | Left Border | Left Border + BG | Left Border + BG |
+| Feature | minimal | default | technical | business |
+|---------|---------|---------|-----------|----------|
+| **Font Family** | Serif | Serif | Sans-serif | Serif |
+| **Base Size** | 10pt | 11pt | 10pt | 11pt |
+| **Colors** | B&W | Navy/Blue/Gray | GitHub Blue/Dark | Navy/Dark Blue |
+| **H1 Borders** | No | Bottom | Bottom | No |
+| **H2 Borders** | No | No | No | Bottom |
+| **Code Blocks** | Gray BG | Dark BG | GitHub Gray BG | Gray BG |
+| **Quote Blocks** | Left Border | Left Border | Left Border | Left Border + BG |
 
 ### Layout Characteristics
 
-| Feature | minimal | default | technical |
-|---------|---------|---------|-----------|
-| **Page Size** | A4 | A4 | A4 |
-| **Text Direction** | Horizontal | Horizontal | Horizontal |
-| **Margins** | Standard | Standard | Compact |
-| **Line Spacing** | 1.5x | 1.5x | 1.4x |
+| Feature | minimal | default | technical | business |
+|---------|---------|---------|-----------|----------|
+| **Page Size** | A4 | A4 | A4 | A4 |
+| **Text Direction** | Horizontal | Horizontal | Horizontal | Horizontal |
+| **Margins** | 2.54 cm | 2.5 cm | 2.5 cm | 3.0 cm (wide) |
+| **Line Spacing** | 1.25× | 1.5× | 1.6× | 1.75× |
 
 ### File Size (Approximate)
 
@@ -176,6 +220,7 @@ docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
 | minimal | ~12 KB |
 | default | ~14 KB |
 | technical | ~13 KB |
+| business | ~14 KB |
 
 *For a 10-page document with standard Markdown content
 
@@ -186,10 +231,13 @@ docker run --rm -v $(pwd):/workspace forest6511/md2docx:latest \
 ```
 Start Here
 │
-├─ Technical documentation?
+├─ Technical documentation or API docs?
 │  └─ Yes → technical
 │
-├─ Professional business document?
+├─ Formal business document?
+│  └─ Yes → business
+│
+├─ General-purpose document?
 │  └─ Yes → default
 │
 └─ Simple, minimal styling?
@@ -202,9 +250,11 @@ Start Here
 |---------------|-------------------|
 | Technical Documentation | technical |
 | API Reference | technical |
-| Business Proposal | default |
-| Meeting Minutes | default |
-| Project Report | default |
+| Software Manual | technical |
+| Business Proposal | business |
+| Meeting Minutes | business |
+| Project Report | business |
+| General Document | default |
 | Academic Paper | minimal |
 | Quick Note | minimal |
 

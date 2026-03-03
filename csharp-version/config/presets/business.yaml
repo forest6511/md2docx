@@ -1,208 +1,118 @@
-# Business Document Preset - For Business Documents
-# Professional style suitable for proposals, reports, meeting minutes, etc.
+# Business Document Preset - For proposals, reports, and meeting minutes
+SchemaVersion: "2.0"
 
-mode: business
+Metadata:
+  Name: "Business"
+  Description: "Professional styling for business documents: proposals, reports, meeting minutes"
+  Author: "md2docx"
+  Version: "1.0.0"
 
-page:
-  size: A4
-  orientation: portrait
-  margins:
-    top: 30mm
-    bottom: 30mm
-    left: 30mm
-    right: 25mm
+TextDirection: "Horizontal"
 
-font:
-  family: "游ゴシック"  # Yu Gothic (or "Calibri", "Arial")
-  size: 11pt
-  embed: false
+PageLayout:
+  Width: 21.0
+  Height: 29.7
+  MarginTop: 3.0
+  MarginBottom: 3.0
+  MarginLeft: 3.0
+  MarginRight: 2.5
 
-text_direction: horizontal
+Fonts:
+  Ascii: "Noto Serif"
+  EastAsia: "Noto Serif CJK JP"
+  DefaultSize: 11
 
-styles:
-  # Cover page title H1
-  h1:
-    size: 24pt
-    bold: true
-    color: "1a5490"
-    spacing_before: 48pt
-    spacing_after: 24pt
-    alignment: center
+TitlePage:
+  Enabled: false
+  PageBreakAfter: true
 
-  # Section title H2
-  h2:
-    size: 16pt
-    bold: true
-    color: "2e5c8a"
-    spacing_before: 18pt
-    spacing_after: 10pt
-    border:
-      bottom:
-        style: single
-        color: "4a90e2"
-        width: 3pt
-        space: 2pt
+TableOfContents:
+  Enabled: false
+  Depth: 3
 
-  # Subsection H3
-  h3:
-    size: 13pt
-    bold: true
-    color: "34495e"
-    spacing_before: 14pt
-    spacing_after: 7pt
-    border:
-      left:
-        style: thick
-        color: "7fb3d5"
-        width: 8pt
-        space: 4pt
-    indent:
-      left: 6mm
-
-  h4:
-    size: 12pt
-    bold: true
-    color: "5d6d7e"
-    spacing_before: 10pt
-    spacing_after: 5pt
-
-  # Body text
-  paragraph:
-    size: 11pt
-    line_spacing: 1.75
-    spacing_after: 8pt
-    alignment: both  # Justified
-    first_line_indent: 0pt
-
-  # Important paragraph (notes, etc.)
-  important_note:
-    background: "fff9e6"
-    border:
-      all: true
-      color: "f39c12"
-      width: 2pt
-    padding:
-      all: 5mm
-    spacing_before: 12pt
-    spacing_after: 12pt
-
-  # Data table
-  table_header:
-    background: "2c3e50"
-    bold: true
-    size: 10pt
-    color: "ffffff"
-    alignment: center
-    border:
-      all: true
-      color: "34495e"
-      width: 1.5pt
-    padding:
-      top: 3mm
-      bottom: 3mm
-      left: 3mm
-      right: 3mm
-
-  table_cell:
-    background: "ffffff"
-    size: 10pt
-    border:
-      all: true
-      color: "95a5a6"
-      width: 0.5pt
-    padding:
-      all: 2.5mm
-    alignment: left
-
-  # Alternating row color
-  table_cell_alt:
-    background: "f8f9fa"
-    size: 10pt
-    border:
-      all: true
-      color: "95a5a6"
-      width: 0.5pt
-    padding:
-      all: 2.5mm
-
-  # Code block (for technical specifications)
-  code_block:
-    background: "f5f5f5"
-    font: "Consolas"
-    size: 9pt
-    color: "333333"
-    border:
-      all: true
-      color: "dddddd"
-      width: 1pt
-    padding:
-      all: 4mm
-    spacing_before: 10pt
-    spacing_after: 10pt
-
-  # Quote (reference information)
-  blockquote:
-    background: "eef2f7"
-    color: "5d6d7e"
-    border:
-      left:
-        style: thick
-        color: "3498db"
-        width: 10pt
-        space: 4pt
-    padding_left: 8mm
-    padding_top: 3mm
-    padding_bottom: 3mm
-    spacing_before: 10pt
-    spacing_after: 10pt
-    italic: false
-
-  # Bullet list
-  list_bullet:
-    size: 11pt
-    bullet_char: "■"  # Square
-    spacing_before: 3pt
-    spacing_after: 3pt
-    indent: 8mm
-
-  # Numbered list
-  list_numbered:
-    size: 11pt
-    numbering_format: decimal
-    spacing_before: 3pt
-    spacing_after: 3pt
-    indent: 8mm
-
-# Header settings
-header:
-  enabled: true
-  content:
-    left: "{company_name}"
-    right: "{document_date}"
-  font_size: 9pt
-  color: "7f8c8d"
-  border:
-    bottom:
-      style: single
-      color: "bdc3c7"
-      width: 0.5pt
-
-# Footer settings
-footer:
-  enabled: true
-  page_number:
-    enabled: true
-    format: "Page {page} / {total}"
-    alignment: center
-  font_size: 9pt
-  color: "7f8c8d"
-  border:
-    top:
-      style: single
-      color: "bdc3c7"
-      width: 0.5pt
-
-# Metadata
-metadata:
-  category: "Business Document"
-  template: "business"
+Styles:
+  H1:
+    Size: 24
+    Bold: true
+    Color: "1a5490"
+    ShowBorder: false
+    SpaceBefore: "960"
+    SpaceAfter: "480"
+  H2:
+    Size: 16
+    Bold: true
+    Color: "2e5c8a"
+    ShowBorder: true
+    BorderColor: "4a90e2"
+    BorderSize: 16
+    BorderSpace: 2
+    SpaceBefore: "360"
+    SpaceAfter: "200"
+  H3:
+    Size: 13
+    Bold: true
+    Color: "34495e"
+    ShowBorder: false
+    SpaceBefore: "280"
+    SpaceAfter: "140"
+  H4:
+    Size: 12
+    Bold: true
+    Color: "5d6d7e"
+    ShowBorder: false
+    SpaceBefore: "200"
+    SpaceAfter: "100"
+  H5:
+    Size: 11
+    Bold: true
+    Color: "5d6d7e"
+    ShowBorder: false
+    SpaceBefore: "160"
+    SpaceAfter: "80"
+  H6:
+    Size: 11
+    Bold: false
+    Color: "7f8c8d"
+    ShowBorder: false
+    SpaceBefore: "120"
+    SpaceAfter: "60"
+  Paragraph:
+    Size: 11
+    Color: "2c3e50"
+    LineSpacing: "420"
+    FirstLineIndent: "0"
+    LeftIndent: "0"
+  List:
+    Size: 11
+    Color: "2c3e50"
+    LeftIndent: "720"
+    HangingIndent: "360"
+    SpaceBefore: "60"
+    SpaceAfter: "60"
+  CodeBlock:
+    Size: 9
+    Color: "333333"
+    BackgroundColor: "f5f5f5"
+    BorderColor: "dddddd"
+    MonospaceFontAscii: "Consolas"
+    MonospaceFontEastAsia: "Noto Sans Mono CJK JP"
+    LineSpacing: "240"
+    SpaceBefore: "200"
+    SpaceAfter: "200"
+    BorderSpace: 4
+  Quote:
+    Size: 11
+    Color: "5d6d7e"
+    Italic: false
+    ShowBorder: true
+    BorderColor: "3498db"
+    BorderSize: 20
+    BorderSpace: 0
+    BackgroundColor: "eef2f7"
+    LeftIndent: "720"
+    SpaceBefore: "200"
+    SpaceAfter: "200"
+    PaddingSpace: 4
+  Image:
+    MaxWidthPercent: 90
+    Alignment: "center"
