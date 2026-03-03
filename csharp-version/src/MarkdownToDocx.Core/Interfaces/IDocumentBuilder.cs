@@ -16,11 +16,11 @@ public interface IDocumentBuilder : IDisposable
     void AddHeading(int level, string text, HeadingStyle style);
 
     /// <summary>
-    /// Adds a paragraph to the document
+    /// Adds a paragraph to the document with inline formatting support
     /// </summary>
-    /// <param name="text">Paragraph text content</param>
+    /// <param name="runs">Structured inline runs (bold, italic, code) extracted from the paragraph</param>
     /// <param name="style">Paragraph style configuration</param>
-    void AddParagraph(string text, ParagraphStyle style);
+    void AddParagraph(IReadOnlyList<InlineRun> runs, ParagraphStyle style);
 
     /// <summary>
     /// Adds a list (ordered or unordered) to the document

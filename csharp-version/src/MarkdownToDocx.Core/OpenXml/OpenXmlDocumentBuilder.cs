@@ -623,18 +623,36 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     }
 
     /// <inheritdoc/>
-    public void AddParagraph(string text, ParagraphStyle style)
+    public void AddParagraph(IReadOnlyList<InlineRun> runs, ParagraphStyle style)
     {
-        ArgumentNullException.ThrowIfNull(text);
+        ArgumentNullException.ThrowIfNull(runs);
         ArgumentNullException.ThrowIfNull(style);
 
         var paragraph = _body.AppendChild(new Paragraph());
         var paragraphProps = CreateParagraphProperties(style);
         paragraph.AppendChild(paragraphProps);
 
-        var run = paragraph.AppendChild(new Run());
-        run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color));
-        run.AppendChild(new Text(text) { Space = SpaceProcessingModeValues.Preserve });
+        foreach (var inlineRun in runs)
+        {
+            var run = paragraph.AppendChild(new Run());
+            var runProps = CreateBaseRunProperties(
+                style.FontSize,
+                style.Color,
+                bold: inlineRun.Bold,
+                italic: inlineRun.IsCode ? false : inlineRun.Italic);
+
+            if (inlineRun.IsCode)
+            {
+                runProps.AppendChild(new RunFonts
+                {
+                    Ascii = "Courier New",
+                    EastAsia = "Noto Sans Mono CJK JP"
+                });
+            }
+
+            run.AppendChild(runProps);
+            run.AppendChild(new Text(inlineRun.Text) { Space = SpaceProcessingModeValues.Preserve });
+        }
     }
 
     /// <summary>

@@ -180,7 +180,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
-            .WithParameterName("text");
+            .WithParameterName("runs");
     }
 
     [Fact]
@@ -190,7 +190,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
 
         // Act
-        Action act = () => builder.AddParagraph("Test", null!);
+        Action act = () => builder.AddParagraph(ToRuns("Test"), null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -205,7 +205,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         var style = CreateDefaultParagraphStyle();
 
         // Act
-        builder.AddParagraph("Test paragraph content.", style);
+        builder.AddParagraph(ToRuns("Test paragraph content."), style);
         builder.Save();
 
         // Assert
@@ -215,6 +215,61 @@ public class OpenXmlDocumentBuilderTests : IDisposable
             .Descendants<Text>()
             .Select(t => t.Text));
         textContent.Should().Contain("Test paragraph content.");
+    }
+
+    [Fact]
+    public void AddParagraph_WithBoldRun_ShouldRenderBoldText()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultParagraphStyle();
+        var runs = new List<InlineRun>
+        {
+            new InlineRun { Text = "Challenge" },
+            new InlineRun { Text = ": " },
+            new InlineRun { Text = "important", Bold = true }
+        };
+
+        // Act
+        builder.AddParagraph(runs, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var allRuns = paragraph.Elements<Run>().ToList();
+        allRuns.Should().HaveCount(3);
+        allRuns[2].RunProperties?.Bold.Should().NotBeNull();
+        var textContent = string.Join("", paragraph.Descendants<Text>().Select(t => t.Text));
+        textContent.Should().Contain("important");
+    }
+
+    [Fact]
+    public void AddParagraph_WithCodeRun_ShouldRenderMonospaceFont()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultParagraphStyle();
+        var runs = new List<InlineRun>
+        {
+            new InlineRun { Text = "Run " },
+            new InlineRun { Text = "claude --help", IsCode = true }
+        };
+
+        // Act
+        builder.AddParagraph(runs, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var allRuns = paragraph.Elements<Run>().ToList();
+        allRuns.Should().HaveCount(2);
+        var codeRunFonts = allRuns[1].RunProperties?.RunFonts;
+        codeRunFonts.Should().NotBeNull();
+        codeRunFonts!.Ascii!.Value.Should().Be("Courier New");
     }
 
     [Fact]
@@ -654,7 +709,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     {
         // Arrange
         using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
-        builder.AddParagraph("Test content", CreateDefaultParagraphStyle());
+        builder.AddParagraph(ToRuns("Test content"), CreateDefaultParagraphStyle());
 
         // Act
         builder.Save();
@@ -697,7 +752,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         using var builder = new OpenXmlDocumentBuilder(_stream, _verticalProvider);
 
         // Act
-        builder.AddParagraph("Vertical text test", CreateDefaultParagraphStyle());
+        builder.AddParagraph(ToRuns("Vertical text test"), CreateDefaultParagraphStyle());
         builder.Save();
 
         // Assert
@@ -718,7 +773,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
 
         // Act
         builder.AddHeading(1, "Main Title", CreateDefaultHeadingStyle());
-        builder.AddParagraph("Introduction paragraph.", CreateDefaultParagraphStyle());
+        builder.AddParagraph(ToRuns("Introduction paragraph."), CreateDefaultParagraphStyle());
         builder.AddHeading(2, "Section 1", CreateDefaultHeadingStyle());
         builder.AddList(new List<CoreListItem>
         {
@@ -1666,6 +1721,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         textContent.Should().Contain("Minimal quote");
     }
 
+    [Fact]
     public void AddQuote_WithBoldRun_ShouldRenderBoldText()
     {
         // Arrange

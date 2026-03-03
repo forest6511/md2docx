@@ -3,6 +3,7 @@ using FluentAssertions;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MarkdownToDocx.Core.Markdown;
+using MarkdownToDocx.Core.Models;
 using MarkdownToDocx.Core.OpenXml;
 using MarkdownToDocx.Core.TextDirection;
 using MarkdownToDocx.Styling.Configuration;
@@ -85,7 +86,7 @@ var x = 42;
                     if (!string.IsNullOrWhiteSpace(text))
                     {
                         var style = _styleApplicator.ApplyParagraphStyle(config.Styles);
-                        builder.AddParagraph(text, style);
+                        builder.AddParagraph(ToRuns(text), style);
                     }
                 }
             }
@@ -148,7 +149,7 @@ Sample vertical text content for testing Japanese tategaki layout.
                     if (!string.IsNullOrWhiteSpace(text))
                     {
                         var style = _styleApplicator.ApplyParagraphStyle(config.Styles);
-                        builder.AddParagraph(text, style);
+                        builder.AddParagraph(ToRuns(text), style);
                     }
                 }
             }
@@ -211,6 +212,9 @@ Sample vertical text content for testing Japanese tategaki layout.
         }
         return string.Empty;
     }
+
+    private static List<InlineRun> ToRuns(string text) =>
+        new List<InlineRun> { new InlineRun { Text = text } };
 
     private static string ExtractInlineText(Inline? inline)
     {
