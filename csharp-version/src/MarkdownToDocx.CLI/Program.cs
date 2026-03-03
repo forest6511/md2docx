@@ -96,14 +96,7 @@ try
                     if (Helpers.IsStandaloneImage(paragraph, out var imagePath, out var imageAltText))
                     {
                         // Resolve image path relative to the input Markdown file directory
-                        if (!Path.IsPathRooted(imagePath))
-                        {
-                            var inputDir = Path.GetDirectoryName(Path.GetFullPath(options.InputPath));
-                            if (inputDir != null)
-                            {
-                                imagePath = Path.GetFullPath(Path.Combine(inputDir, imagePath));
-                            }
-                        }
+                        imagePath = Helpers.ResolveRelativePath(imagePath, options.InputPath);
 
                         var imageStyle = styleApplicator.ApplyImageStyle(config.Styles);
                         builder.AddImage(imagePath, imageAltText, imageStyle);
