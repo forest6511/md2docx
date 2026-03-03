@@ -39,11 +39,11 @@ public interface IDocumentBuilder : IDisposable
     void AddCodeBlock(string code, string? language, CodeBlockStyle style);
 
     /// <summary>
-    /// Adds a quote block to the document
+    /// Adds a quote block to the document with inline formatting support
     /// </summary>
-    /// <param name="text">Quote text content</param>
+    /// <param name="runs">Structured inline runs (bold, italic, code) extracted from the quote block</param>
     /// <param name="style">Quote style configuration</param>
-    void AddQuote(string text, QuoteStyle style);
+    void AddQuote(IReadOnlyList<InlineRun> runs, QuoteStyle style);
 
     /// <summary>
     /// Adds a title page with a cover image to the document.

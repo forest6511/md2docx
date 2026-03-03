@@ -151,28 +151,59 @@ public static class Helpers
         return imagePath != null;
     }
 
-    public static string GetQuoteText(object block)
+    public static IReadOnlyList<InlineRun> GetQuoteRuns(object block)
     {
+        var runs = new List<InlineRun>();
+
         if (block is QuoteBlock quoteBlock)
         {
-            var sb = new StringBuilder();
+            bool firstParagraph = true;
 
             foreach (var child in quoteBlock)
             {
                 if (child is ParagraphBlock paragraph && paragraph.Inline != null)
                 {
-                    var text = ExtractInlineText(paragraph.Inline);
-                    if (!string.IsNullOrWhiteSpace(text))
-                    {
-                        if (sb.Length > 0) sb.AppendLine();
-                        sb.Append(text);
-                    }
+                    if (!firstParagraph)
+                        runs.Add(new InlineRun { Text = " " });
+
+                    ExtractInlineRuns(paragraph.Inline, runs, bold: false, italic: false);
+                    firstParagraph = false;
                 }
             }
-
-            return sb.ToString();
         }
 
-        return string.Empty;
+        return runs;
+    }
+
+    private static void ExtractInlineRuns(Inline? inline, List<InlineRun> runs, bool bold, bool italic)
+    {
+        if (inline == null) return;
+
+        if (inline is EmphasisInline emphasis)
+        {
+            bool isBold = emphasis.DelimiterCount >= 2;
+            bool isItalic = emphasis.DelimiterCount == 1 || emphasis.DelimiterCount == 3;
+            foreach (var child in emphasis)
+                ExtractInlineRuns(child, runs, bold || isBold, italic || isItalic);
+        }
+        else if (inline is ContainerInline container)
+        {
+            foreach (var child in container)
+                ExtractInlineRuns(child, runs, bold, italic);
+        }
+        else if (inline is LiteralInline literal)
+        {
+            var text = literal.Content.ToString();
+            if (!string.IsNullOrEmpty(text))
+                runs.Add(new InlineRun { Text = text, Bold = bold, Italic = italic });
+        }
+        else if (inline is CodeInline code)
+        {
+            runs.Add(new InlineRun { Text = code.Content, IsCode = true });
+        }
+        else if (inline is LineBreakInline)
+        {
+            runs.Add(new InlineRun { Text = " " });
+        }
     }
 }
