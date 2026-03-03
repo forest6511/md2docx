@@ -328,12 +328,12 @@ public sealed class QuoteStyleConfig
     /// <summary>
     /// Spacing before quote block in twips (1/20 of a point)
     /// </summary>
-    public string SpaceBefore { get; init; } = "240";
+    public string SpaceBefore { get; init; } = "120";
 
     /// <summary>
     /// Spacing after quote block in twips (1/20 of a point)
     /// </summary>
-    public string SpaceAfter { get; init; } = "240";
+    public string SpaceAfter { get; init; } = "120";
 }
 
 /// <summary>
