@@ -116,7 +116,8 @@ try
                     var items = Helpers.GetListItems(list);
                     var isOrdered = list.IsOrdered;
                     var listStyle = styleApplicator.ApplyListStyle(config.Styles);
-                    builder.AddList(items, isOrdered, listStyle);
+                    var startNumber = int.TryParse(list.OrderedStart, out var parsed) ? parsed : 1;
+                    builder.AddList(items, isOrdered, listStyle, startNumber);
                     break;
 
                 case QuoteBlock quote:
