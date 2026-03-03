@@ -188,11 +188,11 @@ Styles:
   Paragraph:
     Size: 11                    # Font size
     Color: "2c3e50"            # Text color
-    LineSpacing: "360"          # Line spacing (twips)
+    LineSpacing: "360"          # Line spacing (twips: 240=1.0, 360=1.5, 480=2.0)
     FirstLineIndent: "0"        # First line indent (twips)
     LeftIndent: "0"             # Left indent (twips)
-    SpaceBefore: "0"            # Space before
-    SpaceAfter: "180"           # Space after
+    InlineCodeFontAscii: "Courier New"          # Inline code font (ASCII)
+    InlineCodeFontEastAsia: "Noto Sans Mono CJK JP"  # Inline code font (East Asian)
 ```
 
 **Line Spacing Examples**:
@@ -262,12 +262,16 @@ Styles:
     Italic: true                # Italic text
     ShowBorder: true            # Display left border
     BorderColor: "3498db"       # Border color
-    BorderSize: 16              # Border thickness
-    BorderPosition: "left"      # Border position
-    LeftIndent: "720"           # Left indent
-    BackgroundColor: "f8f9fa"   # Background color
-    SpaceBefore: "300"          # Space before
-    SpaceAfter: "300"           # Space after
+    BorderSize: 16              # Border thickness (eighths of a point: 16=2pt, 24=3pt)
+    BorderSpace: 0              # Space between border line and text (points)
+    BorderPosition: "left"      # Border position (left/right/top/bottom)
+    BackgroundColor: "f8f9fa"   # Background color (optional)
+    LeftIndent: "720"           # Left indent (twips)
+    SpaceBefore: "300"          # Space before (twips)
+    SpaceAfter: "300"           # Space after (twips)
+    PaddingSpace: 0             # Internal padding when BackgroundColor is set (points)
+    InlineCodeFontAscii: "Courier New"          # Inline code font (ASCII)
+    InlineCodeFontEastAsia: "Noto Sans Mono CJK JP"  # Inline code font (East Asian)
 ```
 
 ## Creating Custom Presets

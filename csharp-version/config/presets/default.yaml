@@ -1,140 +1,116 @@
-# Default Preset - Standard conversion style
-# Balanced settings for general-purpose Markdown to Word conversion
+# Default Preset - Balanced general-purpose Markdown to Word conversion
+SchemaVersion: "2.0"
 
-mode: standard
+Metadata:
+  Name: "Default"
+  Description: "Balanced settings for general-purpose Markdown to Word conversion"
+  Author: "md2docx"
+  Version: "1.0.0"
 
-page:
-  size: A4
-  orientation: portrait
-  margins:
-    top: 25mm
-    bottom: 25mm
-    left: 25mm
-    right: 25mm
+TextDirection: "Horizontal"
 
-font:
-  family: "游明朝"  # Yu Mincho (or "Arial", "Times New Roman")
-  size: 11pt
-  embed: false
+PageLayout:
+  Width: 21.0
+  Height: 29.7
+  MarginTop: 2.5
+  MarginBottom: 2.5
+  MarginLeft: 2.5
+  MarginRight: 2.5
 
-text_direction: horizontal
+Fonts:
+  Ascii: "Noto Serif"
+  EastAsia: "Noto Serif CJK JP"
+  DefaultSize: 11
 
-styles:
-  h1:
-    size: 20pt
-    bold: true
-    color: "2c3e50"
-    spacing_before: 18pt
-    spacing_after: 12pt
-    border:
-      bottom:
-        style: single
-        color: "3498db"
-        width: 4pt
-        space: 2pt
+TitlePage:
+  Enabled: false
+  PageBreakAfter: true
 
-  h2:
-    size: 16pt
-    bold: true
-    color: "34495e"
-    spacing_before: 14pt
-    spacing_after: 8pt
+TableOfContents:
+  Enabled: false
+  Depth: 3
 
-  h3:
-    size: 14pt
-    bold: true
-    color: "5d6d7e"
-    spacing_before: 12pt
-    spacing_after: 6pt
-
-  h4:
-    size: 12pt
-    bold: true
-    color: "7f8c8d"
-    spacing_before: 10pt
-    spacing_after: 5pt
-
-  h5:
-    size: 11pt
-    bold: true
-    spacing_before: 8pt
-    spacing_after: 4pt
-
-  h6:
-    size: 11pt
-    bold: false
-    italic: true
-    spacing_before: 6pt
-    spacing_after: 3pt
-
-  paragraph:
-    size: 11pt
-    line_spacing: 1.5
-    spacing_after: 6pt
-    alignment: left
-
-  table_header:
-    background: "ecf0f1"
-    bold: true
-    size: 11pt
-    alignment: center
-    border:
-      all: true
-      color: "95a5a6"
-      width: 1pt
-
-  table_cell:
-    background: "ffffff"
-    size: 11pt
-    border:
-      all: true
-      color: "bdc3c7"
-      width: 0.5pt
-    padding:
-      all: 2mm
-
-  code_block:
-    background: "2c3e50"
-    font: "Consolas"
-    size: 9pt
-    color: "ecf0f1"
-    border:
-      all: true
-      color: "34495e"
-      width: 1pt
-    padding:
-      all: 4mm
-    spacing_before: 8pt
-    spacing_after: 8pt
-
-  code_inline:
-    background: "ecf0f1"
-    font: "Consolas"
-    size: 10pt
-    color: "e74c3c"
-
-  blockquote:
-    background: "f9f9f9"
-    italic: true
-    color: "7f8c8d"
-    border:
-      left:
-        style: thick
-        color: "3498db"
-        width: 12pt
-        space: 4pt
-    padding_left: 10mm
-    spacing_before: 8pt
-    spacing_after: 8pt
-
-  list_bullet:
-    size: 11pt
-    bullet_char: "•"
-    spacing_before: 2pt
-    spacing_after: 2pt
-
-  list_numbered:
-    size: 11pt
-    numbering_format: decimal
-    spacing_before: 2pt
-    spacing_after: 2pt
+Styles:
+  H1:
+    Size: 20
+    Bold: true
+    Color: "2c3e50"
+    ShowBorder: true
+    BorderColor: "3498db"
+    BorderSize: 24
+    BorderSpace: 4
+    SpaceBefore: "360"
+    SpaceAfter: "240"
+  H2:
+    Size: 16
+    Bold: true
+    Color: "34495e"
+    ShowBorder: false
+    SpaceBefore: "280"
+    SpaceAfter: "160"
+  H3:
+    Size: 14
+    Bold: true
+    Color: "5d6d7e"
+    ShowBorder: false
+    SpaceBefore: "240"
+    SpaceAfter: "120"
+  H4:
+    Size: 12
+    Bold: true
+    Color: "7f8c8d"
+    ShowBorder: false
+    SpaceBefore: "200"
+    SpaceAfter: "100"
+  H5:
+    Size: 11
+    Bold: true
+    Color: "7f8c8d"
+    ShowBorder: false
+    SpaceBefore: "160"
+    SpaceAfter: "80"
+  H6:
+    Size: 11
+    Bold: false
+    Color: "95a5a6"
+    ShowBorder: false
+    SpaceBefore: "120"
+    SpaceAfter: "60"
+  Paragraph:
+    Size: 11
+    Color: "2c3e50"
+    LineSpacing: "360"
+    FirstLineIndent: "0"
+    LeftIndent: "0"
+  List:
+    Size: 11
+    Color: "2c3e50"
+    LeftIndent: "720"
+    HangingIndent: "360"
+    SpaceBefore: "40"
+    SpaceAfter: "40"
+  CodeBlock:
+    Size: 9
+    Color: "ecf0f1"
+    BackgroundColor: "2c3e50"
+    BorderColor: "34495e"
+    MonospaceFontAscii: "Consolas"
+    MonospaceFontEastAsia: "Noto Sans Mono CJK JP"
+    LineSpacing: "280"
+    SpaceBefore: "160"
+    SpaceAfter: "160"
+    BorderSpace: 4
+  Quote:
+    Size: 11
+    Color: "7f8c8d"
+    Italic: true
+    ShowBorder: true
+    BorderColor: "3498db"
+    BorderSize: 24
+    BorderSpace: 0
+    LeftIndent: "720"
+    SpaceBefore: "160"
+    SpaceAfter: "160"
+  Image:
+    MaxWidthPercent: 90
+    Alignment: "center"
