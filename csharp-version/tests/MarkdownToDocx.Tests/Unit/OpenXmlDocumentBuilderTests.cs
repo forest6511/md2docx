@@ -380,6 +380,81 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     }
 
     [Fact]
+    public void AddCodeBlock_SingleLine_ShouldNotHaveTrailingBreaks()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultCodeBlockStyle();
+
+        // Act - simulate Markdig output: trailing \r\n sequences after code content
+        builder.AddCodeBlock("touch CLAUDE.md", null, style);
+        builder.Save();
+
+        // Assert: only one Text element with the actual content, no trailing Break elements
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Descendants<Paragraph>().First();
+        var run = paragraph.Elements<Run>().First();
+
+        var texts = run.Elements<Text>().ToList();
+        var breaks = run.Elements<Break>().ToList();
+
+        texts.Should().HaveCount(1);
+        texts[0].Text.Should().Be("touch CLAUDE.md");
+        breaks.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AddCodeBlock_WithTrailingCrLf_ShouldStripTrailingNewlines()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultCodeBlockStyle();
+
+        // Act - code string ending with \r\n\r\n as produced by AppendLine + Markdig trailing lines
+        builder.AddCodeBlock("line1\r\nline2", null, style);
+        builder.Save();
+
+        // Assert: two Text elements (line1, line2), one Break between them, no trailing Break
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Descendants<Paragraph>().First();
+        var run = paragraph.Elements<Run>().First();
+
+        var texts = run.Elements<Text>().ToList();
+        var breaks = run.Elements<Break>().ToList();
+
+        texts.Should().HaveCount(2);
+        texts[0].Text.Should().Be("line1");
+        texts[1].Text.Should().Be("line2");
+        breaks.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void AddCodeBlock_MultiLine_ShouldNotHaveTrailingBreaks()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultCodeBlockStyle();
+
+        // Act
+        builder.AddCodeBlock("line1\nline2\nline3", null, style);
+        builder.Save();
+
+        // Assert: 3 Text elements, 2 Break elements (between lines only)
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Descendants<Paragraph>().First();
+        var run = paragraph.Elements<Run>().First();
+
+        var texts = run.Elements<Text>().ToList();
+        var breaks = run.Elements<Break>().ToList();
+
+        texts.Should().HaveCount(3);
+        breaks.Should().HaveCount(2);
+    }
+
+    [Fact]
     public void AddQuote_WithNullText_ShouldThrowArgumentNullException()
     {
         // Arrange

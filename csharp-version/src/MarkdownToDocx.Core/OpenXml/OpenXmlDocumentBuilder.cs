@@ -735,7 +735,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         var lines = code.Split('\n');
         for (int i = 0; i < lines.Length; i++)
         {
-            run.AppendChild(new Text(lines[i]) { Space = SpaceProcessingModeValues.Preserve });
+            run.AppendChild(new Text(lines[i].TrimEnd('\r')) { Space = SpaceProcessingModeValues.Preserve });
             if (i < lines.Length - 1)
             {
                 run.AppendChild(new Break());

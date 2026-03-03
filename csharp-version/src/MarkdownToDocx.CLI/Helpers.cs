@@ -103,7 +103,7 @@ public static class Helpers
                 if (sb.Length > 0) sb.AppendLine();
                 sb.Append(line.Slice.ToString());
             }
-            return sb.ToString();
+            return sb.ToString().TrimEnd('\r', '\n');
         }
 
         return string.Empty;
