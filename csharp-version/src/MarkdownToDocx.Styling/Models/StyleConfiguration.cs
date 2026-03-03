@@ -142,6 +142,12 @@ public sealed class HeadingStyleConfig
     /// Left margin indent in twips (1/20 of a point). Null or omitted means no indentation.
     /// </summary>
     public string? LeftIndent { get; init; }
+
+    /// <summary>
+    /// When set, suppresses PageBreakBefore if the immediately preceding block is a heading
+    /// at the specified level (e.g., set to 1 on H2 to prevent a page break after H1).
+    /// </summary>
+    public int? SuppressPageBreakIfPrevHeadingLevel { get; init; }
 }
 
 /// <summary>

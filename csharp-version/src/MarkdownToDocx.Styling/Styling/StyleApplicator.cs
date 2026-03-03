@@ -47,7 +47,8 @@ public sealed class StyleApplicator : IStyleApplicator
             SpaceBefore = headingConfig.SpaceBefore,
             SpaceAfter = headingConfig.SpaceAfter,
             BorderExtent = headingConfig.BorderExtent,
-            LeftIndent = headingConfig.LeftIndent
+            LeftIndent = headingConfig.LeftIndent,
+            SuppressPageBreakIfPrevHeadingLevel = headingConfig.SuppressPageBreakIfPrevHeadingLevel
         };
     }
 

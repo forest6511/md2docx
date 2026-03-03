@@ -522,6 +522,41 @@ public class StyleApplicatorTests
         style.LeftIndent.Should().BeNull();
     }
 
+    [Fact]
+    public void ApplyHeadingStyle_WithSuppressPageBreakIfPrevHeadingLevel_ShouldMapCorrectly()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            H2 = new HeadingStyleConfig
+            {
+                Size = 18,
+                Bold = true,
+                Color = "000000",
+                ShowBorder = false,
+                PageBreakBefore = true,
+                SuppressPageBreakIfPrevHeadingLevel = 1
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyHeadingStyle(2, config);
+
+        // Assert
+        style.SuppressPageBreakIfPrevHeadingLevel.Should().Be(1);
+        style.PageBreakBefore.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ApplyHeadingStyle_WithDefaultSuppressPageBreak_ShouldBeNull()
+    {
+        // Act
+        var style = _applicator.ApplyHeadingStyle(1, _testConfig);
+
+        // Assert
+        style.SuppressPageBreakIfPrevHeadingLevel.Should().BeNull();
+    }
+
     private static StyleConfiguration CreateTestConfiguration()
     {
         return new StyleConfiguration

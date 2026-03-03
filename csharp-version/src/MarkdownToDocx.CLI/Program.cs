@@ -66,6 +66,7 @@ try
         var tocStyle = styleApplicator.ApplyTableOfContentsStyle(config);
         builder.AddTableOfContents(tocStyle);
 
+        Block? prevBlock = null;
         foreach (var block in document)
         {
             // Use pattern matching for type-safe block processing
@@ -75,6 +76,12 @@ try
                 case HeadingBlock heading:
                     var headingText = Helpers.GetBlockText(heading);
                     var headingStyle = styleApplicator.ApplyHeadingStyle(heading.Level, config.Styles);
+                    if (headingStyle.SuppressPageBreakIfPrevHeadingLevel.HasValue
+                        && prevBlock is HeadingBlock prevH
+                        && prevH.Level == headingStyle.SuppressPageBreakIfPrevHeadingLevel.Value)
+                    {
+                        headingStyle = headingStyle with { PageBreakBefore = false };
+                    }
                     builder.AddHeading(heading.Level, headingText, headingStyle);
                     break;
 
@@ -130,6 +137,7 @@ try
                     builder.AddThematicBreak();
                     break;
             }
+            prevBlock = block;
         }
 
         builder.Save();
