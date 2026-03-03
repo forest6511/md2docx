@@ -601,7 +601,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         }
 
         // Indentation
-        if (!string.IsNullOrEmpty(style.LeftIndent) && style.LeftIndent != "0")
+        if (!string.IsNullOrEmpty(style.LeftIndent))
         {
             props.AppendChild(new Indentation { Left = style.LeftIndent });
         }

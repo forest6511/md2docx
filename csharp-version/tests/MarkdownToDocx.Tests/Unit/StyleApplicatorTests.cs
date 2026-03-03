@@ -496,13 +496,13 @@ public class StyleApplicatorTests
     }
 
     [Fact]
-    public void ApplyHeadingStyle_WithDefaultLeftIndent_ShouldBeZero()
+    public void ApplyHeadingStyle_WithDefaultLeftIndent_ShouldBeNull()
     {
         // Act
         var style = _applicator.ApplyHeadingStyle(1, _testConfig);
 
         // Assert
-        style.LeftIndent.Should().Be("0");
+        style.LeftIndent.Should().BeNull();
     }
 
     private static StyleConfiguration CreateTestConfiguration()

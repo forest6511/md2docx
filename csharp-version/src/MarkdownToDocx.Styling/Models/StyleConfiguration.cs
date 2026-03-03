@@ -139,9 +139,9 @@ public sealed class HeadingStyleConfig
     public string BorderExtent { get; init; } = "paragraph";
 
     /// <summary>
-    /// Left margin indent in twips (1/20 of a point)
+    /// Left margin indent in twips (1/20 of a point). Null or omitted means no indentation.
     /// </summary>
-    public string LeftIndent { get; init; } = "0";
+    public string? LeftIndent { get; init; }
 }
 
 /// <summary>
