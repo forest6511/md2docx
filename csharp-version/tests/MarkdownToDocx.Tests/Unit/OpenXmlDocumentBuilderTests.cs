@@ -1960,6 +1960,88 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     }
 
     [Fact]
+    public void AddParagraph_WithCodeRun_ShouldUseConfiguredFont()
+    {
+        // Verifies that InlineCodeFontAscii/EastAsia is driven by ParagraphStyle, not hardcoded.
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new ParagraphStyle
+        {
+            FontSize = 22,
+            Color = "333333",
+            LineSpacing = "360",
+            FirstLineIndent = "0",
+            LeftIndent = "0",
+            InlineCodeFontAscii = "Consolas",
+            InlineCodeFontEastAsia = "MS Gothic"
+        };
+        var runs = new List<InlineRun>
+        {
+            new InlineRun { Text = "git status", IsCode = true }
+        };
+
+        // Act
+        builder.AddParagraph(runs, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var codeRunFonts = paragraph.Elements<Run>().First().RunProperties?.RunFonts;
+        codeRunFonts.Should().NotBeNull();
+        codeRunFonts!.Ascii!.Value.Should().Be("Consolas");
+        codeRunFonts!.EastAsia!.Value.Should().Be("MS Gothic");
+    }
+
+    [Fact]
+    public void AddQuote_WithCodeRun_ShouldUseConfiguredFont()
+    {
+        // Verifies that InlineCodeFontAscii/EastAsia is driven by QuoteStyle, not hardcoded.
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new QuoteStyle
+        {
+            FontSize = 22,
+            Color = "555555",
+            ShowBorder = false,
+            InlineCodeFontAscii = "JetBrains Mono",
+            InlineCodeFontEastAsia = "Noto Sans Mono CJK JP"
+        };
+        var runs = new List<InlineRun>
+        {
+            new InlineRun { Text = "fmt.Println()", IsCode = true }
+        };
+
+        // Act
+        builder.AddQuote(runs, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var codeRunFonts = paragraph.Elements<Run>().First().RunProperties?.RunFonts;
+        codeRunFonts.Should().NotBeNull();
+        codeRunFonts!.Ascii!.Value.Should().Be("JetBrains Mono");
+        codeRunFonts!.EastAsia!.Value.Should().Be("Noto Sans Mono CJK JP");
+    }
+
+    [Fact]
+    public void CoreStyleRecords_WithSameProperties_ShouldBeEqual()
+    {
+        // Verifies that new InlineCodeFont properties participate in record equality.
+        var p1 = new ParagraphStyle { InlineCodeFontAscii = "Consolas" };
+        var p2 = new ParagraphStyle { InlineCodeFontAscii = "Consolas" };
+        p1.Should().Be(p2);
+
+        var q1 = new QuoteStyle { InlineCodeFontAscii = "Consolas" };
+        var q2 = new QuoteStyle { InlineCodeFontAscii = "Consolas" };
+        q1.Should().Be(q2);
+
+        var q3 = new QuoteStyle { InlineCodeFontAscii = "Other" };
+        q1.Should().NotBe(q3);
+    }
+
+    [Fact]
     public void AddHeading_WithLeftIndentAndBorderExtentText_ShouldRenderIndentationOnMainParagraph()
     {
         // Arrange

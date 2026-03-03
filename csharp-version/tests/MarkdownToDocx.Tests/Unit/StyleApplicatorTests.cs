@@ -557,6 +557,65 @@ public class StyleApplicatorTests
         style.SuppressPageBreakIfPrevHeadingLevel.Should().BeNull();
     }
 
+    [Fact]
+    public void ApplyParagraphStyle_ShouldMapInlineCodeFont()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            Paragraph = new ParagraphStyleConfig
+            {
+                Size = 11,
+                Color = "000000",
+                InlineCodeFontAscii = "Consolas",
+                InlineCodeFontEastAsia = "MS Gothic"
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyParagraphStyle(config);
+
+        // Assert
+        style.InlineCodeFontAscii.Should().Be("Consolas");
+        style.InlineCodeFontEastAsia.Should().Be("MS Gothic");
+    }
+
+    [Fact]
+    public void ApplyQuoteStyle_ShouldMapInlineCodeFont()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            Quote = new QuoteStyleConfig
+            {
+                Size = 11,
+                Color = "555555",
+                InlineCodeFontAscii = "Consolas",
+                InlineCodeFontEastAsia = "MS Gothic"
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyQuoteStyle(config);
+
+        // Assert
+        style.InlineCodeFontAscii.Should().Be("Consolas");
+        style.InlineCodeFontEastAsia.Should().Be("MS Gothic");
+    }
+
+    [Fact]
+    public void StyleConfigurationRecords_WithSameProperties_ShouldBeEqual()
+    {
+        // Verifies that class→record conversion preserves value equality semantics.
+        new StyleConfiguration().Should().Be(new StyleConfiguration());
+        new HeadingStyleConfig().Should().Be(new HeadingStyleConfig());
+        new ParagraphStyleConfig().Should().Be(new ParagraphStyleConfig());
+        new ListStyleConfig().Should().Be(new ListStyleConfig());
+        new CodeBlockStyleConfig().Should().Be(new CodeBlockStyleConfig());
+        new QuoteStyleConfig().Should().Be(new QuoteStyleConfig());
+        new ImageStyleConfig().Should().Be(new ImageStyleConfig());
+    }
+
     private static StyleConfiguration CreateTestConfiguration()
     {
         return new StyleConfiguration
