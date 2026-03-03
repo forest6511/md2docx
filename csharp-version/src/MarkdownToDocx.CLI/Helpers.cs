@@ -151,6 +151,14 @@ public static class Helpers
         return imagePath != null;
     }
 
+    public static IReadOnlyList<InlineRun> GetParagraphRuns(ParagraphBlock paragraph)
+    {
+        var runs = new List<InlineRun>();
+        if (paragraph.Inline != null)
+            ExtractInlineRuns(paragraph.Inline, runs, bold: false, italic: false);
+        return runs;
+    }
+
     public static IReadOnlyList<InlineRun> GetQuoteRuns(object block)
     {
         var runs = new List<InlineRun>();

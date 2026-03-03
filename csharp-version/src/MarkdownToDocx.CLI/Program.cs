@@ -110,11 +110,11 @@ try
                     }
                     else
                     {
-                        var paragraphText = Helpers.GetBlockText(paragraph);
-                        if (!string.IsNullOrWhiteSpace(paragraphText))
+                        var paragraphRuns = Helpers.GetParagraphRuns(paragraph);
+                        if (paragraphRuns.Count > 0)
                         {
                             var paragraphStyle = styleApplicator.ApplyParagraphStyle(config.Styles);
-                            builder.AddParagraph(paragraphText, paragraphStyle);
+                            builder.AddParagraph(paragraphRuns, paragraphStyle);
                         }
                     }
                     break;
