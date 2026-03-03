@@ -1636,7 +1636,6 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         textContent.Should().Contain("Minimal quote");
     }
 
-    [Fact]
     public void AddQuote_WithBoldRun_ShouldRenderBoldText()
     {
         // Arrange
@@ -1692,6 +1691,73 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         var codeRunFonts = allRuns[1].RunProperties?.RunFonts;
         codeRunFonts.Should().NotBeNull();
         codeRunFonts!.Ascii!.Value.Should().Be("Courier New");
+    }
+
+    [Fact]
+    public void AddQuote_WithPaddingSpaceAndBackground_ShouldRenderInvisiblePaddingBorders()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new QuoteStyle
+        {
+            FontSize = 22,
+            Color = "555555",
+            Italic = false,
+            ShowBorder = true,
+            BorderPosition = "left",
+            BorderColor = "3498db",
+            BorderSize = 24,
+            BackgroundColor = "f0f4f8",
+            LeftIndent = "720",
+            SpaceBefore = "120",
+            SpaceAfter = "120",
+            PaddingSpace = 4
+        };
+
+        // Act
+        builder.AddQuote(ToRuns("Padded quote"), style);
+        builder.Save();
+
+        // Assert: top/right/bottom invisible borders should be present with background color
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var borders = paragraph.ParagraphProperties?.ParagraphBorders;
+        borders.Should().NotBeNull();
+        borders!.GetFirstChild<TopBorder>()!.Space!.Value.Should().Be(4U);
+        borders.GetFirstChild<TopBorder>()!.Color!.Value.Should().Be("f0f4f8");
+        borders.GetFirstChild<RightBorder>()!.Space!.Value.Should().Be(4U);
+        borders.GetFirstChild<BottomBorder>()!.Space!.Value.Should().Be(4U);
+        // Left border should remain the visible border
+        borders.GetFirstChild<LeftBorder>()!.Color!.Value.Should().Be("3498db");
+    }
+
+    [Fact]
+    public void AddQuote_WithPaddingSpaceButNoBackground_ShouldNotRenderPaddingBorders()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = new QuoteStyle
+        {
+            FontSize = 22,
+            Color = "555555",
+            ShowBorder = false,
+            BackgroundColor = null,
+            LeftIndent = "720",
+            SpaceBefore = "120",
+            SpaceAfter = "120",
+            PaddingSpace = 4  // should be ignored without background
+        };
+
+        // Act
+        builder.AddQuote(ToRuns("No padding without background"), style);
+        builder.Save();
+
+        // Assert: no borders rendered when ShowBorder=false and no BackgroundColor
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        paragraph.ParagraphProperties?.ParagraphBorders.Should().BeNull();
     }
 
     [Fact]

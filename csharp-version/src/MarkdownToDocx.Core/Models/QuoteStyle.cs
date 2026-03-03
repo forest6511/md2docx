@@ -64,4 +64,12 @@ public sealed record QuoteStyle
     /// Space after quote in twips
     /// </summary>
     public string SpaceAfter { get; init; } = "120";
+
+    /// <summary>
+    /// Internal padding on top, right, and bottom in points.
+    /// Creates invisible borders matching the background color to produce
+    /// spacing between the background fill and the text content.
+    /// Only effective when BackgroundColor is set.
+    /// </summary>
+    public uint PaddingSpace { get; init; } = 0;
 }

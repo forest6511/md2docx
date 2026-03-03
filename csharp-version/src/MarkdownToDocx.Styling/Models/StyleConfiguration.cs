@@ -334,6 +334,12 @@ public sealed class QuoteStyleConfig
     /// Spacing after quote block in twips (1/20 of a point)
     /// </summary>
     public string SpaceAfter { get; init; } = "120";
+
+    /// <summary>
+    /// Internal padding on top, right, and bottom in points (default: 0 = no padding).
+    /// Only effective when BackgroundColor is set.
+    /// </summary>
+    public uint PaddingSpace { get; init; } = 0;
 }
 
 /// <summary>
