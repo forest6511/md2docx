@@ -27,8 +27,7 @@ public sealed class StyleApplicator : IStyleApplicator
             3 => config.H3,
             4 => config.H4,
             5 => config.H5,
-            6 => config.H6,
-            _ => throw new ArgumentOutOfRangeException(nameof(level))
+            _ => config.H6  // level == 6, guaranteed by guard clause above
         };
 
         return new HeadingStyle
@@ -63,7 +62,9 @@ public sealed class StyleApplicator : IStyleApplicator
             Color = config.Paragraph.Color,
             LineSpacing = config.Paragraph.LineSpacing,
             FirstLineIndent = config.Paragraph.FirstLineIndent,
-            LeftIndent = config.Paragraph.LeftIndent
+            LeftIndent = config.Paragraph.LeftIndent,
+            InlineCodeFontAscii = config.Paragraph.InlineCodeFontAscii,
+            InlineCodeFontEastAsia = config.Paragraph.InlineCodeFontEastAsia
         };
     }
 
@@ -122,7 +123,9 @@ public sealed class StyleApplicator : IStyleApplicator
             LeftIndent = config.Quote.LeftIndent,
             SpaceBefore = config.Quote.SpaceBefore,
             SpaceAfter = config.Quote.SpaceAfter,
-            PaddingSpace = config.Quote.PaddingSpace
+            PaddingSpace = config.Quote.PaddingSpace,
+            InlineCodeFontAscii = config.Quote.InlineCodeFontAscii,
+            InlineCodeFontEastAsia = config.Quote.InlineCodeFontEastAsia
         };
     }
 
@@ -155,6 +158,17 @@ public sealed class StyleApplicator : IStyleApplicator
         };
     }
 
+    /// <summary>
+    /// Resolves a potentially relative path against the directory of a base file.
+    /// Absolute paths are returned unchanged.
+    /// </summary>
+    private static string ResolveRelativePath(string path, string basePath)
+    {
+        if (Path.IsPathRooted(path)) return path;
+        var baseDir = Path.GetDirectoryName(Path.GetFullPath(basePath));
+        return baseDir != null ? Path.GetFullPath(Path.Combine(baseDir, path)) : path;
+    }
+
     /// <inheritdoc/>
     public TitlePageStyle ApplyTitlePageStyle(ConversionConfiguration config, string inputFilePath, string? coverImageOverride = null)
     {
@@ -173,14 +187,7 @@ public sealed class StyleApplicator : IStyleApplicator
         }
 
         // Resolve relative path against input file directory
-        if (!Path.IsPathRooted(imagePath))
-        {
-            var inputDirectory = Path.GetDirectoryName(Path.GetFullPath(inputFilePath));
-            if (inputDirectory != null)
-            {
-                imagePath = Path.GetFullPath(Path.Combine(inputDirectory, imagePath));
-            }
-        }
+        imagePath = ResolveRelativePath(imagePath, inputFilePath);
 
         return new TitlePageStyle
         {

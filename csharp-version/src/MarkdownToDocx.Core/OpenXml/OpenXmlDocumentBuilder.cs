@@ -41,9 +41,17 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         _paragraphConfig = textDirection.GetParagraphConfiguration();
         _document = WordprocessingDocument.Create(outputStream, WordprocessingDocumentType.Document);
 
-        InitializeDocument();
-        _body = _document.MainDocumentPart?.Document?.Body
-            ?? throw new InvalidOperationException("Failed to initialize document structure");
+        try
+        {
+            InitializeDocument();
+            _body = _document.MainDocumentPart?.Document?.Body
+                ?? throw new InvalidOperationException("Failed to initialize document structure");
+        }
+        catch
+        {
+            _document.Dispose();
+            throw;
+        }
     }
 
     /// <summary>
@@ -143,6 +151,13 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     }
 
     /// <summary>
+    /// Applies monospace font settings to RunProperties for inline code spans.
+    /// Centralises the font assignment used by both AddParagraph and AddQuote.
+    /// </summary>
+    private static void ApplyInlineCodeFont(RunProperties runProps, string asciiFont, string eastAsiaFont) =>
+        runProps.AppendChild(new RunFonts { Ascii = asciiFont, EastAsia = eastAsiaFont });
+
+    /// <summary>
     /// Creates a background shading element
     /// </summary>
     private static Shading CreateBackgroundShading(string fillColor) => new()
@@ -174,7 +189,12 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         }
 
         props.AppendChild(new FontSize { Val = fontSize.ToString(CultureInfo.InvariantCulture) });
-        props.AppendChild(new Color { Val = color });
+
+        // Guard against empty color strings from YAML configs that omit the color field
+        if (!string.IsNullOrEmpty(color))
+        {
+            props.AppendChild(new Color { Val = color });
+        }
 
         return props;
     }
@@ -643,11 +663,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
 
             if (inlineRun.IsCode)
             {
-                runProps.AppendChild(new RunFonts
-                {
-                    Ascii = "Courier New",
-                    EastAsia = "Noto Sans Mono CJK JP"
-                });
+                ApplyInlineCodeFont(runProps, style.InlineCodeFontAscii, style.InlineCodeFontEastAsia);
             }
 
             run.AppendChild(runProps);
@@ -812,11 +828,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
 
             if (inlineRun.IsCode)
             {
-                runProps.AppendChild(new RunFonts
-                {
-                    Ascii = "Courier New",
-                    EastAsia = "Noto Sans Mono CJK JP"
-                });
+                ApplyInlineCodeFont(runProps, style.InlineCodeFontAscii, style.InlineCodeFontEastAsia);
             }
 
             run.AppendChild(runProps);
@@ -916,6 +928,17 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     public void Save()
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
+
+        // OOXML spec §17.6.17: SectionProperties must be the last child of Body.
+        // Content added via Add* methods appends after the initially placed SectionProperties,
+        // so we re-anchor it here at save time.
+        var sectionProps = _body.GetFirstChild<SectionProperties>();
+        if (sectionProps != null)
+        {
+            sectionProps.Remove();
+            _body.AppendChild(sectionProps);
+        }
+
         _document.Save();
     }
 

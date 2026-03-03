@@ -29,4 +29,14 @@ public sealed record ParagraphStyle
     /// Left indentation in twips
     /// </summary>
     public string LeftIndent { get; init; } = "0";
+
+    /// <summary>
+    /// Monospace font family for inline code (ASCII characters)
+    /// </summary>
+    public string InlineCodeFontAscii { get; init; } = "Courier New";
+
+    /// <summary>
+    /// Monospace font family for inline code (East Asian characters)
+    /// </summary>
+    public string InlineCodeFontEastAsia { get; init; } = "Noto Sans Mono CJK JP";
 }

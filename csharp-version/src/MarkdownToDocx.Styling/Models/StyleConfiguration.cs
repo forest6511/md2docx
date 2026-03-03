@@ -3,7 +3,7 @@ namespace MarkdownToDocx.Styling.Models;
 /// <summary>
 /// Style configuration for all document elements
 /// </summary>
-public sealed class StyleConfiguration
+public sealed record StyleConfiguration
 {
     /// <summary>
     /// Style configuration for H1 headings
@@ -64,7 +64,7 @@ public sealed class StyleConfiguration
 /// <summary>
 /// Style configuration for heading elements (H1-H6)
 /// </summary>
-public sealed class HeadingStyleConfig
+public sealed record HeadingStyleConfig
 {
     /// <summary>
     /// Font size in points (pt)
@@ -153,7 +153,7 @@ public sealed class HeadingStyleConfig
 /// <summary>
 /// Style configuration for paragraph text
 /// </summary>
-public sealed class ParagraphStyleConfig
+public sealed record ParagraphStyleConfig
 {
     /// <summary>
     /// Font size in points (pt)
@@ -179,12 +179,22 @@ public sealed class ParagraphStyleConfig
     /// Left margin indent in twips (1/20 of a point)
     /// </summary>
     public string LeftIndent { get; init; } = "0";
+
+    /// <summary>
+    /// Monospace font family for inline code (ASCII characters)
+    /// </summary>
+    public string InlineCodeFontAscii { get; init; } = "Courier New";
+
+    /// <summary>
+    /// Monospace font family for inline code (East Asian characters)
+    /// </summary>
+    public string InlineCodeFontEastAsia { get; init; } = "Noto Sans Mono CJK JP";
 }
 
 /// <summary>
 /// Style configuration for list items (ordered and unordered)
 /// </summary>
-public sealed class ListStyleConfig
+public sealed record ListStyleConfig
 {
     /// <summary>
     /// Font size in points (pt). Defaults to 10pt to prevent invisible text
@@ -221,7 +231,7 @@ public sealed class ListStyleConfig
 /// <summary>
 /// Style configuration for code blocks (fenced code blocks)
 /// </summary>
-public sealed class CodeBlockStyleConfig
+public sealed record CodeBlockStyleConfig
 {
     /// <summary>
     /// Font size in points (pt)
@@ -279,7 +289,7 @@ public sealed class CodeBlockStyleConfig
 /// <summary>
 /// Style configuration for quote blocks (blockquotes)
 /// </summary>
-public sealed class QuoteStyleConfig
+public sealed record QuoteStyleConfig
 {
     /// <summary>
     /// Font size in points (pt)
@@ -346,12 +356,22 @@ public sealed class QuoteStyleConfig
     /// Only effective when BackgroundColor is set.
     /// </summary>
     public uint PaddingSpace { get; init; } = 0;
+
+    /// <summary>
+    /// Monospace font family for inline code (ASCII characters)
+    /// </summary>
+    public string InlineCodeFontAscii { get; init; } = "Courier New";
+
+    /// <summary>
+    /// Monospace font family for inline code (East Asian characters)
+    /// </summary>
+    public string InlineCodeFontEastAsia { get; init; } = "Noto Sans Mono CJK JP";
 }
 
 /// <summary>
 /// Style configuration for inline images
 /// </summary>
-public sealed class ImageStyleConfig
+public sealed record ImageStyleConfig
 {
     /// <summary>
     /// Maximum width of the image as a percentage of the printable area (1-100).

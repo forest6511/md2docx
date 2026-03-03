@@ -8,20 +8,13 @@ namespace MarkdownToDocx.CLI;
 
 public static class Helpers
 {
-    public static int GetHeadingLevel(object block)
-    {
-        if (block is HeadingBlock heading)
-        {
-            return heading.Level;
-        }
-        return 1;
-    }
+    public static int GetHeadingLevel(HeadingBlock heading) => heading.Level;
 
-    public static string GetBlockText(object block)
+    public static string GetBlockText(LeafBlock block)
     {
-        if (block is LeafBlock leafBlock && leafBlock.Inline != null)
+        if (block.Inline != null)
         {
-            return ExtractInlineText(leafBlock.Inline);
+            return ExtractInlineText(block.Inline);
         }
         return string.Empty;
     }
@@ -55,68 +48,53 @@ public static class Helpers
         return sb.ToString();
     }
 
-    public static IEnumerable<ListItem> GetListItems(object block)
+    public static IEnumerable<ListItem> GetListItems(ListBlock block)
     {
         var items = new List<ListItem>();
 
-        if (block is ListBlock listBlock)
+        foreach (var item in block)
         {
-            foreach (var item in listBlock)
+            if (item is ListItemBlock listItem)
             {
-                if (item is ListItemBlock listItem)
-                {
-                    var sb = new StringBuilder();
+                var sb = new StringBuilder();
 
-                    // ListItemBlock contains child blocks (usually ParagraphBlocks)
-                    foreach (var child in listItem)
+                // ListItemBlock contains child blocks (usually ParagraphBlocks)
+                foreach (var child in listItem)
+                {
+                    if (child is ParagraphBlock paragraph && paragraph.Inline != null)
                     {
-                        if (child is ParagraphBlock paragraph && paragraph.Inline != null)
+                        var text = ExtractInlineText(paragraph.Inline);
+                        if (!string.IsNullOrWhiteSpace(text))
                         {
-                            var text = ExtractInlineText(paragraph.Inline);
-                            if (!string.IsNullOrWhiteSpace(text))
-                            {
-                                if (sb.Length > 0) sb.Append(' ');
-                                sb.Append(text);
-                            }
+                            if (sb.Length > 0) sb.Append(' ');
+                            sb.Append(text);
                         }
                     }
-
-                    if (sb.Length > 0)
-                    {
-                        items.Add(new ListItem { Text = sb.ToString() });
-                    }
                 }
+
+                if (sb.Length > 0)
+                {
+                    items.Add(new ListItem { Text = sb.ToString() });
+                }
+                // Items with no extractable text (e.g. image-only) are intentionally skipped
             }
         }
 
         return items;
     }
 
-    public static string GetCodeBlockText(object block)
+    public static string GetCodeBlockText(FencedCodeBlock fencedCode)
     {
-        if (block is FencedCodeBlock fencedCode)
+        var sb = new StringBuilder();
+        foreach (var line in fencedCode.Lines.Lines)
         {
-            // Extract text from Lines property
-            var sb = new StringBuilder();
-            foreach (var line in fencedCode.Lines.Lines)
-            {
-                if (sb.Length > 0) sb.AppendLine();
-                sb.Append(line.Slice.ToString());
-            }
-            return sb.ToString().TrimEnd('\r', '\n');
+            if (sb.Length > 0) sb.Append('\n');
+            sb.Append(line.Slice.ToString());
         }
-
-        return string.Empty;
+        return sb.ToString().TrimEnd('\r', '\n');
     }
 
-    public static string? GetCodeBlockLanguage(object block)
-    {
-        if (block is FencedCodeBlock fencedCode)
-        {
-            return fencedCode.Info;
-        }
-        return null;
-    }
+    public static string? GetCodeBlockLanguage(FencedCodeBlock fencedCode) => fencedCode.Info;
 
     /// <summary>
     /// Returns true when a ParagraphBlock contains a single standalone image inline.
@@ -159,28 +137,35 @@ public static class Helpers
         return runs;
     }
 
-    public static IReadOnlyList<InlineRun> GetQuoteRuns(object block)
+    public static IReadOnlyList<InlineRun> GetQuoteRuns(QuoteBlock block)
     {
         var runs = new List<InlineRun>();
+        bool firstParagraph = true;
 
-        if (block is QuoteBlock quoteBlock)
+        foreach (var child in block)
         {
-            bool firstParagraph = true;
-
-            foreach (var child in quoteBlock)
+            if (child is ParagraphBlock paragraph && paragraph.Inline != null)
             {
-                if (child is ParagraphBlock paragraph && paragraph.Inline != null)
-                {
-                    if (!firstParagraph)
-                        runs.Add(new InlineRun { Text = " " });
+                if (!firstParagraph)
+                    runs.Add(new InlineRun { Text = " " });
 
-                    ExtractInlineRuns(paragraph.Inline, runs, bold: false, italic: false);
-                    firstParagraph = false;
-                }
+                ExtractInlineRuns(paragraph.Inline, runs, bold: false, italic: false);
+                firstParagraph = false;
             }
         }
 
         return runs;
+    }
+
+    /// <summary>
+    /// Resolves a potentially relative path against the directory of a base file.
+    /// Absolute paths are returned unchanged.
+    /// </summary>
+    public static string ResolveRelativePath(string path, string basePath)
+    {
+        if (Path.IsPathRooted(path)) return path;
+        var baseDir = Path.GetDirectoryName(Path.GetFullPath(basePath));
+        return baseDir != null ? Path.GetFullPath(Path.Combine(baseDir, path)) : path;
     }
 
     private static void ExtractInlineRuns(Inline? inline, List<InlineRun> runs, bool bold, bool italic)
