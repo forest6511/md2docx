@@ -455,7 +455,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     }
 
     [Fact]
-    public void AddQuote_WithNullText_ShouldThrowArgumentNullException()
+    public void AddQuote_WithNullRuns_ShouldThrowArgumentNullException()
     {
         // Arrange
         using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
@@ -465,7 +465,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
-            .WithParameterName("text");
+            .WithParameterName("runs");
     }
 
     [Fact]
@@ -475,7 +475,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
 
         // Act
-        Action act = () => builder.AddQuote("Test quote", null!);
+        Action act = () => builder.AddQuote(ToRuns("Test quote"), null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -490,7 +490,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         var style = CreateDefaultQuoteStyle();
 
         // Act
-        builder.AddQuote("This is a quoted text.", style);
+        builder.AddQuote(ToRuns("This is a quoted text."), style);
         builder.Save();
 
         // Assert
@@ -696,7 +696,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
             new CoreListItem { Text = "Point 2" }
         }, false, CreateDefaultListStyle());
         builder.AddCodeBlock("var example = true;", "csharp", CreateDefaultCodeBlockStyle());
-        builder.AddQuote("Important note", CreateDefaultQuoteStyle());
+        builder.AddQuote(ToRuns("Important note"), CreateDefaultQuoteStyle());
         builder.AddThematicBreak();
         builder.Save();
 
@@ -1561,7 +1561,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote("Quote without border", style);
+        builder.AddQuote(ToRuns("Quote without border"), style);
         builder.Save();
 
         // Assert
@@ -1593,7 +1593,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote("Quote with background", style);
+        builder.AddQuote(ToRuns("Quote with background"), style);
         builder.Save();
 
         // Assert
@@ -1623,7 +1623,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote("Minimal quote", style);
+        builder.AddQuote(ToRuns("Minimal quote"), style);
         builder.Save();
 
         // Assert
@@ -1634,6 +1634,64 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         paragraph.ParagraphProperties?.Shading.Should().BeNull();
         var textContent = string.Join("", paragraph.Descendants<Text>().Select(t => t.Text));
         textContent.Should().Contain("Minimal quote");
+    }
+
+    [Fact]
+    public void AddQuote_WithBoldRun_ShouldRenderBoldText()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultQuoteStyle();
+        var runs = new List<InlineRun>
+        {
+            new InlineRun { Text = "normal " },
+            new InlineRun { Text = "bold", Bold = true },
+            new InlineRun { Text = " text" }
+        };
+
+        // Act
+        builder.AddQuote(runs, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var allRuns = paragraph.Elements<Run>().ToList();
+        allRuns.Should().HaveCount(3);
+        allRuns[1].RunProperties?.Bold.Should().NotBeNull();
+        var textContent = string.Join("", paragraph.Descendants<Text>().Select(t => t.Text));
+        textContent.Should().Contain("normal ");
+        textContent.Should().Contain("bold");
+        textContent.Should().Contain(" text");
+    }
+
+    [Fact]
+    public void AddQuote_WithCodeRun_ShouldRenderMonospaceFont()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultQuoteStyle();
+        var runs = new List<InlineRun>
+        {
+            new InlineRun { Text = "Use " },
+            new InlineRun { Text = "code()", IsCode = true },
+            new InlineRun { Text = " here" }
+        };
+
+        // Act
+        builder.AddQuote(runs, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
+        var allRuns = paragraph.Elements<Run>().ToList();
+        allRuns.Should().HaveCount(3);
+        var codeRunFonts = allRuns[1].RunProperties?.RunFonts;
+        codeRunFonts.Should().NotBeNull();
+        codeRunFonts!.Ascii!.Value.Should().Be("Courier New");
     }
 
     [Fact]
@@ -1851,4 +1909,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         SpaceBefore = "120",
         SpaceAfter = "120"
     };
+
+    private static List<InlineRun> ToRuns(string text) =>
+        new List<InlineRun> { new InlineRun { Text = text } };
 }

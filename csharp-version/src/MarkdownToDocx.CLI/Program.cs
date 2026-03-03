@@ -120,9 +120,9 @@ try
                     break;
 
                 case QuoteBlock quote:
-                    var quoteText = Helpers.GetQuoteText(quote);
+                    var quoteRuns = Helpers.GetQuoteRuns(quote);
                     var quoteStyle = styleApplicator.ApplyQuoteStyle(config.Styles);
-                    builder.AddQuote(quoteText, quoteStyle);
+                    builder.AddQuote(quoteRuns, quoteStyle);
                     break;
 
                 case ThematicBreakBlock:
