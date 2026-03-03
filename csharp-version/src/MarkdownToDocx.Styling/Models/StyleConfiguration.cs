@@ -137,6 +137,11 @@ public sealed class HeadingStyleConfig
     /// "text": border hugs text only, using spacer paragraphs for spacing.
     /// </summary>
     public string BorderExtent { get; init; } = "paragraph";
+
+    /// <summary>
+    /// Left margin indent in twips (1/20 of a point)
+    /// </summary>
+    public string LeftIndent { get; init; } = "0";
 }
 
 /// <summary>
