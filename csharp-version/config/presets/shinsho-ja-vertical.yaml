@@ -18,7 +18,7 @@ PageLayout:
   MarginTop: 1.2
   MarginBottom: 1.2
   MarginLeft: 1.27  # inner (binding) margin
-  MarginRight: 0.64 # outer margin
+  MarginRight: 1.27 # outer margin
   MarginHeader: 0.7
   MarginFooter: 0.7
   MirrorMargins: true
@@ -105,6 +105,7 @@ Styles:
     SpaceBefore: "80"
     SpaceAfter: "80"
     BorderSpace: 4
+    WordWrap: true
   Quote:
     Size: 8
     Color: "555555"
