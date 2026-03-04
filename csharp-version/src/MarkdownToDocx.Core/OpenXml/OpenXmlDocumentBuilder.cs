@@ -803,6 +803,16 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         // Background shading
         props.AppendChild(CreateBackgroundShading(style.BackgroundColor));
 
+        // Indentation: left/right borders use w:space (points) as external gap toward the margin.
+        // Without indentation the border extends space points outside the text area into the margin,
+        // causing visible overflow on narrow outer margins (e.g. MirrorMargins with 1.27 cm outer).
+        // Adding indent equal to BorderSpace * 20 twips anchors the border at the margin boundary.
+        if (style.BorderSpace > 0)
+        {
+            string indentTwips = (style.BorderSpace * 20).ToString();
+            props.AppendChild(new Indentation { Left = indentTwips, Right = indentTwips });
+        }
+
         // Spacing
         props.AppendChild(new SpacingBetweenLines
         {
@@ -901,8 +911,14 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
             props.AppendChild(CreateBackgroundShading(style.BackgroundColor));
         }
 
-        // Indentation
-        props.AppendChild(new Indentation { Left = style.LeftIndent });
+        // Indentation: right padding border extends PaddingSpace points outside the right text
+        // boundary into the margin. Add matching right indent to anchor the border at the margin.
+        var indentation = new Indentation { Left = style.LeftIndent };
+        if (hasPadding && style.PaddingSpace > 0)
+        {
+            indentation.Right = (style.PaddingSpace * 20).ToString();
+        }
+        props.AppendChild(indentation);
 
         // Spacing
         props.AppendChild(new SpacingBetweenLines

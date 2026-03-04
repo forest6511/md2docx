@@ -586,6 +586,110 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     }
 
     [Fact]
+    public void AddCodeBlock_WithBorderSpace_ShouldAddMatchingIndentation()
+    {
+        // Arrange: BorderSpace = 4 pt → indent must be 4 * 20 = 80 twips on both sides
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultCodeBlockStyle() with { BorderSpace = 4 };
+
+        // Act
+        builder.AddCodeBlock("var x = 42;", null, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        var indent = paragraph.ParagraphProperties!.GetFirstChild<Indentation>();
+        indent.Should().NotBeNull("Indentation must be added when BorderSpace > 0");
+        indent!.Left?.Value.Should().Be("80");
+        indent!.Right?.Value.Should().Be("80");
+    }
+
+    [Fact]
+    public void AddCodeBlock_WithZeroBorderSpace_ShouldNotAddIndentation()
+    {
+        // Arrange: default BorderSpace = 0 → no indentation added
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultCodeBlockStyle() with { BorderSpace = 0 };
+
+        // Act
+        builder.AddCodeBlock("var x = 42;", null, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        paragraph.ParagraphProperties!
+            .GetFirstChild<Indentation>()
+            .Should().BeNull("No Indentation should be added when BorderSpace = 0");
+    }
+
+    [Fact]
+    public void AddQuote_WithPaddingSpaceAndBackground_ShouldAddRightIndentation()
+    {
+        // Arrange: PaddingSpace = 4 pt → right indent must be 4 * 20 = 80 twips
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultQuoteStyle() with
+        {
+            BackgroundColor = "f0f0f0",
+            PaddingSpace = 4,
+            LeftIndent = "560"
+        };
+
+        // Act
+        builder.AddQuote(ToRuns("test"), style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        var indent = paragraph.ParagraphProperties!.GetFirstChild<Indentation>();
+        indent.Should().NotBeNull();
+        indent!.Left?.Value.Should().Be("560");
+        indent!.Right?.Value.Should().Be("80", "right indent = PaddingSpace * 20 twips prevents right border overflow");
+    }
+
+    [Fact]
+    public void AddQuote_WithoutPaddingSpace_ShouldNotAddRightIndentation()
+    {
+        // Arrange: PaddingSpace = 0 or no background → no right indent
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultQuoteStyle() with
+        {
+            BackgroundColor = null,
+            PaddingSpace = 0,
+            LeftIndent = "720"
+        };
+
+        // Act
+        builder.AddQuote(ToRuns("test"), style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        var indent = paragraph.ParagraphProperties!.GetFirstChild<Indentation>();
+        indent.Should().NotBeNull();
+        indent!.Right.Should().BeNull("no right indentation when PaddingSpace = 0");
+    }
+
+    [Fact]
     public void AddQuote_WithNullRuns_ShouldThrowArgumentNullException()
     {
         // Arrange
