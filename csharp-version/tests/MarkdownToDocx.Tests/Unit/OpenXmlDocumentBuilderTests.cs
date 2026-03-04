@@ -540,6 +540,52 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     }
 
     [Fact]
+    public void AddCodeBlock_WithWordWrapEnabled_ShouldAddWordWrapElement()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultCodeBlockStyle() with { WordWrap = true };
+
+        // Act
+        builder.AddCodeBlock("var x = 42;", null, style);
+        builder.Save();
+
+        // Assert: paragraph properties must contain a WordWrap element
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        paragraph.ParagraphProperties!
+            .GetFirstChild<WordWrap>()
+            .Should().NotBeNull("WordWrap element should be present when WordWrap = true");
+    }
+
+    [Fact]
+    public void AddCodeBlock_WithWordWrapDisabled_ShouldNotAddWordWrapElement()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultCodeBlockStyle() with { WordWrap = false };
+
+        // Act
+        builder.AddCodeBlock("var x = 42;", null, style);
+        builder.Save();
+
+        // Assert: paragraph properties must NOT contain a WordWrap element
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        paragraph.ParagraphProperties!
+            .GetFirstChild<WordWrap>()
+            .Should().BeNull("WordWrap element should not be present when WordWrap = false");
+    }
+
+    [Fact]
     public void AddQuote_WithNullRuns_ShouldThrowArgumentNullException()
     {
         // Arrange

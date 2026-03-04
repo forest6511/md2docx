@@ -812,6 +812,12 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
             LineRule = LineSpacingRuleValues.Auto
         });
 
+        // Word wrap
+        if (style.WordWrap)
+        {
+            props.AppendChild(new WordWrap());
+        }
+
         return props;
     }
 

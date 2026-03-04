@@ -284,6 +284,13 @@ public sealed record CodeBlockStyleConfig
     /// Reducing this value makes single-line code blocks appear more compact.
     /// </summary>
     public uint BorderSpace { get; init; } = 4;
+
+    /// <summary>
+    /// When true, enables word wrap for code block paragraphs.
+    /// Prevents long lines from overflowing narrow print areas (e.g., KDP paperback).
+    /// Defaults to false to preserve standard code block rendering.
+    /// </summary>
+    public bool WordWrap { get; init; } = false;
 }
 
 /// <summary>
