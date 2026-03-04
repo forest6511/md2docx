@@ -1,0 +1,120 @@
+# 5.5x8.5 inch English non-fiction preset (139.7x215.9mm)
+# Suitable for: non-fiction, textbooks, academic books
+# Inner margin (MarginLeft) assumes ~300-500 pages; adjust for page count
+SchemaVersion: "2.0"
+
+Metadata:
+  Name: "5.5x8.5 English Non-fiction"
+  Description: "5.5x8.5 inch (139.7x215.9mm) horizontal layout for English non-fiction and textbooks"
+  Author: "md2docx"
+  Version: "1.0.0"
+
+TextDirection: "Horizontal"
+
+PageLayout:
+  Width: 13.97     # 5.5 inches
+  Height: 21.59    # 8.5 inches
+  MarginTop: 1.59
+  MarginBottom: 1.59
+  MarginLeft: 1.59  # inner (binding) margin
+  MarginRight: 0.64 # outer margin
+  MarginHeader: 1.0
+  MarginFooter: 1.0
+  MirrorMargins: true
+
+Fonts:
+  Ascii: "Noto Serif"
+  EastAsia: "Noto Serif"
+  DefaultSize: 11
+
+TitlePage:
+  Enabled: false
+  PageBreakAfter: true
+
+TableOfContents:
+  Enabled: true
+  Depth: 2
+  PageBreakAfter: true
+
+Styles:
+  H1:
+    Size: 20
+    Bold: true
+    Color: "1a1a1a"
+    ShowBorder: false
+    PageBreakBefore: true
+    SpaceBefore: "440"
+    SpaceAfter: "220"
+  H2:
+    Size: 15
+    Bold: true
+    Color: "1a1a1a"
+    ShowBorder: false
+    SpaceBefore: "320"
+    SpaceAfter: "160"
+  H3:
+    Size: 13
+    Bold: true
+    Color: "333333"
+    ShowBorder: false
+    SpaceBefore: "260"
+    SpaceAfter: "130"
+  H4:
+    Size: 12
+    Bold: true
+    Color: "444444"
+    ShowBorder: false
+    SpaceBefore: "200"
+    SpaceAfter: "100"
+  H5:
+    Size: 11
+    Bold: true
+    Color: "555555"
+    ShowBorder: false
+    SpaceBefore: "160"
+    SpaceAfter: "80"
+  H6:
+    Size: 11
+    Bold: false
+    Color: "666666"
+    ShowBorder: false
+    SpaceBefore: "120"
+    SpaceAfter: "60"
+  Paragraph:
+    Size: 11
+    Color: "1a1a1a"
+    LineSpacing: "330"
+    FirstLineIndent: "0"
+    LeftIndent: "0"
+  List:
+    Size: 11
+    Color: "1a1a1a"
+    LeftIndent: "720"
+    HangingIndent: "360"
+    SpaceBefore: "40"
+    SpaceAfter: "40"
+  CodeBlock:
+    Size: 8
+    Color: "333333"
+    BackgroundColor: "f5f5f5"
+    BorderColor: "cccccc"
+    MonospaceFontAscii: "Consolas"
+    MonospaceFontEastAsia: "Noto Sans Mono CJK JP"
+    LineSpacing: "250"
+    SpaceBefore: "150"
+    SpaceAfter: "150"
+    BorderSpace: 4
+  Quote:
+    Size: 11
+    Color: "555555"
+    Italic: true
+    ShowBorder: true
+    BorderColor: "888888"
+    BorderSize: 16
+    BorderSpace: 0
+    LeftIndent: "720"
+    SpaceBefore: "150"
+    SpaceAfter: "150"
+  Image:
+    MaxWidthPercent: 90
+    Alignment: "center"

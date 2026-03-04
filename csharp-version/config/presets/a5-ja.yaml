@@ -1,0 +1,120 @@
+# A5 Japanese non-fiction preset (148x210mm)
+# Suitable for: tech books, business books, how-to guides
+# Inner margin (MarginLeft) assumes ~300-500 pages; adjust for page count
+SchemaVersion: "2.0"
+
+Metadata:
+  Name: "A5 Japanese Non-fiction"
+  Description: "A5 (148x210mm) horizontal layout for Japanese non-fiction books"
+  Author: "md2docx"
+  Version: "1.0.0"
+
+TextDirection: "Horizontal"
+
+PageLayout:
+  Width: 14.8
+  Height: 21.0
+  MarginTop: 1.9
+  MarginBottom: 1.9
+  MarginLeft: 1.59  # inner (binding) margin
+  MarginRight: 0.64 # outer margin
+  MarginHeader: 1.0
+  MarginFooter: 1.0
+  MirrorMargins: true
+
+Fonts:
+  Ascii: "Noto Sans"
+  EastAsia: "Noto Sans CJK JP"
+  DefaultSize: 9
+
+TitlePage:
+  Enabled: false
+  PageBreakAfter: true
+
+TableOfContents:
+  Enabled: true
+  Depth: 2
+  PageBreakAfter: true
+
+Styles:
+  H1:
+    Size: 18
+    Bold: true
+    Color: "1a1a1a"
+    ShowBorder: false
+    PageBreakBefore: true
+    SpaceBefore: "400"
+    SpaceAfter: "200"
+  H2:
+    Size: 14
+    Bold: true
+    Color: "1a1a1a"
+    ShowBorder: false
+    SpaceBefore: "300"
+    SpaceAfter: "150"
+  H3:
+    Size: 11
+    Bold: true
+    Color: "333333"
+    ShowBorder: false
+    SpaceBefore: "240"
+    SpaceAfter: "120"
+  H4:
+    Size: 10
+    Bold: true
+    Color: "444444"
+    ShowBorder: false
+    SpaceBefore: "180"
+    SpaceAfter: "90"
+  H5:
+    Size: 9
+    Bold: true
+    Color: "555555"
+    ShowBorder: false
+    SpaceBefore: "140"
+    SpaceAfter: "70"
+  H6:
+    Size: 9
+    Bold: false
+    Color: "666666"
+    ShowBorder: false
+    SpaceBefore: "100"
+    SpaceAfter: "50"
+  Paragraph:
+    Size: 9
+    Color: "1a1a1a"
+    LineSpacing: "310"
+    FirstLineIndent: "0"
+    LeftIndent: "0"
+  List:
+    Size: 9
+    Color: "1a1a1a"
+    LeftIndent: "640"
+    HangingIndent: "320"
+    SpaceBefore: "40"
+    SpaceAfter: "40"
+  CodeBlock:
+    Size: 7
+    Color: "333333"
+    BackgroundColor: "f5f5f5"
+    BorderColor: "cccccc"
+    MonospaceFontAscii: "Consolas"
+    MonospaceFontEastAsia: "Noto Sans Mono CJK JP"
+    LineSpacing: "230"
+    SpaceBefore: "120"
+    SpaceAfter: "120"
+    BorderSpace: 4
+  Quote:
+    Size: 9
+    Color: "555555"
+    Italic: false
+    ShowBorder: true
+    BorderColor: "888888"
+    BorderSize: 16
+    BorderSpace: 0
+    LeftIndent: "640"
+    SpaceBefore: "120"
+    SpaceAfter: "120"
+  Image:
+    MaxWidthPercent: 90
+    Alignment: "center"
