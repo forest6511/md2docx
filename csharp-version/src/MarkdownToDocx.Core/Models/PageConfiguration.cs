@@ -57,4 +57,9 @@ public sealed record PageConfiguration
     /// Gutter margin for binding
     /// </summary>
     public int GutterMargin { get; init; } = 0;
+
+    /// <summary>
+    /// Whether mirror margins are enabled (alternates inner/outer margins for book binding)
+    /// </summary>
+    public bool MirrorMargins { get; init; } = false;
 }

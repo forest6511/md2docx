@@ -128,6 +128,11 @@ public sealed class PageLayoutConfig
     /// Gutter margin in cm
     /// </summary>
     public double? MarginGutter { get; init; }
+
+    /// <summary>
+    /// Whether to enable mirror margins for book binding (alternates inner/outer margins on odd/even pages)
+    /// </summary>
+    public bool MirrorMargins { get; init; } = false;
 }
 
 /// <summary>
