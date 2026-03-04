@@ -63,6 +63,14 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         mainPart.Document = new Document();
         var body = mainPart.Document.AppendChild(new Body());
 
+        // Add mirror margins to document settings if required
+        var pageConfig = _textDirection.GetPageConfiguration();
+        if (pageConfig.MirrorMargins)
+        {
+            var settingsPart = mainPart.AddNewPart<DocumentSettingsPart>();
+            settingsPart.Settings = new Settings(new W.MirrorMargins());
+        }
+
         // Add section properties for page layout and text direction
         var sectionProps = CreateSectionProperties();
         body.AppendChild(sectionProps);
@@ -952,5 +960,6 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
 
         _document?.Dispose();
         _disposed = true;
+        GC.SuppressFinalize(this);
     }
 }

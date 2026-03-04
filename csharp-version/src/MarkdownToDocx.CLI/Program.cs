@@ -5,6 +5,7 @@ using MarkdownToDocx.Core.Markdown;
 using MarkdownToDocx.Core.Models;
 using MarkdownToDocx.Core.OpenXml;
 using MarkdownToDocx.Core.TextDirection;
+using MarkdownToDocx.Styling.TextDirection;
 using MarkdownToDocx.Styling.Configuration;
 using MarkdownToDocx.Styling.Styling;
 
@@ -43,10 +44,11 @@ try
     var document = parser.Parse(markdown);
     Console.WriteLine("Parsed markdown document");
 
-    // Create text direction provider
-    ITextDirectionProvider textDirection = config.TextDirection == TextDirectionMode.Vertical
+    // Create text direction provider, wrapped with YAML page layout overrides
+    ITextDirectionProvider baseDirection = config.TextDirection == TextDirectionMode.Vertical
         ? new VerticalTextProvider()
         : new HorizontalTextProvider();
+    ITextDirectionProvider textDirection = new ConfigurableTextDirectionProvider(baseDirection, config.PageLayout);
 
     // Create style applicator
     var styleApplicator = new StyleApplicator();
