@@ -55,4 +55,10 @@ public sealed record CodeBlockStyle
     /// Applied to all four sides of the code block border.
     /// </summary>
     public uint BorderSpace { get; init; } = 4;
+
+    /// <summary>
+    /// When true, enables word wrap for code block paragraphs.
+    /// Prevents long lines from overflowing narrow print areas (e.g., KDP paperback).
+    /// </summary>
+    public bool WordWrap { get; init; } = false;
 }

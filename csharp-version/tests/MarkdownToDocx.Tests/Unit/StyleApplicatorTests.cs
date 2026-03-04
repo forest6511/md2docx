@@ -283,6 +283,38 @@ public class StyleApplicatorTests
     }
 
     [Fact]
+    public void ApplyCodeBlockStyle_WithWordWrapTrue_ShouldMapWordWrap()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            CodeBlock = new CodeBlockStyleConfig { Size = 9, Color = "000000", WordWrap = true }
+        };
+
+        // Act
+        var style = _applicator.ApplyCodeBlockStyle(config);
+
+        // Assert
+        style.WordWrap.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ApplyCodeBlockStyle_WithDefaultWordWrap_ShouldBeFalse()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            CodeBlock = new CodeBlockStyleConfig { Size = 9, Color = "000000" }
+        };
+
+        // Act
+        var style = _applicator.ApplyCodeBlockStyle(config);
+
+        // Assert
+        style.WordWrap.Should().BeFalse();
+    }
+
+    [Fact]
     public void ApplyQuoteStyle_ShouldReturnCorrectStyle()
     {
         // Act

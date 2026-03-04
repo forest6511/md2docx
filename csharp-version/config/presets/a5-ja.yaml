@@ -104,6 +104,7 @@ Styles:
     SpaceBefore: "120"
     SpaceAfter: "120"
     BorderSpace: 4
+    WordWrap: true
   Quote:
     Size: 9
     Color: "555555"
