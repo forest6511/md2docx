@@ -2392,6 +2392,97 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     }
 
     [Fact]
+    public void AddTable_ShouldHaveFixedTableLayout()
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+        var tableData = new TableData
+        {
+            ColumnCount = 2,
+            Rows = [new TableRowData { IsHeader = false, Cells = [new TableCellData { Runs = [new InlineRun { Text = "A" }] }, new TableCellData { Runs = [new InlineRun { Text = "B" }] }] }]
+        };
+
+        builder.AddTable(tableData, CreateDefaultTableStyle());
+        builder.Save();
+
+        // Assert: w:tblLayout has type="fixed"
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var body = doc.MainDocumentPart!.Document.Body!;
+        var tblLayout = body.Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>().First()
+            .GetFirstChild<TableProperties>()!
+            .GetFirstChild<TableLayout>();
+
+        tblLayout.Should().NotBeNull("table must use fixed layout to prevent autofit overflow");
+        tblLayout!.Type!.Value.Should().Be(TableLayoutValues.Fixed);
+    }
+
+    [Fact]
+    public void AddTable_ShouldHaveTableGridWithCorrectColumnCount()
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+        const int expectedColumns = 3;
+        var tableData = new TableData
+        {
+            ColumnCount = expectedColumns,
+            Rows = [new TableRowData { IsHeader = false, Cells = [
+                new TableCellData { Runs = [new InlineRun { Text = "A" }] },
+                new TableCellData { Runs = [new InlineRun { Text = "B" }] },
+                new TableCellData { Runs = [new InlineRun { Text = "C" }] }
+            ] }]
+        };
+
+        builder.AddTable(tableData, CreateDefaultTableStyle());
+        builder.Save();
+
+        // Assert: w:tblGrid contains 3 w:gridCol elements
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var body = doc.MainDocumentPart!.Document.Body!;
+        var grid = body.Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>().First()
+            .GetFirstChild<TableGrid>();
+
+        grid.Should().NotBeNull("tblGrid is required for fixed-layout column width enforcement");
+        grid!.Descendants<GridColumn>().Should().HaveCount(expectedColumns);
+    }
+
+    [Fact]
+    public void AddTable_CellWidth_ShouldUseDxaType()
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+        var tableData = new TableData
+        {
+            ColumnCount = 2,
+            Rows = [new TableRowData { IsHeader = false, Cells = [
+                new TableCellData { Runs = [new InlineRun { Text = "A" }] },
+                new TableCellData { Runs = [new InlineRun { Text = "B" }] }
+            ] }]
+        };
+
+        builder.AddTable(tableData, CreateDefaultTableStyle());
+        builder.Save();
+
+        // Assert: all w:tcW elements use type="dxa" (matches gridCol widths for fixed layout)
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var body = doc.MainDocumentPart!.Document.Body!;
+        var cells = body.Descendants<TableCell>().ToList();
+        cells.Should().NotBeEmpty();
+        foreach (var cell in cells)
+        {
+            var tcWidth = cell.GetFirstChild<TableCellProperties>()!.GetFirstChild<TableCellWidth>();
+            tcWidth.Should().NotBeNull();
+            tcWidth!.Type!.Value.Should().Be(TableWidthUnitValues.Dxa,
+                "cell width must use dxa to match tblGrid gridCol widths in fixed-layout tables");
+        }
+    }
+
+    [Fact]
     public void AddTable_WithHeaderRow_ShouldApplyHeaderBackground()
     {
         // Arrange

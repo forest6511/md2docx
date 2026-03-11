@@ -937,15 +937,25 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         ArgumentNullException.ThrowIfNull(tableData);
         ArgumentNullException.ThrowIfNull(style);
 
+        // Compute printable text area width in twips from page configuration.
+        // This is used for tblGrid column widths and tcW dxa values so Word
+        // honours the column widths even in autofit mode.
+        var pageConfig = _textDirection.GetPageConfiguration();
+        int textAreaTwips = (int)(uint)pageConfig.Width
+            - pageConfig.LeftMargin
+            - pageConfig.RightMargin
+            - pageConfig.GutterMargin;
+
         // Spacer paragraph before table
         AddTableSpacer(style.SpaceBefore);
 
         var table = _body.AppendChild(new Table());
-        table.AppendChild(CreateTableProperties(tableData.ColumnCount, style));
+        table.AppendChild(CreateTableProperties(style));
+        table.AppendChild(CreateTableGrid(tableData.ColumnCount, textAreaTwips));
 
         foreach (var row in tableData.Rows)
         {
-            table.AppendChild(CreateTableRow(row, tableData.ColumnCount, style));
+            table.AppendChild(CreateTableRow(row, tableData.ColumnCount, style, textAreaTwips));
         }
 
         // Spacer paragraph after table
@@ -966,19 +976,22 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     }
 
     /// <summary>
-    /// Creates TableProperties with percentage-based width (prevents margin overflow)
-    /// and border/padding configuration
+    /// Creates TableProperties with percentage-based width (overflow safety net) and
+    /// fixed layout so Word honours the tblGrid column widths.
     /// </summary>
-    private static TableProperties CreateTableProperties(int columnCount, CoreTableStyle style)
+    private static TableProperties CreateTableProperties(CoreTableStyle style)
     {
         var tableProps = new TableProperties();
 
-        // Use percentage width (5000 = 100% of text area) to prevent margin overflow
+        // tblW=5000pct acts as overflow safety net (100% of text area)
         tableProps.AppendChild(new TableWidth
         {
             Type = TableWidthUnitValues.Pct,
             Width = "5000"
         });
+
+        // Fixed layout: Word must honour tblGrid column widths, not autofit to content
+        tableProps.AppendChild(new TableLayout { Type = TableLayoutValues.Fixed });
 
         // Table borders: all sides + inside horizontal/vertical
         tableProps.AppendChild(new TableBorders(
@@ -1002,9 +1015,24 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     }
 
     /// <summary>
+    /// Creates a TableGrid element that defines equal-width columns so Word's fixed-layout
+    /// engine can distribute the text area width evenly across all columns.
+    /// </summary>
+    private static TableGrid CreateTableGrid(int columnCount, int textAreaTwips)
+    {
+        var grid = new TableGrid();
+        int colWidth = columnCount > 0 ? textAreaTwips / columnCount : textAreaTwips;
+        for (int i = 0; i < columnCount; i++)
+        {
+            grid.AppendChild(new GridColumn { Width = colWidth.ToString(CultureInfo.InvariantCulture) });
+        }
+        return grid;
+    }
+
+    /// <summary>
     /// Creates a TableRow element with cells
     /// </summary>
-    private TableRow CreateTableRow(TableRowData rowData, int columnCount, CoreTableStyle style)
+    private TableRow CreateTableRow(TableRowData rowData, int columnCount, CoreTableStyle style, int textAreaTwips)
     {
         var row = new TableRow();
 
@@ -1016,7 +1044,7 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
 
         foreach (var cell in rowData.Cells)
         {
-            row.AppendChild(CreateTableCell(cell, columnCount, rowData.IsHeader, style));
+            row.AppendChild(CreateTableCell(cell, columnCount, rowData.IsHeader, style, textAreaTwips));
         }
 
         return row;
@@ -1025,17 +1053,17 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     /// <summary>
     /// Creates a TableCell element with content
     /// </summary>
-    private TableCell CreateTableCell(TableCellData cellData, int columnCount, bool isHeader, CoreTableStyle style)
+    private TableCell CreateTableCell(TableCellData cellData, int columnCount, bool isHeader, CoreTableStyle style, int textAreaTwips)
     {
         var cell = new TableCell();
 
-        // Cell properties: equal column width in percentage
-        int colWidthPct = columnCount > 0 ? 5000 / columnCount : 5000;
+        // Cell width in dxa matches the tblGrid gridCol width so Word renders fixed columns
+        int colWidthDxa = columnCount > 0 ? textAreaTwips / columnCount : textAreaTwips;
         var cellProps = new TableCellProperties();
         cellProps.AppendChild(new TableCellWidth
         {
-            Type = TableWidthUnitValues.Pct,
-            Width = colWidthPct.ToString(CultureInfo.InvariantCulture)
+            Type = TableWidthUnitValues.Dxa,
+            Width = colWidthDxa.ToString(CultureInfo.InvariantCulture)
         });
 
         // Header background shading
