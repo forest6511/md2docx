@@ -74,5 +74,5 @@ public sealed record TableStyle
     /// Table width as a percentage of the printable text area (1-100).
     /// Values below 100 leave horizontal space around the table.
     /// </summary>
-    public int WidthPercent { get; init; } = 100;
+    public int WidthPercent { get; init; } = 90;
 }

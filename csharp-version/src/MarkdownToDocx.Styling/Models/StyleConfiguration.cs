@@ -455,7 +455,7 @@ public sealed record TableStyleConfig
     /// Use values below 100 to leave horizontal breathing room around the table.
     /// Default: 100 (full text-area width).
     /// </summary>
-    public int WidthPercent { get; init; } = 100;
+    public int WidthPercent { get; init; } = 90;
 }
 
 /// <summary>

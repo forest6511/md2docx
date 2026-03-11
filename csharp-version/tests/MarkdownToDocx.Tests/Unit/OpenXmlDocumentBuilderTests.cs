@@ -2378,7 +2378,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         builder.AddTable(tableData, CreateDefaultTableStyle());
         builder.Save();
 
-        // Assert: w:tblW has type="pct" and w="5000"
+        // Assert: w:tblW has type="pct" and w="4500" (default WidthPercent=90 → 90*50=4500)
         stream.Position = 0;
         using var doc = WordprocessingDocument.Open(stream, false);
         var body = doc.MainDocumentPart!.Document.Body!;
@@ -2388,7 +2388,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
 
         tblWidth.Should().NotBeNull();
         tblWidth!.Type!.Value.Should().Be(TableWidthUnitValues.Pct);
-        tblWidth.Width!.Value.Should().Be("5000");
+        tblWidth.Width!.Value.Should().Be("4500");
     }
 
     [Theory]
