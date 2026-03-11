@@ -449,6 +449,13 @@ public sealed record TableStyleConfig
     /// Spacing after table in twips (1/20 of a point)
     /// </summary>
     public string SpaceAfter { get; init; } = "160";
+
+    /// <summary>
+    /// Table width as a percentage of the printable text area (1-100).
+    /// Use values below 100 to leave horizontal breathing room around the table.
+    /// Default: 100 (full text-area width).
+    /// </summary>
+    public int WidthPercent { get; init; } = 100;
 }
 
 /// <summary>

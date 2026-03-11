@@ -937,14 +937,14 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         ArgumentNullException.ThrowIfNull(tableData);
         ArgumentNullException.ThrowIfNull(style);
 
-        // Compute printable text area width in twips from page configuration.
-        // This is used for tblGrid column widths and tcW dxa values so Word
-        // honours the column widths even in autofit mode.
+        // Compute printable text area width in twips from page configuration,
+        // then scale by WidthPercent so the table can be narrower than the full text area.
         var pageConfig = _textDirection.GetPageConfiguration();
-        int textAreaTwips = (int)(uint)pageConfig.Width
+        int fullTextAreaTwips = (int)(uint)pageConfig.Width
             - pageConfig.LeftMargin
             - pageConfig.RightMargin
             - pageConfig.GutterMargin;
+        int textAreaTwips = (int)(fullTextAreaTwips * style.WidthPercent / 100.0);
 
         // Spacer paragraph before table
         AddTableSpacer(style.SpaceBefore);
@@ -983,11 +983,13 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     {
         var tableProps = new TableProperties();
 
-        // tblW=5000pct acts as overflow safety net (100% of text area)
+        // tblW in pct units (5000 = 100%). Scaled by WidthPercent so the table
+        // can be narrower than the full text area (e.g. 90% → "4500").
+        int tblWidthPct = style.WidthPercent * 50; // 1% = 50 in OOXML pct units
         tableProps.AppendChild(new TableWidth
         {
             Type = TableWidthUnitValues.Pct,
-            Width = "5000"
+            Width = tblWidthPct.ToString(CultureInfo.InvariantCulture)
         });
 
         // Fixed layout: Word must honour tblGrid column widths, not autofit to content

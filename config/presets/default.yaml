@@ -120,3 +120,5 @@ Styles:
     BackgroundColor: "f8f9fa"
     SpaceBefore: "300"
     SpaceAfter: "300"
+  Table:
+    WidthPercent: 100   # 1-100: table width as % of printable area
