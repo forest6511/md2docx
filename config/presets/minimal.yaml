@@ -116,4 +116,4 @@ Styles:
     SpaceBefore: "240"
     SpaceAfter: "240"
   Table:
-    WidthPercent: 100   # 1-100: table width as % of printable area
+    WidthPercent: 90   # 1-100: table width as % of printable area
