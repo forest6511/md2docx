@@ -724,7 +724,83 @@ public class StyleApplicatorTests
                 BorderColor = "999999",
                 BorderPosition = "left",
                 LeftIndent = "720"
+            },
+            Table = new TableStyleConfig
+            {
+                Size = 11,
+                HeaderBackgroundColor = "2c3e50",
+                HeaderTextColor = "ecf0f1",
+                BodyTextColor = "2c3e50",
+                BorderColor = "bdc3c7",
+                BorderSize = 4,
+                HeaderBold = true,
+                CellPaddingTop = 40,
+                CellPaddingBottom = 40,
+                CellPaddingLeft = 80,
+                CellPaddingRight = 80,
+                SpaceBefore = "160",
+                SpaceAfter = "160"
             }
         };
+    }
+
+    [Fact]
+    public void ApplyTableStyle_WithValidConfig_ShouldConvertSizeToHalfPoints()
+    {
+        // Act
+        var style = _applicator.ApplyTableStyle(_testConfig);
+
+        // Assert: 11pt × 2 = 22 half-points
+        style.FontSize.Should().Be(11 * 2);
+    }
+
+    [Fact]
+    public void ApplyTableStyle_WithValidConfig_ShouldMapAllProperties()
+    {
+        // Act
+        var style = _applicator.ApplyTableStyle(_testConfig);
+
+        // Assert
+        style.Should().NotBeNull();
+        style.HeaderBackgroundColor.Should().Be("2c3e50");
+        style.HeaderTextColor.Should().Be("ecf0f1");
+        style.BodyTextColor.Should().Be("2c3e50");
+        style.BorderColor.Should().Be("bdc3c7");
+        style.BorderSize.Should().Be(4U);
+        style.HeaderBold.Should().BeTrue();
+        style.CellPaddingTop.Should().Be(40U);
+        style.CellPaddingBottom.Should().Be(40U);
+        style.CellPaddingLeft.Should().Be(80U);
+        style.CellPaddingRight.Should().Be(80U);
+        style.SpaceBefore.Should().Be("160");
+        style.SpaceAfter.Should().Be("160");
+    }
+
+    [Fact]
+    public void ApplyTableStyle_WithNullConfig_ShouldThrowArgumentNullException()
+    {
+        // Arrange
+        StyleConfiguration? nullConfig = null;
+
+        // Act
+        Action act = () => _applicator.ApplyTableStyle(nullConfig!);
+
+        // Assert
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void ApplyTableStyle_WithDefaultConfig_ShouldReturnSensibleDefaults()
+    {
+        // Arrange
+        var config = new StyleConfiguration(); // all defaults
+
+        // Act
+        var style = _applicator.ApplyTableStyle(config);
+
+        // Assert
+        style.FontSize.Should().Be(10 * 2); // default Size=10
+        style.HeaderBold.Should().BeTrue();
+        style.BorderColor.Should().NotBeNullOrWhiteSpace();
     }
 }

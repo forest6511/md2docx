@@ -52,6 +52,13 @@ public interface IStyleApplicator
     ImageStyle ApplyImageStyle(StyleConfiguration config);
 
     /// <summary>
+    /// Apply style configuration to table
+    /// </summary>
+    /// <param name="config">Style configuration</param>
+    /// <returns>Table style</returns>
+    TableStyle ApplyTableStyle(StyleConfiguration config);
+
+    /// <summary>
     /// Apply table of contents configuration
     /// </summary>
     /// <param name="config">Conversion configuration containing TOC settings</param>

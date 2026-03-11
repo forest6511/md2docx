@@ -59,6 +59,11 @@ public sealed record StyleConfiguration
     /// Style configuration for inline images
     /// </summary>
     public ImageStyleConfig Image { get; init; } = new();
+
+    /// <summary>
+    /// Style configuration for tables
+    /// </summary>
+    public TableStyleConfig Table { get; init; } = new();
 }
 
 /// <summary>
@@ -373,6 +378,77 @@ public sealed record QuoteStyleConfig
     /// Monospace font family for inline code (East Asian characters)
     /// </summary>
     public string InlineCodeFontEastAsia { get; init; } = "Noto Sans Mono CJK JP";
+}
+
+/// <summary>
+/// Style configuration for table elements
+/// </summary>
+public sealed record TableStyleConfig
+{
+    /// <summary>
+    /// Font size in points (pt)
+    /// </summary>
+    public int Size { get; init; } = 10;
+
+    /// <summary>
+    /// Header row background color in hex format (e.g., "2c3e50")
+    /// </summary>
+    public string HeaderBackgroundColor { get; init; } = "2c3e50";
+
+    /// <summary>
+    /// Header row text color in hex format (e.g., "ecf0f1")
+    /// </summary>
+    public string HeaderTextColor { get; init; } = "ecf0f1";
+
+    /// <summary>
+    /// Body cell text color in hex format (e.g., "2c3e50")
+    /// </summary>
+    public string BodyTextColor { get; init; } = "2c3e50";
+
+    /// <summary>
+    /// Table border color in hex format (e.g., "bdc3c7")
+    /// </summary>
+    public string BorderColor { get; init; } = "bdc3c7";
+
+    /// <summary>
+    /// Border thickness in eighths of a point (default: 4 = 0.5pt)
+    /// </summary>
+    public uint BorderSize { get; init; } = 4;
+
+    /// <summary>
+    /// Whether to apply bold formatting to header row
+    /// </summary>
+    public bool HeaderBold { get; init; } = true;
+
+    /// <summary>
+    /// Cell top padding in twips (1/20 of a point)
+    /// </summary>
+    public uint CellPaddingTop { get; init; } = 40;
+
+    /// <summary>
+    /// Cell bottom padding in twips (1/20 of a point)
+    /// </summary>
+    public uint CellPaddingBottom { get; init; } = 40;
+
+    /// <summary>
+    /// Cell left padding in twips (1/20 of a point)
+    /// </summary>
+    public uint CellPaddingLeft { get; init; } = 80;
+
+    /// <summary>
+    /// Cell right padding in twips (1/20 of a point)
+    /// </summary>
+    public uint CellPaddingRight { get; init; } = 80;
+
+    /// <summary>
+    /// Spacing before table in twips (1/20 of a point)
+    /// </summary>
+    public string SpaceBefore { get; init; } = "160";
+
+    /// <summary>
+    /// Spacing after table in twips (1/20 of a point)
+    /// </summary>
+    public string SpaceAfter { get; init; } = "160";
 }
 
 /// <summary>

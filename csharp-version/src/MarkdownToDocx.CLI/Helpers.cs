@@ -1,3 +1,4 @@
+using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MarkdownToDocx.Core.Models;
@@ -167,6 +168,12 @@ public static class Helpers
         var baseDir = Path.GetDirectoryName(Path.GetFullPath(basePath));
         return baseDir != null ? Path.GetFullPath(Path.Combine(baseDir, path)) : path;
     }
+
+    /// <summary>
+    /// Extracts structured table data from a Markdig Table AST node.
+    /// </summary>
+    public static TableData GetTableData(Table table) =>
+        MarkdownToDocx.Core.Markdown.TableExtractor.Extract(table);
 
     private static void ExtractInlineRuns(Inline? inline, List<InlineRun> runs, bool bold, bool italic)
     {

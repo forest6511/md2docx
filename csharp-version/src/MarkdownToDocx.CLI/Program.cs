@@ -1,3 +1,4 @@
+using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 using MarkdownToDocx.CLI;
 using MarkdownToDocx.Core.Interfaces;
@@ -126,6 +127,12 @@ try
                     var quoteRuns = Helpers.GetQuoteRuns(quote);
                     var quoteStyle = styleApplicator.ApplyQuoteStyle(config.Styles);
                     builder.AddQuote(quoteRuns, quoteStyle);
+                    break;
+
+                case Table tableBlock:
+                    var tableData = Helpers.GetTableData(tableBlock);
+                    var tableStyle = styleApplicator.ApplyTableStyle(config.Styles);
+                    builder.AddTable(tableData, tableStyle);
                     break;
 
                 case ThematicBreakBlock:

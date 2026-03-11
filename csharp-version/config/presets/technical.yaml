@@ -118,3 +118,17 @@ Styles:
   Image:
     MaxWidthPercent: 90
     Alignment: "center"
+  Table:
+    Size: 10
+    HeaderBackgroundColor: "2c3e50"
+    HeaderTextColor: "ecf0f1"
+    BodyTextColor: "2c3e50"
+    BorderColor: "bdc3c7"
+    BorderSize: 4
+    HeaderBold: true
+    CellPaddingTop: 40
+    CellPaddingBottom: 40
+    CellPaddingLeft: 80
+    CellPaddingRight: 80
+    SpaceBefore: "160"
+    SpaceAfter: "160"
