@@ -69,6 +69,13 @@ public interface IDocumentBuilder : IDisposable
     void AddImage(string imagePath, string altText, ImageStyle style);
 
     /// <summary>
+    /// Adds a table to the document
+    /// </summary>
+    /// <param name="tableData">Structured table data with rows, cells, and alignment</param>
+    /// <param name="style">Table style configuration</param>
+    void AddTable(TableData tableData, TableStyle style);
+
+    /// <summary>
     /// Adds a thematic break (horizontal rule) to the document
     /// </summary>
     void AddThematicBreak();

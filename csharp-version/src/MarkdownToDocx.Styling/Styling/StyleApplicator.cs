@@ -131,6 +131,29 @@ public sealed class StyleApplicator : IStyleApplicator
     }
 
     /// <inheritdoc/>
+    public TableStyle ApplyTableStyle(StyleConfiguration config)
+    {
+        ArgumentNullException.ThrowIfNull(config);
+
+        return new TableStyle
+        {
+            FontSize = config.Table.Size * 2, // Convert pt to half-points
+            HeaderBackgroundColor = config.Table.HeaderBackgroundColor,
+            HeaderTextColor = config.Table.HeaderTextColor,
+            BodyTextColor = config.Table.BodyTextColor,
+            BorderColor = config.Table.BorderColor,
+            BorderSize = config.Table.BorderSize,
+            HeaderBold = config.Table.HeaderBold,
+            CellPaddingTop = config.Table.CellPaddingTop,
+            CellPaddingBottom = config.Table.CellPaddingBottom,
+            CellPaddingLeft = config.Table.CellPaddingLeft,
+            CellPaddingRight = config.Table.CellPaddingRight,
+            SpaceBefore = config.Table.SpaceBefore,
+            SpaceAfter = config.Table.SpaceAfter
+        };
+    }
+
+    /// <inheritdoc/>
     public ImageStyle ApplyImageStyle(StyleConfiguration config)
     {
         ArgumentNullException.ThrowIfNull(config);

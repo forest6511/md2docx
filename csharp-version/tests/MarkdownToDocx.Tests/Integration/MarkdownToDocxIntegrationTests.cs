@@ -1,12 +1,19 @@
 using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using FluentAssertions;
+using Markdig;
+using Markdig.Extensions.Tables;
 using Markdig.Syntax;
+using MarkdigTable = Markdig.Extensions.Tables.Table;
+using OxmlTable = DocumentFormat.OpenXml.Wordprocessing.Table;
+using OxmlTableRow = DocumentFormat.OpenXml.Wordprocessing.TableRow;
 using Markdig.Syntax.Inlines;
 using MarkdownToDocx.Core.Markdown;
 using MarkdownToDocx.Core.Models;
 using MarkdownToDocx.Core.OpenXml;
 using MarkdownToDocx.Core.TextDirection;
 using MarkdownToDocx.Styling.Configuration;
+using MarkdownToDocx.Styling.Models;
 using MarkdownToDocx.Styling.Styling;
 using System.Text;
 using Xunit;
@@ -243,6 +250,116 @@ Sample vertical text content for testing Japanese tategaki layout.
         }
 
         return sb.ToString();
+    }
+
+    [Fact]
+    public void ConvertMarkdownTable_ShouldProduceParsableDocxWithTableElement()
+    {
+        // Arrange
+        const string markdown = """
+            # Document with Table
+
+            | Feature | Status | Notes |
+            |---------|--------|-------|
+            | Paragraphs | Done | Fully supported |
+            | Code blocks | Done | With background color |
+            | Tables | Done | New feature |
+
+            End of document.
+            """;
+
+        var config = _configLoader.LoadPreset("default");
+        var document = _markdownParser.Parse(markdown);
+
+        // Act
+        using var stream = new MemoryStream();
+        var textDirection = new HorizontalTextProvider();
+        using (var builder = new OpenXmlDocumentBuilder(stream, textDirection))
+        {
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            foreach (var block in document)
+            {
+                switch (block)
+                {
+                    case Markdig.Syntax.HeadingBlock heading:
+                        var headingText = heading.Inline != null ? ExtractInlineText(heading.Inline.FirstChild) : string.Empty;
+                        builder.AddHeading(heading.Level, headingText, _styleApplicator.ApplyHeadingStyle(heading.Level, config.Styles));
+                        break;
+                    case MarkdigTable tableBlock:
+                        var tableData = TableExtractor.Extract(tableBlock);
+                        builder.AddTable(tableData, _styleApplicator.ApplyTableStyle(config.Styles));
+                        break;
+                    case Markdig.Syntax.ParagraphBlock para:
+                        var runs = new List<InlineRun>();
+                        if (para.Inline != null)
+                            runs.Add(new InlineRun { Text = ExtractInlineText(para.Inline.FirstChild) });
+                        if (runs.Count > 0 && !string.IsNullOrEmpty(runs[0].Text))
+                            builder.AddParagraph(runs, _styleApplicator.ApplyParagraphStyle(config.Styles));
+                        break;
+                }
+            }
+            builder.Save();
+        }
+
+        // Assert: DOCX is valid and contains a table
+        stream.Position = 0;
+        using var wordDoc = WordprocessingDocument.Open(stream, false);
+        var body = wordDoc.MainDocumentPart!.Document.Body!;
+        var table = body.Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>().FirstOrDefault();
+        table.Should().NotBeNull("document should contain a table element");
+
+        // Assert: table has correct row count (1 header + 3 body)
+        var rows = table!.Descendants<OxmlTableRow>().ToList();
+        rows.Should().HaveCount(4);
+    }
+
+    [Fact]
+    public void ConvertMarkdownTable_WithMirrorMargins_TableShouldUsePercentageWidth()
+    {
+        // Arrange: use a narrow-margin preset (b6-ja) to verify no overflow
+        const string markdown = """
+            | Col1 | Col2 | Col3 |
+            |------|------|------|
+            | A    | B    | C    |
+            """;
+
+        // Use inline config with MirrorMargins to simulate narrow-margin book preset (e.g. B6-ja)
+        var narrowPageLayout = new PageLayoutConfig
+        {
+            Width = 12.8,
+            Height = 18.2,
+            MarginTop = 1.5,
+            MarginBottom = 1.5,
+            MarginLeft = 2.0,
+            MarginRight = 1.27,
+            MirrorMargins = true
+        };
+        var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+        var doc = Markdig.Markdown.Parse(markdown, pipeline);
+        var table = doc.Descendants<MarkdigTable>().First();
+        var tableData = TableExtractor.Extract(table);
+        var tableStyle = _styleApplicator.ApplyTableStyle(new StyleConfiguration());
+
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(
+            stream,
+            new MarkdownToDocx.Styling.TextDirection.ConfigurableTextDirectionProvider(
+                new HorizontalTextProvider(), narrowPageLayout));
+
+        builder.AddTable(tableData, tableStyle);
+        builder.Save();
+
+        // Assert: table width is percentage-based (not absolute), preventing overflow
+        stream.Position = 0;
+        using var wordDoc = WordprocessingDocument.Open(stream, false);
+        var body2 = wordDoc.MainDocumentPart!.Document.Body!;
+        var tblWidth = body2.Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>().First()
+            .GetFirstChild<TableProperties>()!
+            .GetFirstChild<TableWidth>();
+
+        tblWidth.Should().NotBeNull();
+        tblWidth!.Type!.Value.Should().Be(TableWidthUnitValues.Pct,
+            "table width must be percentage-based to prevent margin overflow on narrow pages");
     }
 
     public void Dispose()

@@ -6,6 +6,7 @@ using MarkdownToDocx.Core.Imaging;
 using MarkdownToDocx.Core.Interfaces;
 using MarkdownToDocx.Core.Models;
 using CoreListItem = MarkdownToDocx.Core.Models.ListItem;
+using CoreTableStyle = MarkdownToDocx.Core.Models.TableStyle;
 using A = DocumentFormat.OpenXml.Drawing;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
@@ -928,6 +929,168 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         });
 
         return props;
+    }
+
+    /// <inheritdoc/>
+    public void AddTable(TableData tableData, CoreTableStyle style)
+    {
+        ArgumentNullException.ThrowIfNull(tableData);
+        ArgumentNullException.ThrowIfNull(style);
+
+        // Spacer paragraph before table
+        AddTableSpacer(style.SpaceBefore);
+
+        var table = _body.AppendChild(new Table());
+        table.AppendChild(CreateTableProperties(tableData.ColumnCount, style));
+
+        foreach (var row in tableData.Rows)
+        {
+            table.AppendChild(CreateTableRow(row, tableData.ColumnCount, style));
+        }
+
+        // Spacer paragraph after table
+        AddTableSpacer(style.SpaceAfter);
+    }
+
+    /// <summary>
+    /// Adds an empty spacer paragraph with specified spacing
+    /// </summary>
+    private void AddTableSpacer(string spacing)
+    {
+        if (string.IsNullOrEmpty(spacing) || spacing == "0") return;
+
+        var spacer = _body.AppendChild(new Paragraph());
+        var spacerProps = CreateBaseParagraphProperties();
+        spacerProps.AppendChild(new SpacingBetweenLines { Before = "0", After = spacing });
+        spacer.AppendChild(spacerProps);
+    }
+
+    /// <summary>
+    /// Creates TableProperties with percentage-based width (prevents margin overflow)
+    /// and border/padding configuration
+    /// </summary>
+    private static TableProperties CreateTableProperties(int columnCount, CoreTableStyle style)
+    {
+        var tableProps = new TableProperties();
+
+        // Use percentage width (5000 = 100% of text area) to prevent margin overflow
+        tableProps.AppendChild(new TableWidth
+        {
+            Type = TableWidthUnitValues.Pct,
+            Width = "5000"
+        });
+
+        // Table borders: all sides + inside horizontal/vertical
+        tableProps.AppendChild(new TableBorders(
+            new TopBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = 0U },
+            new BottomBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = 0U },
+            new LeftBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = 0U },
+            new RightBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = 0U },
+            new InsideHorizontalBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = 0U },
+            new InsideVerticalBorder { Val = BorderValues.Single, Color = style.BorderColor, Size = style.BorderSize, Space = 0U }
+        ));
+
+        // Default cell padding
+        tableProps.AppendChild(new TableCellMarginDefault(
+            new TopMargin { Width = style.CellPaddingTop.ToString(CultureInfo.InvariantCulture), Type = TableWidthUnitValues.Dxa },
+            new BottomMargin { Width = style.CellPaddingBottom.ToString(CultureInfo.InvariantCulture), Type = TableWidthUnitValues.Dxa },
+            new StartMargin { Width = style.CellPaddingLeft.ToString(CultureInfo.InvariantCulture), Type = TableWidthUnitValues.Dxa },
+            new EndMargin { Width = style.CellPaddingRight.ToString(CultureInfo.InvariantCulture), Type = TableWidthUnitValues.Dxa }
+        ));
+
+        return tableProps;
+    }
+
+    /// <summary>
+    /// Creates a TableRow element with cells
+    /// </summary>
+    private TableRow CreateTableRow(TableRowData rowData, int columnCount, CoreTableStyle style)
+    {
+        var row = new TableRow();
+
+        // Mark header row
+        if (rowData.IsHeader)
+        {
+            row.AppendChild(new TableRowProperties(new TableHeader()));
+        }
+
+        foreach (var cell in rowData.Cells)
+        {
+            row.AppendChild(CreateTableCell(cell, columnCount, rowData.IsHeader, style));
+        }
+
+        return row;
+    }
+
+    /// <summary>
+    /// Creates a TableCell element with content
+    /// </summary>
+    private TableCell CreateTableCell(TableCellData cellData, int columnCount, bool isHeader, CoreTableStyle style)
+    {
+        var cell = new TableCell();
+
+        // Cell properties: equal column width in percentage
+        int colWidthPct = columnCount > 0 ? 5000 / columnCount : 5000;
+        var cellProps = new TableCellProperties();
+        cellProps.AppendChild(new TableCellWidth
+        {
+            Type = TableWidthUnitValues.Pct,
+            Width = colWidthPct.ToString(CultureInfo.InvariantCulture)
+        });
+
+        // Header background shading
+        if (isHeader)
+        {
+            cellProps.AppendChild(CreateBackgroundShading(style.HeaderBackgroundColor));
+        }
+
+        cell.AppendChild(cellProps);
+
+        // Cell paragraph
+        var paragraph = cell.AppendChild(new Paragraph());
+        var paraProps = CreateBaseParagraphProperties();
+
+        // Column alignment
+        var justification = cellData.Alignment.ToLowerInvariant() switch
+        {
+            "center" => JustificationValues.Center,
+            "right" => JustificationValues.Right,
+            _ => JustificationValues.Left
+        };
+        paraProps.AppendChild(new Justification { Val = justification });
+        // Remove extra spacing inside cells
+        paraProps.AppendChild(new SpacingBetweenLines { Before = "0", After = "0" });
+        paragraph.AppendChild(paraProps);
+
+        // Cell runs
+        string textColor = isHeader ? style.HeaderTextColor : style.BodyTextColor;
+        foreach (var inlineRun in cellData.Runs)
+        {
+            var run = paragraph.AppendChild(new Run());
+            var runProps = CreateBaseRunProperties(
+                style.FontSize,
+                textColor,
+                bold: isHeader && style.HeaderBold || inlineRun.Bold,
+                italic: inlineRun.IsCode ? false : inlineRun.Italic);
+
+            if (inlineRun.IsCode)
+            {
+                // Use default monospace fonts for inline code in cells
+                runProps.AppendChild(new RunFonts { Ascii = "Consolas", EastAsia = "Noto Sans Mono CJK JP" });
+            }
+
+            run.AppendChild(runProps);
+            run.AppendChild(new Text(inlineRun.Text) { Space = SpaceProcessingModeValues.Preserve });
+        }
+
+        // Ensure cell always has at least one paragraph (required by OOXML spec)
+        if (!cellData.Runs.Any())
+        {
+            var emptyRun = paragraph.AppendChild(new Run());
+            emptyRun.AppendChild(CreateBaseRunProperties(style.FontSize, textColor));
+        }
+
+        return cell;
     }
 
     /// <inheritdoc/>

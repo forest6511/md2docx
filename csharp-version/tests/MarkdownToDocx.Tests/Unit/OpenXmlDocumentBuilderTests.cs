@@ -7,6 +7,7 @@ using MarkdownToDocx.Core.OpenXml;
 using MarkdownToDocx.Core.TextDirection;
 using Xunit;
 using CoreListItem = MarkdownToDocx.Core.Models.ListItem;
+using CoreTableStyle = MarkdownToDocx.Core.Models.TableStyle;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 
 namespace MarkdownToDocx.Tests.Unit;
@@ -2296,4 +2297,215 @@ public class OpenXmlDocumentBuilderTests : IDisposable
 
     private static List<InlineRun> ToRuns(string text) =>
         new List<InlineRun> { new InlineRun { Text = text } };
+
+    // ── Table tests ────────────────────────────────────────────────────────
+
+    [Fact]
+    public void AddTable_WithNullTableData_ShouldThrowArgumentNullException()
+    {
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        TableData? nullData = null;
+        Action act = () => builder.AddTable(nullData!, CreateDefaultTableStyle());
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void AddTable_WithNullStyle_ShouldThrowArgumentNullException()
+    {
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        CoreTableStyle? nullStyle = null;
+        var tableData = new TableData { Rows = [], ColumnCount = 2 };
+        Action act = () => builder.AddTable(tableData, nullStyle!);
+        act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void AddTable_WithRows_ShouldAddTableElementToBody()
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+
+        var tableData = new TableData
+        {
+            ColumnCount = 2,
+            Rows =
+            [
+                new TableRowData
+                {
+                    IsHeader = true,
+                    Cells =
+                    [
+                        new TableCellData { Runs = [new InlineRun { Text = "Column A" }], Alignment = "left" },
+                        new TableCellData { Runs = [new InlineRun { Text = "Column B" }], Alignment = "center" }
+                    ]
+                },
+                new TableRowData
+                {
+                    IsHeader = false,
+                    Cells =
+                    [
+                        new TableCellData { Runs = [new InlineRun { Text = "Value 1" }], Alignment = "left" },
+                        new TableCellData { Runs = [new InlineRun { Text = "Value 2" }], Alignment = "center" }
+                    ]
+                }
+            ]
+        };
+
+        builder.AddTable(tableData, CreateDefaultTableStyle());
+        builder.Save();
+
+        // Assert: document contains a Table element
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var body = doc.MainDocumentPart!.Document.Body!;
+        var table = body.Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>().FirstOrDefault();
+        table.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void AddTable_ShouldUsePercentageWidth()
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+        var tableData = new TableData
+        {
+            ColumnCount = 2,
+            Rows = [new TableRowData { IsHeader = false, Cells = [new TableCellData { Runs = [new InlineRun { Text = "A" }] }] }]
+        };
+
+        builder.AddTable(tableData, CreateDefaultTableStyle());
+        builder.Save();
+
+        // Assert: w:tblW has type="pct" and w="5000"
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var body = doc.MainDocumentPart!.Document.Body!;
+        var tblWidth = body.Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>().First()
+            .GetFirstChild<TableProperties>()!
+            .GetFirstChild<TableWidth>();
+
+        tblWidth.Should().NotBeNull();
+        tblWidth!.Type!.Value.Should().Be(TableWidthUnitValues.Pct);
+        tblWidth.Width!.Value.Should().Be("5000");
+    }
+
+    [Fact]
+    public void AddTable_WithHeaderRow_ShouldApplyHeaderBackground()
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+        const string expectedColor = "2c3e50";
+        var tableData = new TableData
+        {
+            ColumnCount = 1,
+            Rows = [new TableRowData { IsHeader = true, Cells = [new TableCellData { Runs = [new InlineRun { Text = "Header" }] }] }]
+        };
+        var style = CreateDefaultTableStyle() with { HeaderBackgroundColor = expectedColor };
+
+        builder.AddTable(tableData, style);
+        builder.Save();
+
+        // Assert: header cell has shading with expected fill color
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var body = doc.MainDocumentPart!.Document.Body!;
+        var cell = body.Descendants<TableCell>().First();
+        var shading = cell.GetFirstChild<TableCellProperties>()!.GetFirstChild<Shading>();
+        shading.Should().NotBeNull();
+        shading!.Fill!.Value.Should().Be(expectedColor);
+    }
+
+    [Fact]
+    public void AddTable_WithCenterAlignment_ShouldApplyJustificationCenter()
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+        var tableData = new TableData
+        {
+            ColumnCount = 1,
+            Rows = [new TableRowData { IsHeader = false, Cells = [new TableCellData { Runs = [new InlineRun { Text = "Centered" }], Alignment = "center" }] }]
+        };
+
+        builder.AddTable(tableData, CreateDefaultTableStyle());
+        builder.Save();
+
+        // Assert: cell paragraph has center justification
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var body = doc.MainDocumentPart!.Document.Body!;
+        var para = body.Descendants<TableCell>().First().Descendants<Paragraph>().First();
+        var jc = para.GetFirstChild<ParagraphProperties>()!.GetFirstChild<Justification>();
+        jc.Should().NotBeNull();
+        jc!.Val!.Value.Should().Be(JustificationValues.Center);
+    }
+
+    [Fact]
+    public void AddTable_WithRightAlignment_ShouldApplyJustificationRight()
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+        var tableData = new TableData
+        {
+            ColumnCount = 1,
+            Rows = [new TableRowData { IsHeader = false, Cells = [new TableCellData { Runs = [new InlineRun { Text = "Right" }], Alignment = "right" }] }]
+        };
+
+        builder.AddTable(tableData, CreateDefaultTableStyle());
+        builder.Save();
+
+        // Assert
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var body = doc.MainDocumentPart!.Document.Body!;
+        var para = body.Descendants<TableCell>().First().Descendants<Paragraph>().First();
+        var jc = para.GetFirstChild<ParagraphProperties>()!.GetFirstChild<Justification>();
+        jc!.Val!.Value.Should().Be(JustificationValues.Right);
+    }
+
+    [Fact]
+    public void AddTable_HeaderRow_ShouldHaveTableHeaderProperty()
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+        var tableData = new TableData
+        {
+            ColumnCount = 1,
+            Rows = [new TableRowData { IsHeader = true, Cells = [new TableCellData { Runs = [new InlineRun { Text = "H" }] }] }]
+        };
+
+        builder.AddTable(tableData, CreateDefaultTableStyle());
+        builder.Save();
+
+        // Assert: header row has TableRowProperties with TableHeader
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var body = doc.MainDocumentPart!.Document.Body!;
+        var row = body.Descendants<TableRow>().First();
+        var trProps = row.GetFirstChild<TableRowProperties>();
+        trProps.Should().NotBeNull();
+        trProps!.GetFirstChild<TableHeader>().Should().NotBeNull();
+    }
+
+    private static CoreTableStyle CreateDefaultTableStyle() => new()
+    {
+        FontSize = 20,
+        HeaderBackgroundColor = "2c3e50",
+        HeaderTextColor = "ecf0f1",
+        BodyTextColor = "2c3e50",
+        BorderColor = "bdc3c7",
+        BorderSize = 4,
+        HeaderBold = true,
+        CellPaddingTop = 40,
+        CellPaddingBottom = 40,
+        CellPaddingLeft = 80,
+        CellPaddingRight = 80,
+        SpaceBefore = "160",
+        SpaceAfter = "160"
+    };
 }
