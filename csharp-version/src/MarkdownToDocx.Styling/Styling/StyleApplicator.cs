@@ -149,7 +149,8 @@ public sealed class StyleApplicator : IStyleApplicator
             CellPaddingLeft = config.Table.CellPaddingLeft,
             CellPaddingRight = config.Table.CellPaddingRight,
             SpaceBefore = config.Table.SpaceBefore,
-            SpaceAfter = config.Table.SpaceAfter
+            SpaceAfter = config.Table.SpaceAfter,
+            WidthPercent = Math.Clamp(config.Table.WidthPercent, 1, 100)
         };
     }
 

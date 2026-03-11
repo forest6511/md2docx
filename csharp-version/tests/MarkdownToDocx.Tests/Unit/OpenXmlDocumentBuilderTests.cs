@@ -2391,6 +2391,37 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         tblWidth.Width!.Value.Should().Be("5000");
     }
 
+    [Theory]
+    [InlineData(100, "5000")]
+    [InlineData(90, "4500")]
+    [InlineData(75, "3750")]
+    public void AddTable_WidthPercent_ShouldScaleTblW(int widthPercent, string expectedPct)
+    {
+        // Arrange
+        using var stream = new MemoryStream();
+        using var builder = new OpenXmlDocumentBuilder(stream, _horizontalProvider);
+        var tableData = new TableData
+        {
+            ColumnCount = 2,
+            Rows = [new TableRowData { IsHeader = false, Cells = [new TableCellData { Runs = [new InlineRun { Text = "A" }] }, new TableCellData { Runs = [new InlineRun { Text = "B" }] }] }]
+        };
+        var style = CreateDefaultTableStyle() with { WidthPercent = widthPercent };
+
+        builder.AddTable(tableData, style);
+        builder.Save();
+
+        // Assert: tblW uses correct pct value
+        stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(stream, false);
+        var tblWidth = doc.MainDocumentPart!.Document.Body!
+            .Descendants<DocumentFormat.OpenXml.Wordprocessing.Table>().First()
+            .GetFirstChild<TableProperties>()!
+            .GetFirstChild<TableWidth>();
+
+        tblWidth!.Type!.Value.Should().Be(TableWidthUnitValues.Pct);
+        tblWidth.Width!.Value.Should().Be(expectedPct);
+    }
+
     [Fact]
     public void AddTable_ShouldHaveFixedTableLayout()
     {

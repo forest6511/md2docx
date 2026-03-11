@@ -69,4 +69,10 @@ public sealed record TableStyle
     /// Space after table in twips
     /// </summary>
     public string SpaceAfter { get; init; } = "160";
+
+    /// <summary>
+    /// Table width as a percentage of the printable text area (1-100).
+    /// Values below 100 leave horizontal space around the table.
+    /// </summary>
+    public int WidthPercent { get; init; } = 100;
 }

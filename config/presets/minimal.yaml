@@ -115,3 +115,5 @@ Styles:
     LeftIndent: "720"
     SpaceBefore: "240"
     SpaceAfter: "240"
+  Table:
+    WidthPercent: 100   # 1-100: table width as % of printable area
