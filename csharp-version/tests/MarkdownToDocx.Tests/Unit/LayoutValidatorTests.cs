@@ -221,8 +221,11 @@ public class LayoutValidatorTests : IDisposable
 
     private static ParagraphStyle DefaultParagraphStyle() => new()
     {
-        FontSize = 18, Color = "000000",
-        LineSpacing = "240", FirstLineIndent = "0", LeftIndent = "0"
+        FontSize = 18,
+        Color = "000000",
+        LineSpacing = "240",
+        FirstLineIndent = "0",
+        LeftIndent = "0"
     };
 
     private static CodeBlockStyle DefaultCodeBlockStyle(bool wordWrap = true) => new()

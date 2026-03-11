@@ -35,13 +35,13 @@ public sealed class ConfigurableTextDirectionProvider(
 
         return baseConfig with
         {
-            Width        = new UInt32Value(width),
-            Height       = new UInt32Value(height),
-            Orientation  = orientation,
-            TopMargin    = layout.MarginTop    > 0 ? (int)Math.Round(layout.MarginTop    * CmToTwips) : baseConfig.TopMargin,
+            Width = new UInt32Value(width),
+            Height = new UInt32Value(height),
+            Orientation = orientation,
+            TopMargin = layout.MarginTop > 0 ? (int)Math.Round(layout.MarginTop * CmToTwips) : baseConfig.TopMargin,
             BottomMargin = layout.MarginBottom > 0 ? (int)Math.Round(layout.MarginBottom * CmToTwips) : baseConfig.BottomMargin,
-            LeftMargin   = layout.MarginLeft   > 0 ? (int)Math.Round(layout.MarginLeft   * CmToTwips) : baseConfig.LeftMargin,
-            RightMargin  = layout.MarginRight  > 0 ? (int)Math.Round(layout.MarginRight  * CmToTwips) : baseConfig.RightMargin,
+            LeftMargin = layout.MarginLeft > 0 ? (int)Math.Round(layout.MarginLeft * CmToTwips) : baseConfig.LeftMargin,
+            RightMargin = layout.MarginRight > 0 ? (int)Math.Round(layout.MarginRight * CmToTwips) : baseConfig.RightMargin,
             HeaderMargin = layout.MarginHeader.HasValue ? (int)Math.Round(layout.MarginHeader.Value * CmToTwips) : baseConfig.HeaderMargin,
             FooterMargin = layout.MarginFooter.HasValue ? (int)Math.Round(layout.MarginFooter.Value * CmToTwips) : baseConfig.FooterMargin,
             GutterMargin = layout.MarginGutter.HasValue ? (int)Math.Round(layout.MarginGutter.Value * CmToTwips) : baseConfig.GutterMargin,

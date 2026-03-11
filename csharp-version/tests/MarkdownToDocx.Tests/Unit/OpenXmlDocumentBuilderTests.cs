@@ -2428,11 +2428,15 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         var tableData = new TableData
         {
             ColumnCount = expectedColumns,
-            Rows = [new TableRowData { IsHeader = false, Cells = [
+            Rows = [new TableRowData
+            {
+                IsHeader = false,
+                Cells = [
                 new TableCellData { Runs = [new InlineRun { Text = "A" }] },
-                new TableCellData { Runs = [new InlineRun { Text = "B" }] },
-                new TableCellData { Runs = [new InlineRun { Text = "C" }] }
-            ] }]
+                    new TableCellData { Runs = [new InlineRun { Text = "B" }] },
+                    new TableCellData { Runs = [new InlineRun { Text = "C" }] }
+            ]
+            }]
         };
 
         builder.AddTable(tableData, CreateDefaultTableStyle());
@@ -2458,10 +2462,14 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         var tableData = new TableData
         {
             ColumnCount = 2,
-            Rows = [new TableRowData { IsHeader = false, Cells = [
+            Rows = [new TableRowData
+            {
+                IsHeader = false,
+                Cells = [
                 new TableCellData { Runs = [new InlineRun { Text = "A" }] },
-                new TableCellData { Runs = [new InlineRun { Text = "B" }] }
-            ] }]
+                    new TableCellData { Runs = [new InlineRun { Text = "B" }] }
+            ]
+            }]
         };
 
         builder.AddTable(tableData, CreateDefaultTableStyle());

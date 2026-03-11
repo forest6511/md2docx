@@ -17,15 +17,15 @@ public class ConfigurableTextDirectionProviderTests
         double marginTop = 1.9, double marginBottom = 1.9,
         double marginLeft = 1.5, double marginRight = 0.6,
         bool mirrorMargins = false) => new()
-    {
-        Width = width,
-        Height = height,
-        MarginTop = marginTop,
-        MarginBottom = marginBottom,
-        MarginLeft = marginLeft,
-        MarginRight = marginRight,
-        MirrorMargins = mirrorMargins,
-    };
+        {
+            Width = width,
+            Height = height,
+            MarginTop = marginTop,
+            MarginBottom = marginBottom,
+            MarginLeft = marginLeft,
+            MarginRight = marginRight,
+            MirrorMargins = mirrorMargins,
+        };
 
     [Fact]
     public void GetPageConfiguration_WhenWidthAndHeightSet_OverridesDefaults()
