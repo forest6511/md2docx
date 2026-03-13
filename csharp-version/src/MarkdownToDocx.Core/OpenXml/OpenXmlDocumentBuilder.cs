@@ -156,6 +156,21 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
             paragraphBorders.AppendChild(border);
         }
 
+        // When only "left" is specified, Word anchors the border at the paragraph indent (flush
+        // with text) instead of at the page content edge. Adding Nil borders for the unspecified
+        // sides forces Word into box-mode rendering, which anchors the left border at position 0
+        // so that LeftIndent creates a visible gap between the border line and the text.
+        var specifiedPositions = new HashSet<string>(positions);
+        if (specifiedPositions.Contains("left"))
+        {
+            if (!specifiedPositions.Contains("top"))
+                paragraphBorders.AppendChild(new TopBorder { Val = BorderValues.Nil });
+            if (!specifiedPositions.Contains("bottom"))
+                paragraphBorders.AppendChild(new BottomBorder { Val = BorderValues.Nil });
+            if (!specifiedPositions.Contains("right"))
+                paragraphBorders.AppendChild(new RightBorder { Val = BorderValues.Nil });
+        }
+
         return paragraphBorders;
     }
 

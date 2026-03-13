@@ -2229,6 +2229,103 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         indentation!.Left!.Value.Should().Be("400");
     }
 
+    [Fact]
+    public void AddHeading_WithLeftBorderOnly_ShouldAddNilBordersForBoxMode()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle() with
+        {
+            ShowBorder = true,
+            BorderPosition = "left",
+            BorderColor = "0066cc",
+            BorderSize = 24,
+            BorderSpace = 8,
+            LeftIndent = "200"
+        };
+
+        // Act
+        builder.AddHeading(3, "Section", style);
+        builder.Save();
+
+        // Assert: left border is Single; top/bottom/right are Nil to force box-mode rendering
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        var borders = paragraph.ParagraphProperties!.ParagraphBorders!;
+        borders.GetFirstChild<LeftBorder>()!.Val!.Value.Should().Be(BorderValues.Single);
+        borders.GetFirstChild<TopBorder>()!.Val!.Value.Should().Be(BorderValues.Nil);
+        borders.GetFirstChild<BottomBorder>()!.Val!.Value.Should().Be(BorderValues.Nil);
+        borders.GetFirstChild<RightBorder>()!.Val!.Value.Should().Be(BorderValues.Nil);
+    }
+
+    [Fact]
+    public void AddHeading_WithAllFourBorders_ShouldNotAddNilBorders()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle() with
+        {
+            ShowBorder = true,
+            BorderPosition = "left,top,right,bottom",
+            BorderColor = "0066cc",
+            BorderSize = 12,
+            BorderSpace = 4
+        };
+
+        // Act
+        builder.AddHeading(2, "Section", style);
+        builder.Save();
+
+        // Assert: all four borders are Single, none are Nil
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        var borders = paragraph.ParagraphProperties!.ParagraphBorders!;
+        borders.GetFirstChild<LeftBorder>()!.Val!.Value.Should().Be(BorderValues.Single);
+        borders.GetFirstChild<TopBorder>()!.Val!.Value.Should().Be(BorderValues.Single);
+        borders.GetFirstChild<BottomBorder>()!.Val!.Value.Should().Be(BorderValues.Single);
+        borders.GetFirstChild<RightBorder>()!.Val!.Value.Should().Be(BorderValues.Single);
+    }
+
+    [Fact]
+    public void AddHeading_WithBottomBorderOnly_ShouldNotAddNilBorders()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle() with
+        {
+            ShowBorder = true,
+            BorderPosition = "bottom",
+            BorderColor = "cccccc",
+            BorderSize = 8,
+            BorderSpace = 2
+        };
+
+        // Act
+        builder.AddHeading(2, "Section", style);
+        builder.Save();
+
+        // Assert: only bottom border exists, no Nil borders added (box-mode only applies to left)
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        var borders = paragraph.ParagraphProperties!.ParagraphBorders!;
+        borders.GetFirstChild<BottomBorder>()!.Val!.Value.Should().Be(BorderValues.Single);
+        borders.GetFirstChild<LeftBorder>().Should().BeNull();
+        borders.GetFirstChild<TopBorder>().Should().BeNull();
+        borders.GetFirstChild<RightBorder>().Should().BeNull();
+    }
+
     public void Dispose()
     {
         _stream?.Dispose();
