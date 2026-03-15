@@ -166,6 +166,25 @@ public sealed record HeadingStyleConfig
     /// at the specified level (e.g., set to 1 on H2 to prevent a page break after H1).
     /// </summary>
     public int? SuppressPageBreakIfPrevHeadingLevel { get; init; }
+
+    /// <summary>
+    /// Border line style for all border positions on this heading.
+    /// Supported values: "single" (default), "double", "thick", "dotted", "dashed",
+    /// "dotDash", "wave", "triple".
+    /// </summary>
+    public string BorderStyle { get; init; } = "single";
+
+    /// <summary>
+    /// Unicode character (or short string) prepended to the heading text as a decorative prefix.
+    /// For example "◆", "★", "▶", or "01". Null or empty means no prefix.
+    /// </summary>
+    public string? IconPrefix { get; init; }
+
+    /// <summary>
+    /// Color of the icon prefix in hexadecimal format (e.g., "E91E8C").
+    /// When null or empty, the heading's main Color is used.
+    /// </summary>
+    public string? IconPrefixColor { get; init; }
 }
 
 /// <summary>

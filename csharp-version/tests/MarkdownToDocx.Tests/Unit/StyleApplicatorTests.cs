@@ -590,6 +590,74 @@ public class StyleApplicatorTests
     }
 
     [Fact]
+    public void ApplyHeadingStyle_WithBorderStyle_ShouldMapCorrectly()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            H1 = new HeadingStyleConfig
+            {
+                Size = 20,
+                Bold = true,
+                Color = "000000",
+                ShowBorder = true,
+                BorderStyle = "double"
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyHeadingStyle(1, config);
+
+        // Assert
+        style.BorderStyle.Should().Be("double");
+    }
+
+    [Fact]
+    public void ApplyHeadingStyle_WithDefaultBorderStyle_ShouldBeSingle()
+    {
+        // Act
+        var style = _applicator.ApplyHeadingStyle(1, _testConfig);
+
+        // Assert
+        style.BorderStyle.Should().Be("single");
+    }
+
+    [Fact]
+    public void ApplyHeadingStyle_WithIconPrefix_ShouldMapCorrectly()
+    {
+        // Arrange
+        var config = new StyleConfiguration
+        {
+            H2 = new HeadingStyleConfig
+            {
+                Size = 18,
+                Bold = true,
+                Color = "000000",
+                IconPrefix = "◆",
+                IconPrefixColor = "E91E8C"
+            }
+        };
+
+        // Act
+        var style = _applicator.ApplyHeadingStyle(2, config);
+
+        // Assert
+        style.IconPrefix.Should().Be("◆");
+        style.IconPrefixColor.Should().Be("E91E8C");
+    }
+
+    [Fact]
+    public void ApplyHeadingStyle_WithDefaultIconPrefix_ShouldBeNull()
+    {
+        // Act
+        var style = _applicator.ApplyHeadingStyle(1, _testConfig);
+
+        // Assert
+        style.IconPrefix.Should().BeNull();
+        style.IconPrefixColor.Should().BeNull();
+    }
+
+    [Fact]
     public void ApplyParagraphStyle_ShouldMapInlineCodeFont()
     {
         // Arrange
