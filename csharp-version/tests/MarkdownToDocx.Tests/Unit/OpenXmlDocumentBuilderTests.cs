@@ -2735,4 +2735,239 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         SpaceBefore = "160",
         SpaceAfter = "160"
     };
+
+    // ── FencedDiv tests ──────────────────────────────────────────────────────
+
+    [Fact]
+    public void AddFencedDiv_WithParagraphOnly_ShouldApplyBackgroundAndBorders()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var content = new FencedDivContent
+        {
+            Blocks =
+            [
+                new FencedDivParagraph
+                {
+                    Runs = [new InlineRun { Text = "Try this exercise" }]
+                }
+            ]
+        };
+        var style = new FencedDivStyle
+        {
+            BackgroundColor = "F2F2F2",
+            BorderTopColor = "AAAAAA",
+            BorderTopSize = 4,
+            BorderBottomColor = "AAAAAA",
+            BorderBottomSize = 4,
+            FontSize = 22,
+            Color = "000000",
+            LineSpacing = "360"
+        };
+
+        // Act
+        builder.AddFencedDiv(content, style);
+        builder.Save();
+
+        // Assert: single paragraph with background shading, top border, and bottom border
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .Where(p => p.ParagraphProperties?.ParagraphBorders != null)
+            .ToList();
+
+        paragraphs.Should().HaveCount(1);
+        var borders = paragraphs[0].ParagraphProperties!.ParagraphBorders!;
+        borders.GetFirstChild<TopBorder>()!.Val!.Value.Should().Be(BorderValues.Single);
+        borders.GetFirstChild<TopBorder>()!.Color!.Value.Should().Be("AAAAAA");
+        borders.GetFirstChild<BottomBorder>()!.Val!.Value.Should().Be(BorderValues.Single);
+        borders.GetFirstChild<BottomBorder>()!.Color!.Value.Should().Be("AAAAAA");
+
+        var shading = paragraphs[0].ParagraphProperties!.GetFirstChild<Shading>();
+        shading.Should().NotBeNull();
+        shading!.Fill!.Value.Should().Be("F2F2F2");
+    }
+
+    [Fact]
+    public void AddFencedDiv_WithMultipleParagraphs_TopBorderOnFirstBottomBorderOnLast()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var content = new FencedDivContent
+        {
+            Blocks =
+            [
+                new FencedDivParagraph { Runs = [new InlineRun { Text = "First" }] },
+                new FencedDivParagraph { Runs = [new InlineRun { Text = "Middle" }] },
+                new FencedDivParagraph { Runs = [new InlineRun { Text = "Last" }] }
+            ]
+        };
+        var style = new FencedDivStyle
+        {
+            BackgroundColor = "F2F2F2",
+            BorderTopColor = "AAAAAA",
+            BorderTopSize = 4,
+            BorderBottomColor = "AAAAAA",
+            BorderBottomSize = 4,
+            FontSize = 22,
+            Color = "000000",
+            LineSpacing = "360"
+        };
+
+        // Act
+        builder.AddFencedDiv(content, style);
+        builder.Save();
+
+        // Assert: 3 paragraphs; first has top border, last has bottom border, middle has neither
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .ToList();
+
+        paragraphs.Should().HaveCount(3);
+
+        var firstBorders = paragraphs[0].ParagraphProperties?.ParagraphBorders;
+        firstBorders.Should().NotBeNull();
+        firstBorders!.GetFirstChild<TopBorder>().Should().NotBeNull();
+        firstBorders.GetFirstChild<BottomBorder>().Should().BeNull();
+
+        var middleBorders = paragraphs[1].ParagraphProperties?.ParagraphBorders;
+        middleBorders.Should().BeNull();
+
+        var lastBorders = paragraphs[2].ParagraphProperties?.ParagraphBorders;
+        lastBorders.Should().NotBeNull();
+        lastBorders!.GetFirstChild<BottomBorder>().Should().NotBeNull();
+        lastBorders.GetFirstChild<TopBorder>().Should().BeNull();
+    }
+
+    [Fact]
+    public void AddFencedDiv_WithNoBorderColors_ShouldApplyOnlyBackground()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var content = new FencedDivContent
+        {
+            Blocks =
+            [
+                new FencedDivParagraph { Runs = [new InlineRun { Text = "Zone content" }] }
+            ]
+        };
+        var style = new FencedDivStyle
+        {
+            BackgroundColor = "EBF5FB",
+            FontSize = 22,
+            Color = "000000",
+            LineSpacing = "360"
+            // BorderTopColor and BorderBottomColor intentionally left empty
+        };
+
+        // Act
+        builder.AddFencedDiv(content, style);
+        builder.Save();
+
+        // Assert: background shading applied, no paragraph borders
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First();
+
+        paragraph.ParagraphProperties?.ParagraphBorders.Should().BeNull();
+        paragraph.ParagraphProperties?.GetFirstChild<Shading>()!.Fill!.Value.Should().Be("EBF5FB");
+    }
+
+    [Fact]
+    public void AddFencedDiv_WithTableBodyCell_ShouldApplyBackgroundShading()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var tableData = new TableData
+        {
+            ColumnCount = 2,
+            Rows =
+            [
+                new TableRowData
+                {
+                    IsHeader = true,
+                    Cells =
+                    [
+                        new TableCellData { Runs = [new InlineRun { Text = "Header 1" }] },
+                        new TableCellData { Runs = [new InlineRun { Text = "Header 2" }] }
+                    ]
+                },
+                new TableRowData
+                {
+                    IsHeader = false,
+                    Cells =
+                    [
+                        new TableCellData { Runs = [new InlineRun { Text = "Body A" }] },
+                        new TableCellData { Runs = [new InlineRun { Text = "Body B" }] }
+                    ]
+                }
+            ]
+        };
+        var content = new FencedDivContent
+        {
+            Blocks = [new FencedDivTable { Data = tableData }]
+        };
+        var style = new FencedDivStyle
+        {
+            BackgroundColor = "F2F2F2",
+            FontSize = 22,
+            Color = "000000",
+            LineSpacing = "360"
+        };
+
+        // Act
+        builder.AddFencedDiv(content, style);
+        builder.Save();
+
+        // Assert: body cells have F2F2F2 background; header cells retain default header color
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var rows = doc.MainDocumentPart!.Document.Body!
+            .Descendants<TableRow>()
+            .ToList();
+
+        rows.Should().HaveCount(2);
+
+        // Header row cells use the default header background (not div background)
+        var headerCells = rows[0].Descendants<TableCell>().ToList();
+        foreach (var cell in headerCells)
+        {
+            var shading = cell.GetFirstChild<TableCellProperties>()?.GetFirstChild<Shading>();
+            shading.Should().NotBeNull("header cell should always have shading");
+            shading!.Fill!.Value.Should().NotBe("F2F2F2", "header cell should use its own background, not the div background");
+        }
+
+        // Body row cells should have the div background applied
+        var bodyCells = rows[1].Descendants<TableCell>().ToList();
+        foreach (var cell in bodyCells)
+        {
+            var shading = cell.GetFirstChild<TableCellProperties>()?.GetFirstChild<Shading>();
+            shading.Should().NotBeNull("body cell should have div background shading");
+            shading!.Fill!.Value.Should().Be("F2F2F2");
+        }
+    }
+
+    [Fact]
+    public void AddFencedDiv_WithEmptyContent_ShouldAddNoParagraphs()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var content = new FencedDivContent { Blocks = [] };
+        var style = new FencedDivStyle { BackgroundColor = "F2F2F2", FontSize = 22, Color = "000000", LineSpacing = "360" };
+
+        // Act
+        builder.AddFencedDiv(content, style);
+        builder.Save();
+
+        // Assert: no content paragraphs added
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Descendants<Paragraph>().ToList();
+        paragraphs.Should().BeEmpty();
+    }
 }

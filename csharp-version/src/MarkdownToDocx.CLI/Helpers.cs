@@ -1,3 +1,4 @@
+using Markdig.Extensions.CustomContainers;
 using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
@@ -174,6 +175,51 @@ public static class Helpers
     /// </summary>
     public static TableData GetTableData(Table table) =>
         MarkdownToDocx.Core.Markdown.TableExtractor.Extract(table);
+
+    /// <summary>
+    /// Extracts structured child blocks from a Markdig CustomContainer (:::classname ... :::).
+    /// Supports paragraphs, headings, tables, and lists within the div.
+    /// Unrecognized child block types are silently skipped.
+    /// </summary>
+    public static FencedDivContent GetFencedDivContent(CustomContainer container)
+    {
+        var blocks = new List<FencedDivBlock>();
+
+        foreach (var child in container)
+        {
+            switch (child)
+            {
+                case ParagraphBlock paragraph:
+                    var runs = new List<InlineRun>();
+                    if (paragraph.Inline != null)
+                        ExtractInlineRuns(paragraph.Inline, runs, bold: false, italic: false);
+                    if (runs.Count > 0)
+                        blocks.Add(new FencedDivParagraph { Runs = runs });
+                    break;
+
+                case HeadingBlock heading:
+                    var headingText = GetBlockText(heading);
+                    if (!string.IsNullOrEmpty(headingText))
+                        blocks.Add(new FencedDivHeading { Level = heading.Level, Text = headingText });
+                    break;
+
+                case Table table:
+                    blocks.Add(new FencedDivTable { Data = GetTableData(table) });
+                    break;
+
+                case ListBlock list:
+                    var items = GetListItems(list).ToList();
+                    if (items.Count > 0)
+                    {
+                        var startNumber = int.TryParse(list.OrderedStart, out var parsed) ? parsed : 1;
+                        blocks.Add(new FencedDivList { Items = items, IsOrdered = list.IsOrdered, StartNumber = startNumber });
+                    }
+                    break;
+            }
+        }
+
+        return new FencedDivContent { Blocks = blocks };
+    }
 
     private static void ExtractInlineRuns(Inline? inline, List<InlineRun> runs, bool bold, bool italic)
     {

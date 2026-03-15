@@ -1,3 +1,4 @@
+using Markdig.Extensions.CustomContainers;
 using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 using MarkdownToDocx.CLI;
@@ -133,6 +134,15 @@ try
                     var tableData = Helpers.GetTableData(tableBlock);
                     var tableStyle = styleApplicator.ApplyTableStyle(config.Styles);
                     builder.AddTable(tableData, tableStyle);
+                    break;
+
+                case CustomContainer container:
+                    var className = container.Info ?? string.Empty;
+                    if (!config.Styles.FencedDivs.TryGetValue(className, out var divConfig))
+                        divConfig = new MarkdownToDocx.Styling.Models.FencedDivClassConfig();
+                    var divStyle = styleApplicator.ApplyFencedDivStyle(divConfig, config.Styles);
+                    var divContent = Helpers.GetFencedDivContent(container);
+                    builder.AddFencedDiv(divContent, divStyle);
                     break;
 
                 case ThematicBreakBlock:

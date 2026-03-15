@@ -76,6 +76,14 @@ public interface IDocumentBuilder : IDisposable
     void AddTable(TableData tableData, TableStyle style);
 
     /// <summary>
+    /// Adds a fenced div block to the document.
+    /// Renders child blocks with background shading and optional top/bottom separator borders.
+    /// </summary>
+    /// <param name="content">Structured child blocks extracted from the fenced div</param>
+    /// <param name="style">Fenced div visual style</param>
+    void AddFencedDiv(FencedDivContent content, FencedDivStyle style);
+
+    /// <summary>
     /// Adds a thematic break (horizontal rule) to the document
     /// </summary>
     void AddThematicBreak();

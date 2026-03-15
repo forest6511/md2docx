@@ -183,6 +183,32 @@ public sealed class StyleApplicator : IStyleApplicator
         };
     }
 
+    /// <inheritdoc/>
+    public FencedDivStyle ApplyFencedDivStyle(FencedDivClassConfig divConfig, StyleConfiguration styles)
+    {
+        ArgumentNullException.ThrowIfNull(divConfig);
+        ArgumentNullException.ThrowIfNull(styles);
+
+        var para = styles.Paragraph;
+        return new FencedDivStyle
+        {
+            BackgroundColor = divConfig.BackgroundColor,
+            BorderTopColor = divConfig.BorderTopColor,
+            BorderTopSize = divConfig.BorderTopSize,
+            BorderBottomColor = divConfig.BorderBottomColor,
+            BorderBottomSize = divConfig.BorderBottomSize,
+            BorderSpace = divConfig.BorderSpace,
+            SpaceBefore = divConfig.SpaceBefore,
+            SpaceAfter = divConfig.SpaceAfter,
+            LeftIndent = divConfig.LeftIndent,
+            FontSize = para.Size * 2, // Convert pt to half-points
+            Color = para.Color,
+            LineSpacing = para.LineSpacing,
+            InlineCodeFontAscii = para.InlineCodeFontAscii,
+            InlineCodeFontEastAsia = para.InlineCodeFontEastAsia
+        };
+    }
+
     /// <summary>
     /// Resolves a potentially relative path against the directory of a base file.
     /// Absolute paths are returned unchanged.
