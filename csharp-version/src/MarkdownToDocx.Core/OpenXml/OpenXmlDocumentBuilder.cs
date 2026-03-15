@@ -130,28 +130,45 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     }
 
     /// <summary>
+    /// Converts a border style name to the corresponding BorderValues enum value.
+    /// </summary>
+    private static BorderValues ParseBorderStyle(string borderStyle) => borderStyle.ToLowerInvariant() switch
+    {
+        "double" => BorderValues.Double,
+        "thick" => BorderValues.Thick,
+        "dotted" => BorderValues.Dotted,
+        "dashed" => BorderValues.Dashed,
+        "dotdash" => BorderValues.DotDash,
+        "wave" => BorderValues.Wave,
+        "triple" => BorderValues.Triple,
+        _ => BorderValues.Single
+    };
+
+    /// <summary>
     /// Creates a ParagraphBorders element from a comma-separated position string
     /// </summary>
     private static ParagraphBorders CreateBordersFromPositions(
         string borderPosition,
         string borderColor,
         uint borderSize,
-        uint borderSpace)
+        uint borderSpace,
+        string borderStyle = "single")
     {
         var positions = borderPosition
             .ToLowerInvariant()
             .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
+        var borderVal = ParseBorderStyle(borderStyle);
         var paragraphBorders = new ParagraphBorders();
 
         foreach (var pos in positions)
         {
             OpenXmlElement border = pos switch
             {
-                "left" => new LeftBorder { Val = BorderValues.Single, Color = borderColor, Size = borderSize, Space = borderSpace },
-                "right" => new RightBorder { Val = BorderValues.Single, Color = borderColor, Size = borderSize, Space = borderSpace },
-                "top" => new TopBorder { Val = BorderValues.Single, Color = borderColor, Size = borderSize, Space = borderSpace },
-                _ => new BottomBorder { Val = BorderValues.Single, Color = borderColor, Size = borderSize, Space = borderSpace }
+                "left" => new LeftBorder { Val = borderVal, Color = borderColor, Size = borderSize, Space = borderSpace },
+                "right" => new RightBorder { Val = borderVal, Color = borderColor, Size = borderSize, Space = borderSpace },
+                "top" => new TopBorder { Val = borderVal, Color = borderColor, Size = borderSize, Space = borderSpace },
+                _ => new BottomBorder { Val = borderVal, Color = borderColor, Size = borderSize, Space = borderSpace }
             };
             paragraphBorders.AppendChild(border);
         }
@@ -516,6 +533,15 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         var paragraphProps = CreateHeadingParagraphProperties(level, style);
         paragraph.AppendChild(paragraphProps);
 
+        // Icon prefix run
+        if (!string.IsNullOrEmpty(style.IconPrefix))
+        {
+            var iconColor = string.IsNullOrEmpty(style.IconPrefixColor) ? style.Color : style.IconPrefixColor;
+            var iconRun = paragraph.AppendChild(new Run());
+            iconRun.AppendChild(CreateBaseRunProperties(style.FontSize, iconColor, bold: style.Bold));
+            iconRun.AppendChild(new Text(style.IconPrefix + " ") { Space = SpaceProcessingModeValues.Preserve });
+        }
+
         var run = paragraph.AppendChild(new Run());
         run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color, bold: style.Bold));
         run.AppendChild(new Text(text) { Space = SpaceProcessingModeValues.Preserve });
@@ -565,7 +591,8 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
                 style.BorderPosition,
                 style.BorderColor ?? "3498db",
                 style.BorderSize,
-                style.BorderSpace));
+                style.BorderSpace,
+                style.BorderStyle));
 
             // Background shading
             if (!string.IsNullOrEmpty(style.BackgroundColor))
@@ -589,6 +616,15 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
             mainProps.AppendChild(mainSpacing);
 
             mainParagraph.AppendChild(mainProps);
+
+            // Icon prefix run
+            if (!string.IsNullOrEmpty(style.IconPrefix))
+            {
+                var iconColor = string.IsNullOrEmpty(style.IconPrefixColor) ? style.Color : style.IconPrefixColor;
+                var iconRun = mainParagraph.AppendChild(new Run());
+                iconRun.AppendChild(CreateBaseRunProperties(style.FontSize, iconColor, bold: style.Bold));
+                iconRun.AppendChild(new Text(style.IconPrefix + " ") { Space = SpaceProcessingModeValues.Preserve });
+            }
 
             var run = mainParagraph.AppendChild(new Run());
             run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color, bold: style.Bold));
@@ -635,7 +671,8 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
                 style.BorderPosition,
                 style.BorderColor ?? "3498db",
                 style.BorderSize,
-                style.BorderSpace));
+                style.BorderSpace,
+                style.BorderStyle));
         }
 
         // Background shading

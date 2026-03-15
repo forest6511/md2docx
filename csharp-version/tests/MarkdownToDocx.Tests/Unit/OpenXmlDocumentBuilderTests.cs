@@ -2326,6 +2326,174 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         borders.GetFirstChild<RightBorder>().Should().BeNull();
     }
 
+    [Fact]
+    public void AddHeading_WithBorderStyleDouble_ShouldRenderDoubleBorder()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle() with
+        {
+            ShowBorder = true,
+            BorderPosition = "bottom",
+            BorderColor = "3498db",
+            BorderSize = 12,
+            BorderSpace = 2,
+            BorderStyle = "double"
+        };
+
+        // Act
+        builder.AddHeading(1, "Double border heading", style);
+        builder.Save();
+
+        // Assert: bottom border uses Double style
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        var borders = paragraph.ParagraphProperties!.ParagraphBorders!;
+        borders.GetFirstChild<BottomBorder>()!.Val!.Value.Should().Be(BorderValues.Double);
+    }
+
+    [Fact]
+    public void AddHeading_WithBorderStyleWave_ShouldRenderWaveBorder()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle() with
+        {
+            ShowBorder = true,
+            BorderPosition = "bottom",
+            BorderColor = "3498db",
+            BorderSize = 12,
+            BorderSpace = 2,
+            BorderStyle = "wave"
+        };
+
+        // Act
+        builder.AddHeading(2, "Wave border heading", style);
+        builder.Save();
+
+        // Assert: bottom border uses Wave style
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.ParagraphProperties?.ParagraphBorders != null);
+
+        var borders = paragraph.ParagraphProperties!.ParagraphBorders!;
+        borders.GetFirstChild<BottomBorder>()!.Val!.Value.Should().Be(BorderValues.Wave);
+    }
+
+    [Fact]
+    public void AddHeading_WithIconPrefix_ShouldPrependIconRun()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle() with
+        {
+            IconPrefix = "◆"
+        };
+
+        // Act
+        builder.AddHeading(1, "Test Heading", style);
+        builder.Save();
+
+        // Assert: paragraph has two runs — icon prefix run and text run
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.Descendants<Run>().Any());
+
+        var runs = paragraph.Descendants<Run>().ToList();
+        runs.Should().HaveCount(2);
+        runs[0].InnerText.Should().StartWith("◆");
+        runs[1].InnerText.Should().Be("Test Heading");
+    }
+
+    [Fact]
+    public void AddHeading_WithIconPrefixColor_ShouldUseCustomColor()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle() with
+        {
+            IconPrefix = "★",
+            IconPrefixColor = "E91E8C"
+        };
+
+        // Act
+        builder.AddHeading(1, "Colored Icon Heading", style);
+        builder.Save();
+
+        // Assert: icon run uses custom color, text run uses heading color
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.Descendants<Run>().Any());
+
+        var runs = paragraph.Descendants<Run>().ToList();
+        runs.Should().HaveCount(2);
+        var iconColor = runs[0].RunProperties!.GetFirstChild<Color>()!.Val!.Value;
+        var textColor = runs[1].RunProperties!.GetFirstChild<Color>()!.Val!.Value;
+        iconColor.Should().Be("E91E8C");
+        textColor.Should().Be("2c3e50");
+    }
+
+    [Fact]
+    public void AddHeading_WithIconPrefixNoColor_ShouldUseHeadingColor()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle() with
+        {
+            IconPrefix = "▶",
+            IconPrefixColor = null
+        };
+
+        // Act
+        builder.AddHeading(1, "Default Color Icon", style);
+        builder.Save();
+
+        // Assert: icon run uses heading color (same as text run color)
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.Descendants<Run>().Any());
+
+        var runs = paragraph.Descendants<Run>().ToList();
+        runs.Should().HaveCount(2);
+        var iconColor = runs[0].RunProperties!.GetFirstChild<Color>()!.Val!.Value;
+        var textColor = runs[1].RunProperties!.GetFirstChild<Color>()!.Val!.Value;
+        iconColor.Should().Be("2c3e50");
+        textColor.Should().Be("2c3e50");
+    }
+
+    [Fact]
+    public void AddHeading_WithNoIconPrefix_ShouldHaveSingleRun()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultHeadingStyle() with { IconPrefix = null };
+
+        // Act
+        builder.AddHeading(1, "Plain Heading", style);
+        builder.Save();
+
+        // Assert: only one run (no icon prefix)
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraph = doc.MainDocumentPart!.Document.Body!
+            .Descendants<Paragraph>()
+            .First(p => p.Descendants<Run>().Any());
+
+        paragraph.Descendants<Run>().Should().HaveCount(1);
+    }
+
     public void Dispose()
     {
         _stream?.Dispose();
