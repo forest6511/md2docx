@@ -1083,10 +1083,15 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
             Width = colWidthDxa.ToString(CultureInfo.InvariantCulture)
         });
 
-        // Header background shading
+        // Cell background shading: header always uses HeaderBackgroundColor;
+        // body cells use BodyCellBackgroundColor when set (e.g., inside a fenced div).
         if (isHeader)
         {
             cellProps.AppendChild(CreateBackgroundShading(style.HeaderBackgroundColor));
+        }
+        else if (!string.IsNullOrEmpty(style.BodyCellBackgroundColor))
+        {
+            cellProps.AppendChild(CreateBackgroundShading(style.BodyCellBackgroundColor));
         }
 
         cell.AppendChild(cellProps);
@@ -1136,6 +1141,234 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
         }
 
         return cell;
+    }
+
+    /// <inheritdoc/>
+    public void AddFencedDiv(FencedDivContent content, FencedDivStyle style)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+        ArgumentNullException.ThrowIfNull(style);
+
+        var blocks = content.Blocks;
+        if (blocks.Count == 0) return;
+
+        // Identify the first and last block indices that can carry paragraph borders.
+        // Tables use cell shading instead of paragraph borders, so they are excluded here.
+        int firstBorderable = -1;
+        int lastBorderable = -1;
+        for (int i = 0; i < blocks.Count; i++)
+        {
+            if (blocks[i] is not FencedDivTable)
+            {
+                if (firstBorderable < 0) firstBorderable = i;
+                lastBorderable = i;
+            }
+        }
+
+        // When the div starts or ends with a table, inject invisible spacer paragraphs
+        // that carry the separator borders so the zone boundary is still visible.
+        bool needTopSpacer = firstBorderable != 0 && !string.IsNullOrEmpty(style.BorderTopColor);
+        bool needBottomSpacer = lastBorderable != blocks.Count - 1 && !string.IsNullOrEmpty(style.BorderBottomColor);
+
+        if (needTopSpacer)
+            AddDivBorderSpacer(style, addTop: true, addBottom: false, isFirst: true, isLast: false);
+
+        for (int i = 0; i < blocks.Count; i++)
+        {
+            bool addTopBorder = !needTopSpacer && i == firstBorderable;
+            bool addBottomBorder = !needBottomSpacer && i == lastBorderable;
+
+            switch (blocks[i])
+            {
+                case FencedDivParagraph p:
+                    AddDivParagraph(p.Runs, style, addTopBorder, addBottomBorder, i == 0, i == blocks.Count - 1);
+                    break;
+
+                case FencedDivHeading h:
+                    AddDivHeading(h, style, addTopBorder, addBottomBorder, i == 0, i == blocks.Count - 1);
+                    break;
+
+                case FencedDivList l:
+                    AddDivList(l, style, addTopBorder, addBottomBorder, i == 0, i == blocks.Count - 1);
+                    break;
+
+                case FencedDivTable t:
+                    AddDivTable(t.Data, style);
+                    break;
+            }
+        }
+
+        if (needBottomSpacer)
+            AddDivBorderSpacer(style, addTop: false, addBottom: true, isFirst: false, isLast: true);
+    }
+
+    /// <summary>
+    /// Renders a paragraph inside a fenced div with background shading and optional separator borders.
+    /// </summary>
+    private void AddDivParagraph(
+        IReadOnlyList<InlineRun> runs,
+        FencedDivStyle style,
+        bool addTopBorder,
+        bool addBottomBorder,
+        bool isFirst,
+        bool isLast)
+    {
+        var paragraph = _body.AppendChild(new Paragraph());
+        var props = CreateDivParagraphProperties(style, addTopBorder, addBottomBorder, isFirst, isLast);
+        paragraph.AppendChild(props);
+
+        foreach (var inlineRun in runs)
+        {
+            var run = paragraph.AppendChild(new Run());
+            var runProps = CreateBaseRunProperties(style.FontSize, style.Color, inlineRun.Bold, inlineRun.Italic);
+            if (inlineRun.IsCode)
+                ApplyInlineCodeFont(runProps, style.InlineCodeFontAscii, style.InlineCodeFontEastAsia);
+            run.AppendChild(runProps);
+            run.AppendChild(new Text(inlineRun.Text) { Space = SpaceProcessingModeValues.Preserve });
+        }
+    }
+
+    /// <summary>
+    /// Renders a heading inside a fenced div as a bold paragraph with background shading.
+    /// </summary>
+    private void AddDivHeading(
+        FencedDivHeading heading,
+        FencedDivStyle style,
+        bool addTopBorder,
+        bool addBottomBorder,
+        bool isFirst,
+        bool isLast)
+    {
+        var paragraph = _body.AppendChild(new Paragraph());
+        var props = CreateDivParagraphProperties(style, addTopBorder, addBottomBorder, isFirst, isLast);
+        paragraph.AppendChild(props);
+
+        var run = paragraph.AppendChild(new Run());
+        run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color, bold: true, italic: false));
+        run.AppendChild(new Text(heading.Text) { Space = SpaceProcessingModeValues.Preserve });
+    }
+
+    /// <summary>
+    /// Renders a list inside a fenced div with background shading on each item paragraph.
+    /// </summary>
+    private void AddDivList(
+        FencedDivList list,
+        FencedDivStyle style,
+        bool addTopBorder,
+        bool addBottomBorder,
+        bool isFirst,
+        bool isLast)
+    {
+        int itemNumber = list.StartNumber;
+        var items = list.Items.ToList();
+        for (int j = 0; j < items.Count; j++)
+        {
+            bool itemIsFirst = isFirst && j == 0;
+            bool itemIsLast = isLast && j == items.Count - 1;
+            bool itemTopBorder = addTopBorder && j == 0;
+            bool itemBottomBorder = addBottomBorder && j == items.Count - 1;
+
+            var paragraph = _body.AppendChild(new Paragraph());
+            var props = CreateDivParagraphProperties(style, itemTopBorder, itemBottomBorder, itemIsFirst, itemIsLast);
+            paragraph.AppendChild(props);
+
+            var run = paragraph.AppendChild(new Run());
+            run.AppendChild(CreateBaseRunProperties(style.FontSize, style.Color));
+
+            string bullet = list.IsOrdered ? $"{itemNumber}. " : "• ";
+            run.AppendChild(new Text(bullet + items[j].Text) { Space = SpaceProcessingModeValues.Preserve });
+
+            if (list.IsOrdered) itemNumber++;
+        }
+    }
+
+    /// <summary>
+    /// Renders a table inside a fenced div, applying background shading to all body cells.
+    /// </summary>
+    private void AddDivTable(TableData tableData, FencedDivStyle style)
+    {
+        var pageConfig = _textDirection.GetPageConfiguration();
+        int fullTextAreaTwips = (int)(uint)pageConfig.Width
+            - pageConfig.LeftMargin
+            - pageConfig.RightMargin
+            - pageConfig.GutterMargin;
+
+        // Use a default TableStyle with the div's background applied to body cells
+        var tableStyle = new CoreTableStyle
+        {
+            BodyCellBackgroundColor = string.IsNullOrEmpty(style.BackgroundColor) ? null : style.BackgroundColor
+        };
+
+        int textAreaTwips = (int)(fullTextAreaTwips * tableStyle.WidthPercent / 100.0);
+
+        var table = _body.AppendChild(new Table());
+        table.AppendChild(CreateTableProperties(tableStyle));
+        table.AppendChild(CreateTableGrid(tableData.ColumnCount, textAreaTwips));
+
+        foreach (var row in tableData.Rows)
+        {
+            table.AppendChild(CreateTableRow(row, tableData.ColumnCount, tableStyle, textAreaTwips));
+        }
+    }
+
+    /// <summary>
+    /// Creates an invisible spacer paragraph carrying a single separator border,
+    /// used when the first or last block in a fenced div is a table.
+    /// </summary>
+    private void AddDivBorderSpacer(FencedDivStyle style, bool addTop, bool addBottom, bool isFirst, bool isLast)
+    {
+        var paragraph = _body.AppendChild(new Paragraph());
+        var props = CreateDivParagraphProperties(style, addTop, addBottom, isFirst, isLast);
+        // Zero-height spacer: suppress spacing so the line appears flush with the table
+        props.AppendChild(new SpacingBetweenLines { Before = "0", After = "0" });
+        paragraph.AppendChild(props);
+    }
+
+    /// <summary>
+    /// Builds paragraph properties for a block inside a fenced div.
+    /// Applies background shading, optional separator borders, and spacing.
+    /// </summary>
+    private ParagraphProperties CreateDivParagraphProperties(
+        FencedDivStyle style,
+        bool addTopBorder,
+        bool addBottomBorder,
+        bool isFirst,
+        bool isLast)
+    {
+        var props = CreateBaseParagraphProperties();
+
+        // Separator borders (top and/or bottom separator lines delimiting the zone)
+        bool hasTopBorder = addTopBorder && !string.IsNullOrEmpty(style.BorderTopColor);
+        bool hasBottomBorder = addBottomBorder && !string.IsNullOrEmpty(style.BorderBottomColor);
+
+        if (hasTopBorder || hasBottomBorder)
+        {
+            var borders = new ParagraphBorders();
+            if (hasTopBorder)
+                borders.AppendChild(new TopBorder { Val = BorderValues.Single, Color = style.BorderTopColor, Size = style.BorderTopSize, Space = style.BorderSpace });
+            if (hasBottomBorder)
+                borders.AppendChild(new BottomBorder { Val = BorderValues.Single, Color = style.BorderBottomColor, Size = style.BorderBottomSize, Space = style.BorderSpace });
+            props.AppendChild(borders);
+        }
+
+        // Background shading
+        if (!string.IsNullOrEmpty(style.BackgroundColor))
+            props.AppendChild(CreateBackgroundShading(style.BackgroundColor));
+
+        // Line spacing
+        props.AppendChild(new SpacingBetweenLines
+        {
+            Before = isFirst ? style.SpaceBefore : "0",
+            After = isLast ? style.SpaceAfter : "0",
+            Line = style.LineSpacing,
+            LineRule = LineSpacingRuleValues.Auto
+        });
+
+        // Left indent
+        if (style.LeftIndent != "0" && !string.IsNullOrEmpty(style.LeftIndent))
+            props.AppendChild(new Indentation { Left = style.LeftIndent });
+
+        return props;
     }
 
     /// <inheritdoc/>

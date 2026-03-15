@@ -73,4 +73,12 @@ public interface IStyleApplicator
     /// <param name="coverImageOverride">CLI override for cover image path (implicitly enables title page)</param>
     /// <returns>Title page style</returns>
     TitlePageStyle ApplyTitlePageStyle(ConversionConfiguration config, string inputFilePath, string? coverImageOverride = null);
+
+    /// <summary>
+    /// Apply style configuration for a fenced div block, inheriting font settings from the base paragraph style.
+    /// </summary>
+    /// <param name="divConfig">Fenced div class configuration from YAML</param>
+    /// <param name="styles">Full style configuration (used to inherit font size, color, and line spacing)</param>
+    /// <returns>Fenced div style</returns>
+    FencedDivStyle ApplyFencedDivStyle(FencedDivClassConfig divConfig, StyleConfiguration styles);
 }

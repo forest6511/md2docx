@@ -75,4 +75,11 @@ public sealed record TableStyle
     /// Values below 100 leave horizontal space around the table.
     /// </summary>
     public int WidthPercent { get; init; } = 90;
+
+    /// <summary>
+    /// Background color applied to all body cells in hex (e.g., "F2F2F2").
+    /// When set (e.g., when the table is inside a fenced div), overrides the default
+    /// transparent body cell background. Null or empty means no shading.
+    /// </summary>
+    public string? BodyCellBackgroundColor { get; init; }
 }

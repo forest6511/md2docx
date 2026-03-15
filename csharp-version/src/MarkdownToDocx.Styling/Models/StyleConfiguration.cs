@@ -5,6 +5,12 @@ namespace MarkdownToDocx.Styling.Models;
 /// </summary>
 public sealed record StyleConfiguration
 {
+    // Shared empty instance used as the default value for FencedDivs so that two
+    // `new StyleConfiguration()` instances compare equal (records use reference equality
+    // for Dictionary properties; sharing the same empty instance avoids false inequality).
+    private static readonly Dictionary<string, FencedDivClassConfig> EmptyFencedDivs = new();
+
+
     /// <summary>
     /// Style configuration for H1 headings
     /// </summary>
@@ -64,6 +70,13 @@ public sealed record StyleConfiguration
     /// Style configuration for tables
     /// </summary>
     public TableStyleConfig Table { get; init; } = new();
+
+    /// <summary>
+    /// Per-class style configuration for fenced div blocks (:::classname ... :::).
+    /// Keys are class names (e.g., "try", "hint"); values define background and border styles.
+    /// Unrecognized class names are rendered without any visual treatment.
+    /// </summary>
+    public Dictionary<string, FencedDivClassConfig> FencedDivs { get; init; } = EmptyFencedDivs;
 }
 
 /// <summary>
@@ -473,4 +486,55 @@ public sealed record ImageStyleConfig
     /// Horizontal alignment of the image paragraph ("left", "center", "right")
     /// </summary>
     public string Alignment { get; init; } = "center";
+}
+
+/// <summary>
+/// Per-class style configuration for a fenced div block (:::classname ... :::).
+/// </summary>
+public sealed record FencedDivClassConfig
+{
+    /// <summary>
+    /// Background fill color in hex (e.g., "F2F2F2"). Empty = no shading.
+    /// </summary>
+    public string BackgroundColor { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Top separator line color in hex (e.g., "AAAAAA"). Empty = no top border.
+    /// </summary>
+    public string BorderTopColor { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Top separator line thickness in eighths of a point (default: 4 = 0.5pt).
+    /// </summary>
+    public uint BorderTopSize { get; init; } = 4;
+
+    /// <summary>
+    /// Bottom separator line color in hex (e.g., "AAAAAA"). Empty = no bottom border.
+    /// </summary>
+    public string BorderBottomColor { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Bottom separator line thickness in eighths of a point (default: 4 = 0.5pt).
+    /// </summary>
+    public uint BorderBottomSize { get; init; } = 4;
+
+    /// <summary>
+    /// Space between separator line and text in points (default: 0).
+    /// </summary>
+    public uint BorderSpace { get; init; } = 0;
+
+    /// <summary>
+    /// Spacing before the div zone in twips.
+    /// </summary>
+    public string SpaceBefore { get; init; } = "0";
+
+    /// <summary>
+    /// Spacing after the div zone in twips.
+    /// </summary>
+    public string SpaceAfter { get; init; } = "0";
+
+    /// <summary>
+    /// Left indent for div paragraphs in twips.
+    /// </summary>
+    public string LeftIndent { get; init; } = "0";
 }
