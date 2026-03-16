@@ -40,11 +40,12 @@ public interface IDocumentBuilder : IDisposable
     void AddCodeBlock(string code, string? language, CodeBlockStyle style);
 
     /// <summary>
-    /// Adds a quote block to the document with inline formatting support
+    /// Adds a quote block to the document with structured content support.
+    /// Renders paragraphs and lists within the blockquote with quote styling.
     /// </summary>
-    /// <param name="runs">Structured inline runs (bold, italic, code) extracted from the quote block</param>
+    /// <param name="content">Structured child blocks extracted from the blockquote</param>
     /// <param name="style">Quote style configuration</param>
-    void AddQuote(IReadOnlyList<InlineRun> runs, QuoteStyle style);
+    void AddQuote(QuoteContent content, QuoteStyle style);
 
     /// <summary>
     /// Adds a title page with a cover image to the document.

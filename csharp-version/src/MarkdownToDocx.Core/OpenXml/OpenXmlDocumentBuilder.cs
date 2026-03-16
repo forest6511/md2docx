@@ -885,11 +885,31 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
     }
 
     /// <inheritdoc/>
-    public void AddQuote(IReadOnlyList<InlineRun> runs, QuoteStyle style)
+    public void AddQuote(QuoteContent content, QuoteStyle style)
     {
-        ArgumentNullException.ThrowIfNull(runs);
+        ArgumentNullException.ThrowIfNull(content);
         ArgumentNullException.ThrowIfNull(style);
 
+        foreach (var block in content.Blocks)
+        {
+            switch (block)
+            {
+                case QuoteParagraph p:
+                    AddQuoteParagraph(p.Runs, style);
+                    break;
+
+                case QuoteList l:
+                    AddQuoteList(l, style);
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Renders a paragraph inside a blockquote with quote styling.
+    /// </summary>
+    private void AddQuoteParagraph(IReadOnlyList<InlineRun> runs, QuoteStyle style)
+    {
         var paragraph = _body.AppendChild(new Paragraph());
         var paragraphProps = CreateQuoteParagraphProperties(style);
         paragraph.AppendChild(paragraphProps);
@@ -910,6 +930,32 @@ public sealed class OpenXmlDocumentBuilder : IDocumentBuilder
 
             run.AppendChild(runProps);
             run.AppendChild(new Text(inlineRun.Text) { Space = SpaceProcessingModeValues.Preserve });
+        }
+    }
+
+    /// <summary>
+    /// Renders a list inside a blockquote with quote styling on each item.
+    /// </summary>
+    private void AddQuoteList(QuoteList list, QuoteStyle style)
+    {
+        int itemNumber = list.StartNumber;
+        foreach (var item in list.Items)
+        {
+            var paragraph = _body.AppendChild(new Paragraph());
+            var paragraphProps = CreateQuoteParagraphProperties(style);
+            paragraph.AppendChild(paragraphProps);
+
+            var run = paragraph.AppendChild(new Run());
+            var runProps = CreateBaseRunProperties(
+                style.FontSize,
+                style.Color,
+                italic: style.Italic);
+            run.AppendChild(runProps);
+
+            string bullet = list.IsOrdered ? $"{itemNumber}. " : "\u2022 ";
+            run.AppendChild(new Text(bullet + item.Text) { Space = SpaceProcessingModeValues.Preserve });
+
+            if (list.IsOrdered) itemNumber++;
         }
     }
 
