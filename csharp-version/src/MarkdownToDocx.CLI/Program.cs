@@ -125,9 +125,9 @@ try
                     break;
 
                 case QuoteBlock quote:
-                    var quoteRuns = Helpers.GetQuoteRuns(quote);
+                    var quoteContent = Helpers.GetQuoteContent(quote);
                     var quoteStyle = styleApplicator.ApplyQuoteStyle(config.Styles);
-                    builder.AddQuote(quoteRuns, quoteStyle);
+                    builder.AddQuote(quoteContent, quoteStyle);
                     break;
 
                 case Table tableBlock:

@@ -139,24 +139,34 @@ public static class Helpers
         return runs;
     }
 
-    public static IReadOnlyList<InlineRun> GetQuoteRuns(QuoteBlock block)
+    public static QuoteContent GetQuoteContent(QuoteBlock block)
     {
-        var runs = new List<InlineRun>();
-        bool firstParagraph = true;
+        var blocks = new List<QuoteContentBlock>();
 
         foreach (var child in block)
         {
-            if (child is ParagraphBlock paragraph && paragraph.Inline != null)
+            switch (child)
             {
-                if (!firstParagraph)
-                    runs.Add(new InlineRun { Text = " " });
+                case ParagraphBlock paragraph:
+                    var runs = new List<InlineRun>();
+                    if (paragraph.Inline != null)
+                        ExtractInlineRuns(paragraph.Inline, runs, bold: false, italic: false);
+                    if (runs.Count > 0)
+                        blocks.Add(new QuoteParagraph { Runs = runs });
+                    break;
 
-                ExtractInlineRuns(paragraph.Inline, runs, bold: false, italic: false);
-                firstParagraph = false;
+                case ListBlock list:
+                    var items = GetListItems(list).ToList();
+                    if (items.Count > 0)
+                    {
+                        var startNumber = int.TryParse(list.OrderedStart, out var parsed) ? parsed : 1;
+                        blocks.Add(new QuoteList { Items = items, IsOrdered = list.IsOrdered, StartNumber = startNumber });
+                    }
+                    break;
             }
         }
 
-        return runs;
+        return new QuoteContent { Blocks = blocks };
     }
 
     /// <summary>

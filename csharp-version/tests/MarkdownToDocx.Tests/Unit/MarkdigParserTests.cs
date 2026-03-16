@@ -181,4 +181,53 @@ print('Hello')
         result.Should().Contain(b => b is FencedCodeBlock);
         result.Should().Contain(b => b is QuoteBlock);
     }
+
+    [Fact]
+    public void Parse_WithListInsideQuote_ShouldContainListBlockChild()
+    {
+        // Arrange — the exact pattern from issue #70
+        var markdown = "> - Item 1\n> - Item 2\n> - Item 3";
+
+        // Act
+        var result = _parser.Parse(markdown);
+
+        // Assert
+        result.Should().HaveCount(1);
+        var quoteBlock = result[0].Should().BeOfType<QuoteBlock>().Subject;
+        quoteBlock.Should().Contain(child => child is ListBlock);
+        var list = quoteBlock.OfType<ListBlock>().Single();
+        list.Count.Should().Be(3);
+        list.IsOrdered.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Parse_WithParagraphAndListInsideQuote_ShouldContainBoth()
+    {
+        // Arrange
+        var markdown = "> Summary text\n>\n> - Point A\n> - Point B";
+
+        // Act
+        var result = _parser.Parse(markdown);
+
+        // Assert
+        var quoteBlock = result.OfType<QuoteBlock>().Single();
+        quoteBlock.Should().Contain(child => child is ParagraphBlock);
+        quoteBlock.Should().Contain(child => child is ListBlock);
+    }
+
+    [Fact]
+    public void Parse_WithOrderedListInsideQuote_ShouldPreserveOrdering()
+    {
+        // Arrange
+        var markdown = "> 1. First\n> 2. Second";
+
+        // Act
+        var result = _parser.Parse(markdown);
+
+        // Assert
+        var quoteBlock = result.OfType<QuoteBlock>().Single();
+        var list = quoteBlock.OfType<ListBlock>().Single();
+        list.IsOrdered.Should().BeTrue();
+        list.Count.Should().Be(2);
+    }
 }

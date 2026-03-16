@@ -646,7 +646,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote(ToRuns("test"), style);
+        builder.AddQuote(ToQuoteContent("test"), style);
         builder.Save();
 
         // Assert
@@ -675,7 +675,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote(ToRuns("test"), style);
+        builder.AddQuote(ToQuoteContent("test"), style);
         builder.Save();
 
         // Assert
@@ -691,7 +691,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
     }
 
     [Fact]
-    public void AddQuote_WithNullRuns_ShouldThrowArgumentNullException()
+    public void AddQuote_WithNullContent_ShouldThrowArgumentNullException()
     {
         // Arrange
         using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
@@ -701,7 +701,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
-            .WithParameterName("runs");
+            .WithParameterName("content");
     }
 
     [Fact]
@@ -711,7 +711,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
 
         // Act
-        Action act = () => builder.AddQuote(ToRuns("Test quote"), null!);
+        Action act = () => builder.AddQuote(ToQuoteContent("Test quote"), null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -726,7 +726,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         var style = CreateDefaultQuoteStyle();
 
         // Act
-        builder.AddQuote(ToRuns("This is a quoted text."), style);
+        builder.AddQuote(ToQuoteContent("This is a quoted text."), style);
         builder.Save();
 
         // Assert
@@ -932,7 +932,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
             new CoreListItem { Text = "Point 2" }
         }, false, CreateDefaultListStyle());
         builder.AddCodeBlock("var example = true;", "csharp", CreateDefaultCodeBlockStyle());
-        builder.AddQuote(ToRuns("Important note"), CreateDefaultQuoteStyle());
+        builder.AddQuote(ToQuoteContent("Important note"), CreateDefaultQuoteStyle());
         builder.AddThematicBreak();
         builder.Save();
 
@@ -1797,7 +1797,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote(ToRuns("Quote without border"), style);
+        builder.AddQuote(ToQuoteContent("Quote without border"), style);
         builder.Save();
 
         // Assert
@@ -1829,7 +1829,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote(ToRuns("Quote with background"), style);
+        builder.AddQuote(ToQuoteContent("Quote with background"), style);
         builder.Save();
 
         // Assert
@@ -1859,7 +1859,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote(ToRuns("Minimal quote"), style);
+        builder.AddQuote(ToQuoteContent("Minimal quote"), style);
         builder.Save();
 
         // Assert
@@ -1886,7 +1886,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote(runs, style);
+        builder.AddQuote(ToQuoteContent(runs), style);
         builder.Save();
 
         // Assert
@@ -1916,7 +1916,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote(runs, style);
+        builder.AddQuote(ToQuoteContent(runs), style);
         builder.Save();
 
         // Assert
@@ -1952,7 +1952,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote(ToRuns("Padded quote"), style);
+        builder.AddQuote(ToQuoteContent("Padded quote"), style);
         builder.Save();
 
         // Assert: top/right/bottom invisible borders should be present with background color
@@ -1987,7 +1987,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote(ToRuns("No padding without background"), style);
+        builder.AddQuote(ToQuoteContent("No padding without background"), style);
         builder.Save();
 
         // Assert: no borders rendered when ShowBorder=false and no BackgroundColor
@@ -1995,6 +1995,132 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         using var doc = WordprocessingDocument.Open(_stream, false);
         var paragraph = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().First();
         paragraph.ParagraphProperties?.ParagraphBorders.Should().BeNull();
+    }
+
+    [Fact]
+    public void AddQuote_WithUnorderedList_ShouldRenderBulletItems()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultQuoteStyle();
+        var content = new QuoteContent
+        {
+            Blocks =
+            [
+                new QuoteList
+                {
+                    Items = [new CoreListItem { Text = "Item 1" }, new CoreListItem { Text = "Item 2" }],
+                    IsOrdered = false
+                }
+            ]
+        };
+
+        // Act
+        builder.AddQuote(content, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        paragraphs.Should().HaveCount(2);
+        var texts = paragraphs.Select(p => string.Join("", p.Descendants<Text>().Select(t => t.Text))).ToList();
+        texts[0].Should().Contain("\u2022 Item 1");
+        texts[1].Should().Contain("\u2022 Item 2");
+
+        // Each item should have quote styling (border, indentation)
+        foreach (var p in paragraphs)
+        {
+            p.ParagraphProperties?.ParagraphBorders.Should().NotBeNull();
+            p.ParagraphProperties?.GetFirstChild<Indentation>()?.Left?.Value.Should().Be("720");
+        }
+    }
+
+    [Fact]
+    public void AddQuote_WithOrderedList_ShouldRenderNumberedItems()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultQuoteStyle();
+        var content = new QuoteContent
+        {
+            Blocks =
+            [
+                new QuoteList
+                {
+                    Items = [new CoreListItem { Text = "First" }, new CoreListItem { Text = "Second" }],
+                    IsOrdered = true,
+                    StartNumber = 1
+                }
+            ]
+        };
+
+        // Act
+        builder.AddQuote(content, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var texts = doc.MainDocumentPart!.Document.Body!
+            .Elements<Paragraph>()
+            .Select(p => string.Join("", p.Descendants<Text>().Select(t => t.Text)))
+            .ToList();
+        texts[0].Should().Contain("1. First");
+        texts[1].Should().Contain("2. Second");
+    }
+
+    [Fact]
+    public void AddQuote_WithMixedParagraphAndList_ShouldRenderBoth()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultQuoteStyle();
+        var content = new QuoteContent
+        {
+            Blocks =
+            [
+                new QuoteParagraph { Runs = ToRuns("Summary:") },
+                new QuoteList
+                {
+                    Items = [new CoreListItem { Text = "Point A" }, new CoreListItem { Text = "Point B" }],
+                    IsOrdered = false
+                }
+            ]
+        };
+
+        // Act
+        builder.AddQuote(content, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        paragraphs.Should().HaveCount(3);
+        var allText = string.Join(" ", paragraphs.Select(p => string.Join("", p.Descendants<Text>().Select(t => t.Text))));
+        allText.Should().Contain("Summary:");
+        allText.Should().Contain("Point A");
+        allText.Should().Contain("Point B");
+    }
+
+    [Fact]
+    public void AddQuote_WithEmptyContent_ShouldNotAddParagraphs()
+    {
+        // Arrange
+        using var builder = new OpenXmlDocumentBuilder(_stream, _horizontalProvider);
+        var style = CreateDefaultQuoteStyle();
+        var content = new QuoteContent { Blocks = [] };
+
+        // Act
+        builder.AddQuote(content, style);
+        builder.Save();
+
+        // Assert
+        _stream.Position = 0;
+        using var doc = WordprocessingDocument.Open(_stream, false);
+        var paragraphs = doc.MainDocumentPart!.Document.Body!.Elements<Paragraph>().ToList();
+        paragraphs.Should().BeEmpty();
     }
 
     [Fact]
@@ -2163,7 +2289,7 @@ public class OpenXmlDocumentBuilderTests : IDisposable
         };
 
         // Act
-        builder.AddQuote(runs, style);
+        builder.AddQuote(ToQuoteContent(runs), style);
         builder.Save();
 
         // Assert
@@ -2562,6 +2688,12 @@ public class OpenXmlDocumentBuilderTests : IDisposable
 
     private static List<InlineRun> ToRuns(string text) =>
         new List<InlineRun> { new InlineRun { Text = text } };
+
+    private static QuoteContent ToQuoteContent(IReadOnlyList<InlineRun> runs) =>
+        new QuoteContent { Blocks = [new QuoteParagraph { Runs = runs }] };
+
+    private static QuoteContent ToQuoteContent(string text) =>
+        ToQuoteContent(ToRuns(text));
 
     // ── Table tests ────────────────────────────────────────────────────────
 
